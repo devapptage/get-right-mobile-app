@@ -1,0 +1,292 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_right/controllers/auth_controller.dart';
+import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/theme/color_constants.dart';
+import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/widgets/common/app_logo.dart';
+import 'package:get_right/widgets/common/custom_button.dart';
+import 'package:get_right/widgets/common/custom_text_field.dart';
+
+/// Modern login screen with premium design and enhanced UX
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _rememberMe = false;
+
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupAnimations();
+  }
+
+  void _setupAnimations() {
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _login() {
+    final authController = Get.find<AuthController>();
+    authController.login(email: _emailController.text.trim(), password: _passwordController.text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(center: Alignment.topRight, radius: 1.2, colors: [AppColors.accent.withOpacity(0.05), AppColors.background]),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+
+                    // Logo with modern styling
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: LinearGradient(colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
+                          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
+                          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
+                        ),
+                        child: const AppLogo(size: 100, borderRadius: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+
+                    // Welcome text with modern typography
+                    Text(
+                      'Welcome Back!',
+                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 36, fontWeight: FontWeight.w800, letterSpacing: -1),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Login to continue your fitness journey',
+                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
+                    ),
+                    const SizedBox(height: 48),
+
+                    // Email field
+                    CustomTextField(
+                      controller: _emailController,
+                      labelText: 'Email Address',
+                      hintText: 'Enter your email',
+                      keyboardType: TextInputType.emailAddress,
+                      prefixIcon: const Icon(Icons.email_outlined),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Password field
+                    PasswordTextField(controller: _passwordController),
+                    const SizedBox(height: 16),
+
+                    // Remember Me and Forgot Password row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Remember Me checkbox
+                        InkWell(
+                          onTap: () => setState(() => _rememberMe = !_rememberMe),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: _rememberMe ? AppColors.accent : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(color: _rememberMe ? AppColors.accent : AppColors.primaryGray.withOpacity(0.5), width: 2),
+                                  ),
+                                  child: _rememberMe ? const Icon(Icons.check_rounded, size: 14, color: AppColors.onAccent) : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Remember Me',
+                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Forgot password
+                        TextButton(
+                          onPressed: () => Get.toNamed(AppRoutes.forgotPassword),
+                          style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
+                          child: Text(
+                            'Forgot Password?',
+                            style: AppTextStyles.labelLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Login button
+                    GetBuilder<AuthController>(
+                      builder: (controller) {
+                        return CustomButton(text: 'Login', onPressed: _login, isLoading: controller.isLoading);
+                      },
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Divider with "OR"
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AppColors.primaryGray.withOpacity(0.3)])),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'OR',
+                            style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(gradient: LinearGradient(colors: [AppColors.primaryGray.withOpacity(0.3), Colors.transparent])),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Social login buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSocialButton(
+                            icon: Icons.g_mobiledata_rounded,
+                            label: 'Google',
+                            onPressed: () {
+                              // TODO: Implement Google login
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildSocialButton(
+                            icon: Icons.apple_rounded,
+                            label: 'Apple',
+                            onPressed: () {
+                              // TODO: Implement Apple login
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildSocialButton(
+                            icon: Icons.facebook_rounded,
+                            label: 'Facebook',
+                            onPressed: () {
+                              // TODO: Implement Facebook login
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 48),
+
+                    // Sign up link
+                    Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Don\'t have an account? ', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15)),
+                          TextButton(
+                            onPressed: () => Get.toNamed(AppRoutes.signup),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text(
+                              'Sign Up',
+                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700, fontSize: 15),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({required IconData icon, required String label, required VoidCallback onPressed}) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1.5),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 26, color: AppColors.onBackground),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: AppTextStyles.labelSmall.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
