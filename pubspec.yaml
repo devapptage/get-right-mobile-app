@@ -48,10 +48,17 @@ dependencies:
   geolocator: ^12.0.0  # GPS for run tracking
   flutter_map: ^7.0.2  # Map visualization
   latlong2: ^0.9.1  # Latitude/Longitude utilities
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/applogo.jpg"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
