@@ -33,6 +33,7 @@ class AppRoutes {
   static const String calendar = '/calendar';
   static const String progress = '/progress';
   static const String runTracker = '/run-tracker';
+  static const String runTracking = '/run-tracking'; // Live GPS tracking
   static const String runHistory = '/run-history';
   static const String runDetail = '/run-detail';
 

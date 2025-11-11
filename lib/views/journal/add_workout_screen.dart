@@ -7,7 +7,7 @@ import 'package:get_right/utils/validators.dart';
 import 'package:get_right/widgets/common/custom_button.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
 
-/// Add workout screen
+/// Add workout screen - Redesigned to match app theme
 class AddWorkoutScreen extends StatefulWidget {
   const AddWorkoutScreen({super.key});
 
@@ -36,7 +36,20 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   }
 
   Future<void> _selectDate() async {
-    final date = await showDatePicker(context: context, initialDate: _selectedDate, firstDate: DateTime(2020), lastDate: DateTime.now());
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(primary: AppColors.accent, onPrimary: AppColors.onAccent, surface: AppColors.surface, onSurface: AppColors.onSurface),
+          ),
+          child: child!,
+        );
+      },
+    );
     if (date != null) {
       setState(() {
         _selectedDate = date;
@@ -47,14 +60,70 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   void _saveWorkout() {
     if (_formKey.currentState!.validate()) {
       // TODO: Save workout
+      Get.snackbar(
+        'Success',
+        'Workout logged successfully!',
+        backgroundColor: AppColors.accent,
+        colorText: AppColors.onAccent,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
       Get.back();
     }
+  }
+
+  void _showPhotoOptions() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Add Progress Photo', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface)),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.camera_alt, color: AppColors.accent),
+              ),
+              title: Text('Take Photo', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+              onTap: () {
+                Get.back();
+                // TODO: Implement camera
+              },
+            ),
+            ListTile(
+              leading: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.photo_library, color: AppColors.completed),
+              ),
+              title: Text('Choose from Gallery', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+              onTap: () {
+                Get.back();
+                // TODO: Implement gallery picker
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Workout')),
+      appBar: AppBar(
+        title: Text('Log Workout', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -62,101 +131,238 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Exercise name
-              CustomTextField(
-                controller: _exerciseController,
-                labelText: 'Exercise Name',
-                hintText: 'e.g., Bench Press',
-                validator: (value) => Validators.validateRequired(value, 'Exercise name'),
-              ),
+              // Exercise Details Section
+              _buildSectionHeader('Exercise Details', Icons.fitness_center),
               const SizedBox(height: 16),
-
-              // Sets, Reps, Weight
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      controller: _setsController,
-                      labelText: 'Sets',
-                      keyboardType: TextInputType.number,
-                      validator: (value) => Validators.validatePositiveNumber(value, fieldName: 'Sets'),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.primaryGray, width: 1),
+                ),
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      controller: _exerciseController,
+                      labelText: 'Exercise Name',
+                      hintText: 'e.g., Bench Press',
+                      prefixIcon: const Icon(Icons.fitness_center),
+                      validator: (value) => Validators.validateRequired(value, 'Exercise name'),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomTextField(
-                      controller: _repsController,
-                      labelText: 'Reps',
-                      keyboardType: TextInputType.number,
-                      validator: (value) => Validators.validatePositiveNumber(value, fieldName: 'Reps'),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            controller: _setsController,
+                            labelText: 'Sets',
+                            keyboardType: TextInputType.number,
+                            prefixIcon: const Icon(Icons.repeat),
+                            validator: (value) => Validators.validatePositiveNumber(value, fieldName: 'Sets'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: CustomTextField(
+                            controller: _repsController,
+                            labelText: 'Reps',
+                            keyboardType: TextInputType.number,
+                            prefixIcon: const Icon(Icons.numbers),
+                            validator: (value) => Validators.validatePositiveNumber(value, fieldName: 'Reps'),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomTextField(controller: _weightController, labelText: 'Weight (kg)', keyboardType: TextInputType.number),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      controller: _weightController,
+                      labelText: 'Weight (kg)',
+                      hintText: 'Optional',
+                      keyboardType: TextInputType.number,
+                      prefixIcon: const Icon(Icons.scale),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-              // Date
-              CustomTextField(
-                labelText: 'Date',
-                hintText: 'Select date',
-                readOnly: true,
+              // Date Section
+              _buildSectionHeader('Date & Time', Icons.calendar_today),
+              const SizedBox(height: 12),
+              GestureDetector(
                 onTap: _selectDate,
-                controller: TextEditingController(text: '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}'),
-                prefixIcon: const Icon(Icons.calendar_today),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.accent, width: 2),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.calendar_today, color: AppColors.accent, size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Workout Date', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${_selectedDate.day} ${_getMonthName(_selectedDate.month)} ${_selectedDate.year}',
+                              style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.edit, color: AppColors.accent, size: 20),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-              // Tags - White on black
-              Text('Tags', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: AppConstants.workoutTags.map((tag) {
-                  final isSelected = _selectedTags.contains(tag);
-                  return FilterChip(
-                    label: Text(tag),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedTags.add(tag);
-                        } else {
-                          _selectedTags.remove(tag);
-                        }
-                      });
-                    },
-                    selectedColor: AppColors.secondary, // Green (secondary) when selected
-                    labelStyle: TextStyle(color: isSelected ? AppColors.onSecondary : AppColors.onBackground), // White on green, white otherwise
-                  );
-                }).toList(),
+              // Tags Section
+              _buildSectionHeader('Tags', Icons.label_outline),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.primaryGray, width: 1),
+                ),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: AppConstants.workoutTags.map((tag) {
+                    final isSelected = _selectedTags.contains(tag);
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (isSelected) {
+                            _selectedTags.remove(tag);
+                          } else {
+                            _selectedTags.add(tag);
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.accent : AppColors.primaryVariant,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
+                        ),
+                        child: Text(
+                          tag,
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: isSelected ? AppColors.onAccent : AppColors.onBackground,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-              // Notes
-              CustomTextField(controller: _notesController, labelText: 'Notes (Optional)', hintText: 'Add any additional notes', maxLines: 3),
-              const SizedBox(height: 16),
-
-              // Add photo button
-              OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Add photo
-                },
-                icon: const Icon(Icons.camera_alt),
-                label: const Text('Add Progress Photo'),
+              // Notes Section
+              _buildSectionHeader('Notes', Icons.edit_note),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.primaryGray, width: 1),
+                ),
+                child: CustomTextField(
+                  controller: _notesController,
+                  labelText: 'Additional Notes',
+                  hintText: 'How did it feel? Any observations?',
+                  maxLines: 4,
+                  prefixIcon: const Icon(Icons.notes),
+                ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Save button
+              // Progress Photo Section
+              _buildSectionHeader('Progress Photo', Icons.photo_camera),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: _showPhotoOptions,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGray, width: 1, style: BorderStyle.solid),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
+                        child: const Icon(Icons.add_a_photo, color: AppColors.accent, size: 36),
+                      ),
+                      const SizedBox(height: 16),
+                      Text('Add Progress Photo', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      Text('Optional - Track your progress visually', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // Action Buttons
               CustomButton(text: 'Save Workout', onPressed: _saveWorkout),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.primaryGray, width: 2),
+                    foregroundColor: AppColors.onBackground,
+                  ),
+                  child: Text('Cancel', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onBackground)),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+          child: Icon(icon, color: AppColors.accent, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Text(title, style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
+      ],
+    );
+  }
+
+  String _getMonthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
   }
 }

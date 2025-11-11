@@ -95,24 +95,15 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Logo with scale animation and shimmer
-                      ScaleTransition(
-                        scale: _scaleAnimation,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Glow effect
-                            Container(
-                              width: 180,
-                              height: 180,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 60, spreadRadius: 20)],
-                              ),
-                            ),
-                            // Logo
-                            const AppLogo(size: 160, borderRadius: 32, showShadow: true),
-                          ],
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          gradient: LinearGradient(colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
+                          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
+                          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 30, spreadRadius: 5, offset: const Offset(0, 10))],
                         ),
+                        child: const AppLogo(size: 120, borderRadius: 20),
                       ),
                       const SizedBox(height: 48),
 

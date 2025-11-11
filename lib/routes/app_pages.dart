@@ -12,14 +12,21 @@ import 'package:get_right/views/auth/profile_setup_screen.dart';
 import 'package:get_right/views/auth/terms_conditions_screen.dart';
 import 'package:get_right/views/auth/privacy_policy_screen.dart';
 import 'package:get_right/views/home/home_screen.dart';
+import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/views/profile/edit_profile_screen.dart';
 import 'package:get_right/views/journal/journal_screen.dart';
 import 'package:get_right/views/journal/add_workout_screen.dart';
 import 'package:get_right/views/tracker/tracker_screen.dart';
+import 'package:get_right/views/tracker/run_tracker_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/settings/settings_screen.dart';
+import 'package:get_right/views/settings/notifications_screen.dart';
+import 'package:get_right/views/settings/help_feedback_screen.dart';
+import 'package:get_right/views/settings/about_screen.dart';
+import 'package:get_right/views/chat/chat_list_screen.dart';
+import 'package:get_right/views/tracker/progress_screen.dart';
 
 /// App Pages - GetX route configuration
 class AppPages {
@@ -43,6 +50,7 @@ class AppPages {
 
     // Main App Pages
     GetPage(name: AppRoutes.home, page: () => const HomeScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.dashboard, page: () => const DashboardScreen(), transition: Transition.fade),
 
     // Profile Pages
     GetPage(name: AppRoutes.profile, page: () => const ProfileScreen(), transition: Transition.rightToLeft),
@@ -54,6 +62,9 @@ class AppPages {
 
     // Tracker Pages
     GetPage(name: AppRoutes.tracker, page: () => const TrackerScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.runTracker, page: () => const RunTrackerScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.runTracking, page: () => const RunTrackerScreen(), transition: Transition.rightToLeft), // TODO: Create live tracking screen
+    GetPage(name: AppRoutes.progress, page: () => const ProgressScreen(), transition: Transition.rightToLeft),
 
     // Planner Pages
     GetPage(name: AppRoutes.planner, page: () => const PlannerScreen(), transition: Transition.fade),
@@ -61,7 +72,13 @@ class AppPages {
     // Marketplace Pages
     GetPage(name: AppRoutes.marketplace, page: () => const MarketplaceScreen(), transition: Transition.fade),
 
+    // Chat Pages
+    GetPage(name: AppRoutes.chatList, page: () => const ChatListScreen(), transition: Transition.rightToLeft),
+
     // Settings Pages
     GetPage(name: AppRoutes.settings, page: () => const SettingsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.notifications, page: () => const NotificationsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.helpFeedback, page: () => const HelpFeedbackScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.about, page: () => const AboutScreen(), transition: Transition.rightToLeft),
   ];
 }

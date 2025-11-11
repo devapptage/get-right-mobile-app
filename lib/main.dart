@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get_right/theme/app_theme.dart';
 import 'package:get_right/routes/app_pages.dart';
+import 'package:get_right/services/storage_service.dart';
+import 'package:get_right/controllers/auth_controller.dart';
 
-void main() {
+void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -15,7 +17,20 @@ void main() {
   // Set preferred orientations
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
+  // Initialize services
+  await initServices();
+
   runApp(const GetRightApp());
+}
+
+/// Initialize all required services
+Future<void> initServices() async {
+  // Initialize StorageService
+  final storageService = await StorageService.getInstance();
+  Get.put(storageService);
+
+  // Initialize AuthController
+  Get.put(AuthController(storageService));
 }
 
 class GetRightApp extends StatelessWidget {

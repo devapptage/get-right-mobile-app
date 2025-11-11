@@ -216,8 +216,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
             children: [
               // Icon with modern card design
               Container(
-                width: 200,
-                height: 200,
+                width: 150,
+                height: 150,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(40),
                   gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
@@ -226,13 +226,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                 ),
                 child: Center(
                   child: Container(
-                    width: 100,
-                    height: 100,
+                    width: 70,
+                    height: 70,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(colors: [page.accentColor, page.accentColor.withOpacity(0.8)]),
                     ),
-                    child: Icon(page.icon, size: 50, color: AppColors.onAccent),
+                    child: Icon(page.icon, size: 40, color: AppColors.onAccent),
                   ),
                 ),
               ),
