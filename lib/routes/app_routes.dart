@@ -27,6 +27,9 @@ class AppRoutes {
   static const String addWorkout = '/add-workout';
   static const String editWorkout = '/edit-workout';
   static const String workoutDetail = '/workout-detail';
+  static const String logRun = '/log-run';
+  static const String logMeal = '/log-meal';
+  static const String writeNote = '/write-note';
 
   // Tracker Routes
   static const String tracker = '/tracker';

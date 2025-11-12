@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Planner screen - workout plans and calendar with color-coded entries
 class PlannerScreen extends StatefulWidget {
@@ -105,11 +106,11 @@ class _PlannerScreenState extends State<PlannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
         ),
         title: Text('Workout Planner', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
@@ -246,6 +247,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'planner_fab',
         onPressed: _showAddWorkoutDialog,
         backgroundColor: AppColors.accent,
         foregroundColor: AppColors.onAccent,

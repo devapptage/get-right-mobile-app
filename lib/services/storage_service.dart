@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_right/constants/app_constants.dart';
+import 'package:get_right/models/run_model.dart';
 
 /// Local storage service using SharedPreferences
 class StorageService {
@@ -149,5 +151,96 @@ class StorageService {
     await remove(AppConstants.keyUserEmail);
     await remove(AppConstants.keyUserName);
     return await saveBool(AppConstants.keyIsLoggedIn, false);
+  }
+
+  // Run tracking methods
+
+  /// Save runs list
+  Future<bool> saveRuns(List<RunModel> runs) async {
+    final jsonList = runs.map((run) => json.encode(run.toJson())).toList();
+    return await saveStringList('user_runs', jsonList);
+  }
+
+  /// Get runs list
+  Future<List<RunModel>> getRuns() async {
+    final jsonList = getStringList('user_runs') ?? [];
+    return jsonList.map((jsonStr) => RunModel.fromJson(json.decode(jsonStr))).toList();
+  }
+
+  /// Get runs for specific date
+  Future<List<RunModel>> getRunsForDate(DateTime date) async {
+    final allRuns = await getRuns();
+    return allRuns.where((run) {
+      return run.startTime.year == date.year && run.startTime.month == date.month && run.startTime.day == date.day;
+    }).toList();
+  }
+
+  /// Get total runs count
+  Future<int> getTotalRunsCount() async {
+    final runs = await getRuns();
+    return runs.length;
+  }
+
+  /// Get total distance in meters
+  Future<double> getTotalDistance() async {
+    final runs = await getRuns();
+    double total = 0.0;
+    for (final run in runs) {
+      total += run.distanceMeters;
+    }
+    return total;
+  }
+
+  // Journal sync methods
+
+  /// Sync run to journal as a workout activity
+  Future<bool> syncRunToJournal(RunModel run) async {
+    try {
+      // Store run ID in synced runs list
+      final syncedRuns = getStringList('synced_runs_to_journal') ?? [];
+      if (!syncedRuns.contains(run.id)) {
+        syncedRuns.add(run.id);
+        await saveStringList('synced_runs_to_journal', syncedRuns);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Check if run is synced to journal
+  bool isRunSyncedToJournal(String runId) {
+    final syncedRuns = getStringList('synced_runs_to_journal') ?? [];
+    return syncedRuns.contains(runId);
+  }
+
+  // Calendar sync methods
+
+  /// Sync run to calendar
+  Future<bool> syncRunToCalendar(RunModel run) async {
+    try {
+      // Store run ID in synced runs list for calendar
+      final syncedRuns = getStringList('synced_runs_to_calendar') ?? [];
+      if (!syncedRuns.contains(run.id)) {
+        syncedRuns.add(run.id);
+        await saveStringList('synced_runs_to_calendar', syncedRuns);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Check if run is synced to calendar
+  bool isRunSyncedToCalendar(String runId) {
+    final syncedRuns = getStringList('synced_runs_to_calendar') ?? [];
+    return syncedRuns.contains(runId);
+  }
+
+  /// Auto-sync run to both journal and calendar
+  Future<bool> autoSyncRun(RunModel run) async {
+    final journalSync = await syncRunToJournal(run);
+    final calendarSync = await syncRunToCalendar(run);
+    return journalSync && calendarSync;
   }
 }

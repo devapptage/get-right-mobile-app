@@ -17,8 +17,14 @@ import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/views/profile/edit_profile_screen.dart';
 import 'package:get_right/views/journal/journal_screen.dart';
 import 'package:get_right/views/journal/add_workout_screen.dart';
+import 'package:get_right/views/journal/log_run_screen.dart';
+import 'package:get_right/views/journal/log_meal_screen.dart';
+import 'package:get_right/views/journal/write_note_screen.dart';
 import 'package:get_right/views/tracker/tracker_screen.dart';
 import 'package:get_right/views/tracker/run_tracker_screen.dart';
+import 'package:get_right/views/tracker/active_run_screen.dart';
+import 'package:get_right/views/tracker/run_summary_screen.dart';
+import 'package:get_right/views/tracker/run_history_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/settings/settings_screen.dart';
@@ -59,11 +65,16 @@ class AppPages {
     // Journal Pages
     GetPage(name: AppRoutes.journal, page: () => const JournalScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.addWorkout, page: () => const AddWorkoutScreen(), transition: Transition.downToUp),
+    GetPage(name: AppRoutes.logRun, page: () => const LogRunScreen(), transition: Transition.downToUp),
+    GetPage(name: AppRoutes.logMeal, page: () => const LogMealScreen(), transition: Transition.downToUp),
+    GetPage(name: AppRoutes.writeNote, page: () => const WriteNoteScreen(), transition: Transition.downToUp),
 
     // Tracker Pages
     GetPage(name: AppRoutes.tracker, page: () => const TrackerScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.runTracker, page: () => const RunTrackerScreen(), transition: Transition.fade),
-    GetPage(name: AppRoutes.runTracking, page: () => const RunTrackerScreen(), transition: Transition.rightToLeft), // TODO: Create live tracking screen
+    GetPage(name: AppRoutes.runTracking, page: () => const ActiveRunScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.runHistory, page: () => const RunHistoryScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.runDetail, page: () => const RunSummaryScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.progress, page: () => const ProgressScreen(), transition: Transition.rightToLeft),
 
     // Planner Pages

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Marketplace screen - browse trainer programs
 class MarketplaceScreen extends StatefulWidget {
@@ -458,11 +460,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
         ),
         title: Text('Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,

@@ -23,11 +23,11 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
         ),
         title: Text('Get Right', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
@@ -289,10 +289,15 @@ class DashboardScreen extends StatelessWidget {
 /// Controller for managing home navigation
 class HomeNavigationController extends GetxController {
   final _currentIndex = 0.obs;
+  GlobalKey<ScaffoldState>? scaffoldKey;
 
   int get currentIndex => _currentIndex.value;
 
   void changeTab(int index) {
     _currentIndex.value = index;
+  }
+
+  void openDrawer() {
+    scaffoldKey?.currentState?.openDrawer();
   }
 }

@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeNavigationController _navController;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _screens = const [
     DashboardScreen(), // Home
@@ -32,12 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Initialize navigation controller
     _navController = Get.put(HomeNavigationController());
+    // Store scaffold key in controller for global access
+    _navController.scaffoldKey = _scaffoldKey;
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
+        key: _scaffoldKey,
         drawer: const AppDrawer(), // Professional app drawer
         body: IndexedStack(index: _navController.currentIndex, children: _screens),
         bottomNavigationBar: _buildProfessionalBottomNav(),

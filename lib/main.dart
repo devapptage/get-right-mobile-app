@@ -7,6 +7,13 @@ import 'package:get_right/routes/app_pages.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 
+// Stub for Firebase Messaging background handler (to prevent errors if Firebase tries to initialize)
+@pragma('vm:entry-point')
+void _firebaseMessagingBackgroundHandler(dynamic message) async {
+  // This is a stub to prevent Firebase initialization errors
+  // Firebase is not currently used in this app
+}
+
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();

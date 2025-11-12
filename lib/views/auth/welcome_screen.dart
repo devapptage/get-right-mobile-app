@@ -131,7 +131,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
                       child: Column(
                         children: [
                           // Sign Up Button (Primary)
-                          CustomButton(text: 'Sign IN', onPressed: _navigateToSignIn, icon: const Icon(Icons.arrow_forward_rounded)),
+                          CustomButton(text: 'Sign In', onPressed: _navigateToSignIn, icon: const Icon(Icons.arrow_forward_rounded)),
                           const SizedBox(height: 16),
 
                           // Sign In Button (Outline)

@@ -1,22 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get_right/controllers/run_tracking_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/services/gps_service.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Run Tracker - GPS tracking and run history
-class RunTrackerScreen extends StatelessWidget {
+class RunTrackerScreen extends StatefulWidget {
   const RunTrackerScreen({super.key});
+
+  @override
+  State<RunTrackerScreen> createState() => _RunTrackerScreenState();
+}
+
+class _RunTrackerScreenState extends State<RunTrackerScreen> {
+  final RunTrackingController _trackingController = Get.put(RunTrackingController());
+  GoogleMapController? _mapController;
+  int _totalRuns = 0;
+  double _totalDistance = 0.0;
+  bool _mapLoadError = false;
+  bool _isMapCreated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+    _initializeLocation();
+    // Listen to position updates and update camera only
+    ever(_trackingController.currentPosition, (position) {
+      if (position != null && _mapController != null && _isMapCreated && mounted) {
+        _updateCameraPosition(position);
+      }
+    });
+  }
+
+  /// Initialize location with proper error handling
+  Future<void> _initializeLocation() async {
+    try {
+      final gpsService = GpsService.getInstance();
+
+      // Check if location services are enabled
+      final serviceEnabled = await gpsService.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          Get.snackbar(
+            'Location Disabled',
+            'Please enable location services to use the Run Tracker',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 5),
+            mainButton: TextButton(onPressed: () => gpsService.openLocationSettings(), child: const Text('Open Settings')),
+          );
+        }
+        return;
+      }
+
+      // Check and request permission if needed
+      var permission = await gpsService.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await gpsService.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            Get.snackbar('Permission Required', 'Location permission is required to track your runs', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 5));
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          Get.snackbar(
+            'Permission Denied',
+            'Please enable location permission in app settings',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 5),
+            mainButton: TextButton(onPressed: () => gpsService.openAppSettings(), child: const Text('Open Settings')),
+          );
+        }
+        return;
+      }
+
+      // Get current location
+      final position = await gpsService.getCurrentLocation();
+      if (position != null && mounted) {
+        _trackingController.currentPosition.value = position;
+        debugPrint('✅ Location initialized: ${position.latitude}, ${position.longitude}');
+      } else {
+        debugPrint('❌ Failed to get location');
+      }
+    } catch (e) {
+      debugPrint('❌ Location initialization error: $e');
+      if (mounted) {
+        Get.snackbar('Location Error', 'Failed to initialize location: $e', snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 3));
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _isMapCreated = false;
+    _mapController?.dispose();
+    _mapController = null;
+    super.dispose();
+  }
+
+  /// Update camera position without rebuilding the map
+  void _updateCameraPosition(position) {
+    if (_mapController != null && _isMapCreated) {
+      _mapController!.animateCamera(CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)));
+    }
+  }
+
+  Future<void> _loadStats() async {
+    final storageService = Get.find<StorageService>();
+    final runsCount = await storageService.getTotalRunsCount();
+    final distance = await storageService.getTotalDistance();
+    setState(() {
+      _totalRuns = runsCount;
+      _totalDistance = distance;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
+          onPressed: () {
+            Get.find<HomeNavigationController>().openDrawer();
+          },
         ),
         title: Text('Run Tracker', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
@@ -24,94 +141,393 @@ class RunTrackerScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.history, color: AppColors.onPrimary),
             onPressed: () {
-              // TODO: Show run history
+              Get.toNamed(AppRoutes.runHistory);
             },
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Run icon
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
-              child: const Icon(Icons.directions_run, size: 60, color: AppColors.accent),
-            ),
-            const SizedBox(height: 32),
+            // Map Preview
+            _buildMapPreview(),
 
-            // Title
-            Text('Ready to Run?', style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground)),
-            const SizedBox(height: 12),
-            Text(
-              'Track your distance, pace, route, and elevation in real-time',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 40),
+            // Ready to Run Card
+            _buildReadyCard(),
 
-            // Quick Stats Preview
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primaryGray, width: 1),
+            // Stats Section
+            _buildStatsSection(),
+
+            // Action Buttons
+            _buildActionButtons(),
+
+            // Features List
+            _buildFeaturesList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build map preview with Google Maps
+  Widget _buildMapPreview() {
+    return Obx(() {
+      final position = _trackingController.currentPosition.value;
+      final hasPosition = position != null;
+
+      debugPrint('🗺️ Building map preview - hasPosition: $hasPosition, mapError: $_mapLoadError');
+
+      return Container(
+        height: 320,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+        ),
+        child: Stack(
+          children: [
+            // Google Map layer - only build once when position is available
+            hasPosition
+                ? _mapLoadError
+                      ? _buildMapErrorState(position)
+                      : _buildGoogleMapWidget(position)
+                : Container(
+                    color: AppColors.surface,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), shape: BoxShape.circle),
+                            child: const Icon(Icons.location_searching, size: 40, color: AppColors.accent),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Finding your location...',
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(color: AppColors.accent, strokeWidth: 3)),
+                        ],
+                      ),
+                    ),
+                  ),
+
+            // Top overlay with gradient
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.black.withOpacity(0.6), AppColors.black.withOpacity(0)]),
+                ),
               ),
-              child: Column(
+            ),
+
+            // Map info badge
+            if (hasPosition)
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.black.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.accent.withOpacity(0.5), width: 1.5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.gps_fixed, color: AppColors.accent, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        'GPS Ready',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // Bottom border accent
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 3,
+                decoration: BoxDecoration(gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0), AppColors.accent, AppColors.accent.withOpacity(0)])),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  /// Build Google Map widget with error handling - only builds once
+  Widget _buildGoogleMapWidget(position) {
+    // Only log on first build
+    if (!_isMapCreated) {
+      debugPrint('🗺️ Building GoogleMap widget - Position: ${position.latitude}, ${position.longitude}');
+    }
+
+    try {
+      return GoogleMap(
+        key: const ValueKey('static_google_map'), // Static key prevents rebuilds
+        initialCameraPosition: CameraPosition(target: LatLng(position.latitude, position.longitude), zoom: 15),
+        onMapCreated: (controller) {
+          debugPrint('✅ Map created successfully');
+          if (!_isMapCreated || _mapController == null) {
+            _mapController = controller;
+            _isMapCreated = true;
+            try {
+              _setMapStyle(controller);
+              debugPrint('✅ Map style applied');
+            } catch (e) {
+              debugPrint('⚠️ Map style error: $e');
+              // Style error doesn't prevent map from working
+            }
+          }
+        },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+        mapToolbarEnabled: false,
+        compassEnabled: false,
+        liteModeEnabled: false, // Disable lite mode to prevent buffer issues
+        buildingsEnabled: true,
+        indoorViewEnabled: false,
+        trafficEnabled: false,
+      );
+    } catch (e) {
+      debugPrint('❌ Error building map: $e');
+      // Schedule error state update for next frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _mapLoadError = true;
+          });
+        }
+      });
+      // Return loading state while error is being set
+      return Container(
+        color: AppColors.surface,
+        child: const Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      );
+    }
+  }
+
+  /// Build map error state with location info
+  Widget _buildMapErrorState(position) {
+    return Container(
+      color: AppColors.surface,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(color: AppColors.upcoming.withOpacity(0.15), shape: BoxShape.circle),
+                child: const Icon(Icons.map_outlined, size: 40, color: AppColors.upcoming),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Map Unavailable',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please add your Google Maps API key to enable maps',
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.accent.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.location_on, color: AppColors.accent, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'GPS Location Ready',
+                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Lat: ${position.latitude.toStringAsFixed(6)}\nLng: ${position.longitude.toStringAsFixed(6)}',
+                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Your Running Stats', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [_buildStatItem('0', 'km', 'Total Distance'), _buildStatItem('0', 'runs', 'This Week'), _buildStatItem('0:00', 'avg', 'Pace')],
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _mapLoadError = false;
+                      });
+                    },
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text('Retry'),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.accent),
+                  ),
+                  const SizedBox(width: 16),
+                  TextButton.icon(
+                    onPressed: () {
+                      Get.snackbar(
+                        'Setup Required',
+                        'Please check GET_GOOGLE_MAPS_API_KEY.md for instructions',
+                        snackPosition: SnackPosition.BOTTOM,
+                        duration: const Duration(seconds: 5),
+                      );
+                    },
+                    icon: const Icon(Icons.help_outline, size: 18),
+                    label: const Text('How to fix?'),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.accent),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 40),
-
-            // Start Run Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: () => Get.toNamed(AppRoutes.runTracking),
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, foregroundColor: AppColors.onAccent),
-                icon: const Icon(Icons.play_arrow, size: 28),
-                label: Text('Start Run', style: AppTextStyles.buttonLarge),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // View History Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Show run history
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.primaryGray, width: 2),
-                  foregroundColor: AppColors.onBackground,
-                ),
-                icon: const Icon(Icons.history),
-                label: Text('View History', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onBackground)),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Feature List
-            _buildFeatureItem(Icons.gps_fixed, 'Live GPS Tracking'),
-            _buildFeatureItem(Icons.speed, 'Real-time Pace & Distance'),
-            _buildFeatureItem(Icons.map, 'Route Visualization'),
-            _buildFeatureItem(Icons.terrain, 'Elevation Tracking'),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  /// Set custom map style for dark theme
+  void _setMapStyle(GoogleMapController controller) {
+    const String mapStyle = '''
+    [
+      {
+        "elementType": "geometry",
+        "stylers": [{"color": "#1a1a1a"}]
+      },
+      {
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "#8a8a8a"}]
+      },
+      {
+        "elementType": "labels.text.stroke",
+        "stylers": [{"color": "#1a1a1a"}]
+      },
+      {
+        "featureType": "poi",
+        "elementType": "geometry",
+        "stylers": [{"color": "#2a2a2a"}]
+      },
+      {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [{"color": "#29603C"}, {"lightness": -40}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [{"color": "#2a2a2a"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [{"color": "#1a1a1a"}]
+      },
+      {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [{"color": "#000000"}]
+      }
+    ]
+    ''';
+    controller.setMapStyle(mapStyle);
+  }
+
+  /// Build ready to run card
+  Widget _buildReadyCard() {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.15), AppColors.surface], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
+        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.accent.withOpacity(0.2),
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.accent, width: 2),
+            ),
+            child: const Icon(Icons.directions_run_rounded, size: 40, color: AppColors.accent),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Ready to Run?',
+            style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Track distance, pace, route, and elevation',
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build stats section
+  Widget _buildStatsSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Your Running Stats',
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('${(_totalDistance / 1000).toStringAsFixed(1)}', 'km', 'Total Distance'),
+              _buildStatItem('$_totalRuns', 'runs', 'Total Runs'),
+              _buildStatItem('0:00', 'avg', 'Avg Pace'),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -124,11 +540,11 @@ class RunTrackerScreen extends StatelessWidget {
           children: [
             Text(
               value,
-              style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+              style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 24),
             ),
             const SizedBox(width: 4),
             Padding(
-              padding: const EdgeInsets.only(bottom: 2),
+              padding: const EdgeInsets.only(bottom: 3),
               child: Text(unit, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
             ),
           ],
@@ -136,21 +552,114 @@ class RunTrackerScreen extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray),
+          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
+  /// Build action buttons
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // Start Run Button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () async {
+                final success = await _trackingController.startTracking();
+                if (success) {
+                  Get.toNamed(AppRoutes.runTracking);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: AppColors.onAccent,
+                elevation: 4,
+                shadowColor: AppColors.accent.withOpacity(0.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.play_arrow_rounded, size: 28),
+                  const SizedBox(width: 8),
+                  Text('Start Run', style: AppTextStyles.buttonLarge),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // View History Button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: OutlinedButton(
+              onPressed: () {
+                Get.toNamed(AppRoutes.runHistory);
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.accent.withOpacity(0.5), width: 2),
+                foregroundColor: AppColors.accent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.history_rounded, size: 24),
+                  const SizedBox(width: 8),
+                  Text('View History', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.accent)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build features list
+  Widget _buildFeaturesList() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Features',
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          _buildFeatureItem(Icons.gps_fixed_rounded, 'Live GPS Tracking'),
+          _buildFeatureItem(Icons.speed_rounded, 'Real-time Pace & Distance'),
+          _buildFeatureItem(Icons.map_rounded, 'Route Visualization'),
+          _buildFeatureItem(Icons.terrain_rounded, 'Elevation Tracking'),
+          _buildFeatureItem(Icons.history_rounded, 'Run History & Stats'),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFeatureItem(IconData icon, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.accent, size: 20),
-          const SizedBox(width: 12),
-          Text(text, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+            child: Icon(icon, color: AppColors.accent, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(text, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+          ),
         ],
       ),
     );

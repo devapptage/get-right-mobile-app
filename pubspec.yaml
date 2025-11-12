@@ -46,8 +46,7 @@ dependencies:
   shared_preferences: ^2.2.3  # Local storage
   image_picker: ^1.1.2  # Image selection for progress photos
   geolocator: ^12.0.0  # GPS for run tracking
-  flutter_map: ^7.0.2  # Map visualization
-  latlong2: ^0.9.1  # Latitude/Longitude utilities
+  google_maps_flutter: ^2.6.1  # Google Maps for visualization
   
 
 dev_dependencies:

@@ -98,14 +98,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   color: AppColors.completed,
                   onTap: () {
                     Get.back();
-                    Get.snackbar(
-                      'Coming Soon',
-                      'Run logging feature will be available soon!',
-                      backgroundColor: AppColors.completed,
-                      colorText: AppColors.onAccent,
-                      snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(16),
-                    );
+                    Get.toNamed(AppRoutes.logRun);
                   },
                 ),
                 const SizedBox(height: 12),
@@ -116,14 +109,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   color: const Color(0xFFFF9800),
                   onTap: () {
                     Get.back();
-                    Get.snackbar(
-                      'Coming Soon',
-                      'Meal logging feature will be available soon!',
-                      backgroundColor: const Color(0xFFFF9800),
-                      colorText: AppColors.onAccent,
-                      snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(16),
-                    );
+                    Get.toNamed(AppRoutes.logMeal);
                   },
                 ),
                 const SizedBox(height: 12),
@@ -134,14 +120,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   color: const Color(0xFF9C27B0),
                   onTap: () {
                     Get.back();
-                    Get.snackbar(
-                      'Coming Soon',
-                      'Note writing feature will be available soon!',
-                      backgroundColor: const Color(0xFF9C27B0),
-                      colorText: AppColors.onAccent,
-                      snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(16),
-                    );
+                    Get.toNamed(AppRoutes.writeNote);
                   },
                 ),
                 const SizedBox(height: 24),
@@ -194,11 +173,11 @@ class _JournalScreenState extends State<JournalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
         ),
         title: Text('My Journal', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
@@ -453,6 +432,7 @@ class _JournalScreenState extends State<JournalScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'journal_fab',
         onPressed: _showAddEntryOptions,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         backgroundColor: AppColors.accent,
