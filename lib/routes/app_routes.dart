@@ -51,8 +51,13 @@ class AppRoutes {
   static const String marketplace = '/marketplace';
   static const String programDetail = '/program-detail';
   static const String trainerProfile = '/trainer-profile';
+  static const String trainerReviews = '/trainer-reviews';
   static const String myPrograms = '/my-programs';
   static const String checkout = '/checkout';
+
+  // Search Routes
+  static const String search = '/search';
+  static const String searchResults = '/search-results';
 
   // Chat Routes
   static const String chatList = '/chat-list';
@@ -65,4 +70,5 @@ class AppRoutes {
   static const String termsConditions = '/terms-conditions';
   static const String privacyPolicy = '/privacy-policy';
   static const String about = '/about';
+  static const String createTrainerProfile = '/create-trainer-profile';
 }

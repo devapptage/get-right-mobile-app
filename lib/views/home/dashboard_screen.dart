@@ -47,6 +47,30 @@ class DashboardScreen extends StatelessWidget {
             Text('Welcome back!', style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground)),
             const SizedBox(height: 4),
             Text('Ready to crush your goals today?', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+            const SizedBox(height: 20),
+
+            // Search Bar
+            InkWell(
+              onTap: () => Get.toNamed(AppRoutes.search),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.primaryGray, width: 1),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: AppColors.primaryGray),
+                    const SizedBox(width: 12),
+                    Text('Search workouts and programs...', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                    const Spacer(),
+                    Icon(Icons.tune, color: AppColors.accent),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
 
             // Quick Stats Row

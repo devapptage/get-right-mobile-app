@@ -33,6 +33,11 @@ import 'package:get_right/views/settings/help_feedback_screen.dart';
 import 'package:get_right/views/settings/about_screen.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
 import 'package:get_right/views/tracker/progress_screen.dart';
+import 'package:get_right/views/search/search_screen.dart';
+import 'package:get_right/views/search/search_results_screen.dart';
+import 'package:get_right/views/trainer/trainer_profile_screen.dart';
+import 'package:get_right/views/trainer/trainer_reviews_screen.dart';
+import 'package:get_right/views/marketplace/program_detail_screen.dart';
 
 /// App Pages - GetX route configuration
 class AppPages {
@@ -82,6 +87,13 @@ class AppPages {
 
     // Marketplace Pages
     GetPage(name: AppRoutes.marketplace, page: () => const MarketplaceScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.programDetail, page: () => const ProgramDetailScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.trainerProfile, page: () => const TrainerProfileScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.trainerReviews, page: () => const TrainerReviewsScreen(), transition: Transition.rightToLeft),
+
+    // Search Pages
+    GetPage(name: AppRoutes.search, page: () => SearchScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.searchResults, page: () => const SearchResultsScreen(), transition: Transition.rightToLeft),
 
     // Chat Pages
     GetPage(name: AppRoutes.chatList, page: () => const ChatListScreen(), transition: Transition.rightToLeft),
@@ -91,5 +103,6 @@ class AppPages {
     GetPage(name: AppRoutes.notifications, page: () => const NotificationsScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.helpFeedback, page: () => const HelpFeedbackScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.about, page: () => const AboutScreen(), transition: Transition.rightToLeft),
+    // GetPage(name: AppRoutes.createTrainerProfile, page: () => const CreateTrainerProfileScreen(), transition: Transition.rightToLeft),
   ];
 }

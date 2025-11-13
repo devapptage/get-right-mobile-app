@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
-import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Marketplace screen - browse trainer programs
 class MarketplaceScreen extends StatefulWidget {
@@ -356,40 +356,47 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           child: ListView(
             controller: scrollController,
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: AppColors.accent,
-                    child: Text(program['trainerImage'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(program['trainer'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: AppColors.upcoming, size: 16),
-                            const SizedBox(width: 4),
-                            Text('${program['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
-                            const SizedBox(width: 8),
-                            Text('${program['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                          ],
-                        ),
-                        if (program['certified'])
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToTrainerProfile(program);
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppColors.accent,
+                      child: Text(program['trainerImage'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(program['trainer'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
                           Row(
                             children: [
-                              Icon(Icons.verified, color: AppColors.completed, size: 16),
+                              Icon(Icons.star, color: AppColors.upcoming, size: 16),
                               const SizedBox(width: 4),
-                              Text('Certified Trainer', style: AppTextStyles.labelSmall.copyWith(color: AppColors.completed)),
+                              Text('${program['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
+                              const SizedBox(width: 8),
+                              Text('${program['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
                             ],
                           ),
-                      ],
+                          if (program['certified'])
+                            Row(
+                              children: [
+                                Icon(Icons.verified, color: AppColors.completed, size: 16),
+                                const SizedBox(width: 4),
+                                Text('Certified Trainer', style: AppTextStyles.labelSmall.copyWith(color: AppColors.completed)),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    Icon(Icons.chevron_right, color: AppColors.accent),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               Text(program['title'], style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onSurface)),
@@ -433,16 +440,15 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: Navigate to checkout
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Checkout coming soon!'), backgroundColor: AppColors.accent));
+                        Get.toNamed(AppRoutes.programDetail, arguments: program);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
                         foregroundColor: AppColors.onAccent,
                         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       ),
-                      child: const Text('Buy Now'),
+                      child: const Text('View Details'),
                     ),
                   ],
                 ),
@@ -595,34 +601,40 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.accent,
-                  child: Text(program['trainerImage'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onAccent)),
+                GestureDetector(
+                  onTap: () => _navigateToTrainerProfile(program),
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.accent,
+                    child: Text(program['trainerImage'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onAccent)),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(program['trainer'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                          ),
-                          if (program['certified']) Icon(Icons.verified, color: AppColors.completed, size: 16),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: AppColors.upcoming, size: 14),
-                          const SizedBox(width: 4),
-                          Text('${program['rating']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
-                          const SizedBox(width: 8),
-                          Text('${program['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                        ],
-                      ),
-                    ],
+                  child: GestureDetector(
+                    onTap: () => _navigateToTrainerProfile(program),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(program['trainer'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
+                            ),
+                            if (program['certified']) Icon(Icons.verified, color: AppColors.completed, size: 16),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.star, color: AppColors.upcoming, size: 14),
+                            const SizedBox(width: 4),
+                            Text('${program['rating']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
+                            const SizedBox(width: 8),
+                            Text('${program['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -693,5 +705,28 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         ],
       ),
     );
+  }
+
+  void _navigateToTrainerProfile(Map<String, dynamic> program) {
+    // Create trainer data from program info
+    final trainerData = {
+      'id': program['trainer'].toString().toLowerCase().replaceAll(' ', '_'),
+      'name': program['trainer'],
+      'initials': program['trainerImage'],
+      'bio': 'Certified personal trainer with years of experience helping clients achieve their fitness goals. Specializing in ${program['category']} and ${program['goal']}.',
+      'specialties': [program['category'], program['goal'], 'Nutrition Coaching'],
+      'yearsOfExperience': 8,
+      'certified': program['certified'],
+      'certifications': program['certified'] ? ['NASM Certified Personal Trainer', 'Precision Nutrition Level 1'] : null,
+      'hourlyRate': 75.0,
+      'rating': program['rating'],
+      'totalReviews': 127,
+      'students': program['students'],
+      'activePrograms': 5,
+      'completedPrograms': 12,
+      'totalPrograms': 17,
+    };
+
+    Get.toNamed(AppRoutes.trainerProfile, arguments: trainerData);
   }
 }
