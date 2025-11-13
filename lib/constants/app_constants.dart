@@ -31,6 +31,12 @@ class AppConstants {
   // Gender Options
   static const List<String> genderOptions = ['Male', 'Female', 'Other', 'Prefer not to say'];
 
+  // Activity Levels
+  static const List<String> activityLevels = ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Extremely Active'];
+
+  // Units
+  static const List<String> unitsOptions = ['Metric', 'Imperial'];
+
   // Validation
   static const int minPasswordLength = 8;
   static const int otpLength = 6;

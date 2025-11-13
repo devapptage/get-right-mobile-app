@@ -23,9 +23,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _ageController = TextEditingController();
+  final _heightController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _targetWeightController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _medicalConditionsController = TextEditingController();
+  final _emergencyContactNameController = TextEditingController();
+  final _emergencyContactPhoneController = TextEditingController();
 
   String? _selectedGender;
   String? _selectedFitnessGoal;
+  String? _selectedActivityLevel;
+  String? _selectedUnits = 'Metric'; // Default to metric
   List<String> _selectedWorkoutTypes = [];
   String? _profileImagePath;
 
@@ -51,6 +60,13 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
     _firstNameController.dispose();
     _lastNameController.dispose();
     _ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _targetWeightController.dispose();
+    _phoneController.dispose();
+    _medicalConditionsController.dispose();
+    _emergencyContactNameController.dispose();
+    _emergencyContactPhoneController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -292,6 +308,16 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                     ),
                     const SizedBox(height: 20),
 
+                    // Phone Number
+                    CustomTextField(
+                      controller: _phoneController,
+                      labelText: 'Contact Number',
+                      hintText: '+1 234 567 8900',
+                      keyboardType: TextInputType.phone,
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                    ),
+                    const SizedBox(height: 20),
+
                     // Gender dropdown
                     _buildDropdownField(
                       label: 'Gender',
@@ -299,6 +325,42 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                       items: AppConstants.genderOptions,
                       icon: Icons.wc_outlined,
                       onChanged: (value) => setState(() => _selectedGender = value),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Units preference
+                    _buildDropdownField(
+                      label: 'Units',
+                      value: _selectedUnits,
+                      items: AppConstants.unitsOptions,
+                      icon: Icons.straighten_outlined,
+                      onChanged: (value) => setState(() => _selectedUnits = value),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Height and Weight
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            controller: _heightController,
+                            labelText: _selectedUnits == 'Metric' ? 'Height (cm)' : 'Height (ft)',
+                            hintText: _selectedUnits == 'Metric' ? '170' : '5.7',
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            prefixIcon: const Icon(Icons.height_outlined),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: CustomTextField(
+                            controller: _weightController,
+                            labelText: _selectedUnits == 'Metric' ? 'Weight (kg)' : 'Weight (lbs)',
+                            hintText: _selectedUnits == 'Metric' ? '70' : '154',
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            prefixIcon: const Icon(Icons.monitor_weight_outlined),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
 
@@ -312,8 +374,83 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                     ),
                     const SizedBox(height: 20),
 
+                    // Target Weight (optional)
+                    if (_selectedFitnessGoal == 'Weight Loss' || _selectedFitnessGoal == 'Muscle Gain')
+                      Column(
+                        children: [
+                          CustomTextField(
+                            controller: _targetWeightController,
+                            labelText: _selectedUnits == 'Metric' ? 'Target Weight (kg)' : 'Target Weight (lbs)',
+                            hintText: _selectedUnits == 'Metric' ? '65' : '143',
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            prefixIcon: const Icon(Icons.track_changes_outlined),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+
+                    // Activity Level dropdown
+                    _buildDropdownField(
+                      label: 'Activity Level',
+                      value: _selectedActivityLevel,
+                      items: AppConstants.activityLevels,
+                      icon: Icons.directions_run_outlined,
+                      onChanged: (value) => setState(() => _selectedActivityLevel = value),
+                    ),
+                    const SizedBox(height: 20),
+
                     // Preferred Workout Types (multi-select chips)
                     _buildWorkoutTypesSection(),
+                    const SizedBox(height: 32),
+
+                    // Medical & Emergency Section Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 22),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Health & Safety Information',
+                          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Medical Conditions (Optional)
+                    CustomTextField(
+                      controller: _medicalConditionsController,
+                      labelText: 'Medical Conditions (Optional)',
+                      hintText: 'e.g., Asthma, Diabetes, Allergies',
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.health_and_safety_outlined),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Emergency Contact Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.emergency_outlined, color: AppColors.accent, size: 22),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Emergency Contact',
+                          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Emergency Contact Name
+
+                    // Emergency Contact Phone
+                    CustomTextField(
+                      controller: _emergencyContactPhoneController,
+                      labelText: 'Emergency Contact Phone',
+                      hintText: '+1 234 567 8900',
+                      keyboardType: TextInputType.phone,
+                      prefixIcon: const Icon(Icons.phone_in_talk_outlined),
+                    ),
                     const SizedBox(height: 32),
 
                     // Complete Profile button
@@ -429,6 +566,31 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
           return DropdownMenuItem<String>(value: item, child: Text(item));
         }).toList(),
         onChanged: onChanged,
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.1), AppColors.surface], begin: Alignment.centerLeft, end: Alignment.centerRight),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+            child: Icon(icon, color: AppColors.accent, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            title,
+            style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+        ],
       ),
     );
   }
