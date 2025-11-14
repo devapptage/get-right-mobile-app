@@ -152,6 +152,24 @@ class AppDrawer extends StatelessWidget {
                     Get.toNamed(AppRoutes.marketplace);
                   },
                 ),
+                _buildDrawerItem(
+                  icon: Icons.history_outlined,
+                  activeIcon: Icons.history,
+                  title: 'Program History',
+                  onTap: () {
+                    Get.back();
+                    Get.toNamed(AppRoutes.programHistory);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long,
+                  title: 'Transaction History',
+                  onTap: () {
+                    Get.back();
+                    Get.toNamed(AppRoutes.transactionHistory);
+                  },
+                ),
 
                 const SizedBox(height: 16),
                 const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),

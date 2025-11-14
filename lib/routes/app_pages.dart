@@ -44,6 +44,12 @@ import 'package:get_right/views/marketplace/payment_form_screen.dart';
 import 'package:get_right/views/marketplace/program_terms_screen.dart';
 import 'package:get_right/views/marketplace/my_programs_screen.dart';
 import 'package:get_right/views/favorites/favorites_screen.dart';
+import 'package:get_right/views/program_history/program_history_screen.dart';
+import 'package:get_right/views/program_history/active_program_detail_screen.dart';
+import 'package:get_right/views/program_history/completed_program_detail_screen.dart';
+import 'package:get_right/views/program_history/program_modification_request_screen.dart';
+import 'package:get_right/views/transaction_history/transaction_history_screen.dart';
+import 'package:get_right/views/transaction_history/transaction_detail_screen.dart';
 
 /// App Pages - GetX route configuration
 class AppPages {
@@ -102,6 +108,12 @@ class AppPages {
     GetPage(name: AppRoutes.favorites, page: () => const FavoritesScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.trainerProfile, page: () => const TrainerProfileScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.trainerReviews, page: () => const TrainerReviewsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.programHistory, page: () => const ProgramHistoryScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.activeProgramDetail, page: () => const ActiveProgramDetailScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.completedProgramDetail, page: () => const CompletedProgramDetailScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.programModificationRequest, page: () => const ProgramModificationRequestScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.transactionHistory, page: () => TransactionHistoryScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.transactionDetail, page: () => const TransactionDetailScreen(), transition: Transition.rightToLeft),
 
     // Search Pages
     GetPage(name: AppRoutes.search, page: () => SearchScreen(), transition: Transition.rightToLeft),

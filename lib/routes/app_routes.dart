@@ -59,6 +59,12 @@ class AppRoutes {
   static const String myPrograms = '/my-programs';
   static const String favorites = '/favorites';
   static const String checkout = '/checkout';
+  static const String programHistory = '/program-history';
+  static const String activeProgramDetail = '/active-program-detail';
+  static const String completedProgramDetail = '/completed-program-detail';
+  static const String programModificationRequest = '/program-modification-request';
+  static const String transactionHistory = '/transaction-history';
+  static const String transactionDetail = '/transaction-detail';
 
   // Search Routes
   static const String search = '/search';
