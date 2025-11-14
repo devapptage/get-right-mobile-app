@@ -50,9 +50,14 @@ class AppRoutes {
   // Marketplace Routes
   static const String marketplace = '/marketplace';
   static const String programDetail = '/program-detail';
+  static const String programEnrollment = '/program-enrollment';
+  static const String purchaseDetails = '/purchase-details';
+  static const String paymentForm = '/payment-form';
+  static const String programTerms = '/program-terms';
   static const String trainerProfile = '/trainer-profile';
   static const String trainerReviews = '/trainer-reviews';
   static const String myPrograms = '/my-programs';
+  static const String favorites = '/favorites';
   static const String checkout = '/checkout';
 
   // Search Routes

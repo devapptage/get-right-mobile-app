@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/controllers/favorites_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
 /// Program Detail Screen
-class ProgramDetailScreen extends StatelessWidget {
+class ProgramDetailScreen extends StatefulWidget {
   const ProgramDetailScreen({super.key});
+
+  @override
+  State<ProgramDetailScreen> createState() => _ProgramDetailScreenState();
+}
+
+class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
+  final FavoritesController _favoritesController = Get.put(FavoritesController());
 
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> program = Get.arguments ?? _getMockProgramData();
+    final programId = (program['id']?.toString() ?? program['title']?.toString() ?? 'unknown_program').replaceAll(' ', '_');
+
+    // Ensure required fields have defaults
+    final safeProgram = {
+      'id': programId,
+      'title': program['title'] ?? 'Program',
+      'trainer': program['trainer'] ?? 'Unknown Trainer',
+      'trainerImage': program['trainerImage'] ?? 'UT',
+      'price': program['price'] ?? 0.0,
+      'duration': program['duration'] ?? '12 weeks',
+      'category': program['category'] ?? 'General',
+      'goal': program['goal'] ?? 'Fitness',
+      'certified': program['certified'] ?? false,
+      'rating': program['rating'] ?? 0.0,
+      'students': program['students'] ?? 0,
+      'reviews': program['reviews'] ?? 0,
+      'description': program['description'] ?? 'No description available',
+      ...program, // Keep any additional fields
+    };
 
     return Scaffold(
       body: CustomScrollView(
@@ -19,6 +46,26 @@ class ProgramDetailScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 250,
             pinned: true,
+            actions: [
+              // Favorite Icon
+              Obx(() {
+                final isFavorite = _favoritesController.isFavorite(programId);
+                return IconButton(
+                  onPressed: () {
+                    _favoritesController.toggleFavorite(programId, {...safeProgram, 'type': 'program'});
+                    Get.snackbar(
+                      isFavorite ? 'Removed' : 'Added',
+                      isFavorite ? 'Removed from favorites' : 'Added to favorites',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: isFavorite ? AppColors.primaryGray : AppColors.completed,
+                      colorText: Colors.white,
+                      duration: const Duration(seconds: 2),
+                    );
+                  },
+                  icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.onPrimary),
+                );
+              }),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
@@ -54,7 +101,7 @@ class ProgramDetailScreen extends StatelessWidget {
                 children: [
                   // Program Title
                   Text(
-                    program['title'],
+                    safeProgram['title'] ?? 'Program',
                     style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
@@ -76,7 +123,7 @@ class ProgramDetailScreen extends StatelessWidget {
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: AppColors.accent,
-                            child: Text(program['trainerImage'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
+                            child: Text(safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -85,8 +132,8 @@ class ProgramDetailScreen extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    Text(program['trainer'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-                                    if (program['certified'])
+                                    Text(safeProgram['trainer'] ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                                    if (safeProgram['certified'] == true)
                                       Padding(
                                         padding: const EdgeInsets.only(left: 8),
                                         child: Icon(Icons.verified, color: AppColors.completed, size: 18),
@@ -97,9 +144,9 @@ class ProgramDetailScreen extends StatelessWidget {
                                   children: [
                                     Icon(Icons.star, color: AppColors.upcoming, size: 16),
                                     const SizedBox(width: 4),
-                                    Text('${program['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
+                                    Text('${safeProgram['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
                                     const SizedBox(width: 8),
-                                    Text('${program['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                    Text('${safeProgram['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
                                   ],
                                 ),
                               ],
@@ -115,11 +162,11 @@ class ProgramDetailScreen extends StatelessWidget {
                   // Quick Info Cards
                   Row(
                     children: [
-                      Expanded(child: _buildInfoCard(Icons.schedule, 'Duration', program['duration'])),
+                      Expanded(child: _buildInfoCard(Icons.schedule, 'Duration', safeProgram['duration'] ?? '12 weeks')),
                       const SizedBox(width: 12),
-                      Expanded(child: _buildInfoCard(Icons.category, 'Category', program['category'])),
+                      Expanded(child: _buildInfoCard(Icons.category, 'Category', safeProgram['category'] ?? 'General')),
                       const SizedBox(width: 12),
-                      Expanded(child: _buildInfoCard(Icons.flag, 'Goal', program['goal'])),
+                      Expanded(child: _buildInfoCard(Icons.flag, 'Goal', safeProgram['goal'] ?? 'Fitness')),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -130,7 +177,7 @@ class ProgramDetailScreen extends StatelessWidget {
                     style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  Text(program['description'], style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
+                  Text(safeProgram['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
                   const SizedBox(height: 24),
 
                   // What's Included
@@ -171,7 +218,7 @@ class ProgramDetailScreen extends StatelessWidget {
                         children: [
                           Icon(Icons.star, color: AppColors.upcoming, size: 20),
                           const SizedBox(width: 4),
-                          Text('${program['rating']} (${program['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+                          Text('${safeProgram['rating']} (${safeProgram['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
                         ],
                       ),
                     ],
@@ -201,7 +248,7 @@ class ProgramDetailScreen extends StatelessWidget {
                 children: [
                   Text('Total Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
                   Text(
-                    '\$${program['price']}',
+                    '\$${safeProgram['price']}',
                     style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -210,22 +257,16 @@ class ProgramDetailScreen extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Get.snackbar(
-                      'Purchase',
-                      'Checkout coming soon!',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: AppColors.accent,
-                      colorText: Colors.white,
-                      duration: const Duration(seconds: 2),
-                    );
+                    // Navigate to enrollment screen
+                    Get.toNamed(AppRoutes.programEnrollment, arguments: safeProgram);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  icon: const Icon(Icons.shopping_cart, size: 20),
-                  label: Text('Buy Now', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
+                  icon: const Icon(Icons.school, size: 20),
+                  label: Text('Enroll Now', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
                 ),
               ),
             ],
@@ -361,6 +402,7 @@ class ProgramDetailScreen extends StatelessWidget {
 
   Map<String, dynamic> _getMockProgramData() {
     return {
+      'id': 'mock_program_1',
       'title': 'Complete Strength Program',
       'trainer': 'Sarah Johnson',
       'trainerImage': 'SJ',

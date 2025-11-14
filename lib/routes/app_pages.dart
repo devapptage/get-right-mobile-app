@@ -38,6 +38,12 @@ import 'package:get_right/views/search/search_results_screen.dart';
 import 'package:get_right/views/trainer/trainer_profile_screen.dart';
 import 'package:get_right/views/trainer/trainer_reviews_screen.dart';
 import 'package:get_right/views/marketplace/program_detail_screen.dart';
+import 'package:get_right/views/marketplace/program_enrollment_screen.dart';
+import 'package:get_right/views/marketplace/purchase_details_screen.dart';
+import 'package:get_right/views/marketplace/payment_form_screen.dart';
+import 'package:get_right/views/marketplace/program_terms_screen.dart';
+import 'package:get_right/views/marketplace/my_programs_screen.dart';
+import 'package:get_right/views/favorites/favorites_screen.dart';
 
 /// App Pages - GetX route configuration
 class AppPages {
@@ -88,6 +94,12 @@ class AppPages {
     // Marketplace Pages
     GetPage(name: AppRoutes.marketplace, page: () => const MarketplaceScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.programDetail, page: () => const ProgramDetailScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.programEnrollment, page: () => const ProgramEnrollmentScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.purchaseDetails, page: () => const PurchaseDetailsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.paymentForm, page: () => const PaymentFormScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.programTerms, page: () => const ProgramTermsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.myPrograms, page: () => const MyProgramsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.favorites, page: () => const FavoritesScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.trainerProfile, page: () => const TrainerProfileScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.trainerReviews, page: () => const TrainerReviewsScreen(), transition: Transition.rightToLeft),
 

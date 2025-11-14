@@ -47,6 +47,7 @@ dependencies:
   image_picker: ^1.1.2  # Image selection for progress photos
   geolocator: ^12.0.0  # GPS for run tracking
   google_maps_flutter: ^2.6.1  # Google Maps for visualization
+  table_calendar: ^3.0.9  # Calendar for program enrollment
   
 
 dev_dependencies:

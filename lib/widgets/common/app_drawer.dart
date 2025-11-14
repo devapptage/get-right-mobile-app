@@ -5,6 +5,7 @@ import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/services/storage_service.dart';
+import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Professional App Drawer
 ///
@@ -22,6 +23,7 @@ class AppDrawer extends StatelessWidget {
     // Safely get StorageService with fallback
     String userName = 'Demo User';
     String userEmail = 'demo@getright.com';
+    final HomeNavigationController navController = Get.put(HomeNavigationController());
 
     try {
       final storageService = Get.find<StorageService>();
@@ -85,8 +87,8 @@ class AppDrawer extends StatelessWidget {
                   activeIcon: Icons.book,
                   title: 'Journal',
                   onTap: () {
+                    navController.changeTab(1);
                     Get.back();
-                    Get.toNamed(AppRoutes.journal);
                   },
                 ),
                 _buildDrawerItem(
@@ -94,8 +96,8 @@ class AppDrawer extends StatelessWidget {
                   activeIcon: Icons.calendar_today,
                   title: 'Planner',
                   onTap: () {
+                    navController.changeTab(2);
                     Get.back();
-                    Get.toNamed(AppRoutes.planner);
                   },
                 ),
                 _buildDrawerItem(
@@ -103,8 +105,8 @@ class AppDrawer extends StatelessWidget {
                   activeIcon: Icons.directions_run,
                   title: 'Run Tracker',
                   onTap: () {
+                    navController.changeTab(3);
                     Get.back();
-                    Get.toNamed(AppRoutes.runTracker);
                   },
                 ),
                 _buildDrawerItem(

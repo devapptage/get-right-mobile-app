@@ -20,6 +20,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   // Mock program data
   final List<Map<String, dynamic>> _programs = [
     {
+      'id': 'program_1',
       'title': 'Complete Strength Program',
       'trainer': 'Sarah Johnson',
       'trainerImage': 'SJ',
@@ -33,6 +34,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'description': 'Build muscle and strength with this comprehensive program',
     },
     {
+      'id': 'program_2',
       'title': 'Cardio Blast Challenge',
       'trainer': 'Mike Chen',
       'trainerImage': 'MC',
@@ -46,6 +48,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'description': 'High-intensity cardio program for maximum fat loss',
     },
     {
+      'id': 'program_3',
       'title': 'Yoga for Athletes',
       'trainer': 'Emma Davis',
       'trainerImage': 'ED',
@@ -59,6 +62,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'description': 'Improve flexibility and recovery through targeted yoga',
     },
     {
+      'id': 'program_4',
       'title': 'Bodyweight Mastery',
       'trainer': 'Alex Rodriguez',
       'trainerImage': 'AR',
@@ -72,6 +76,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'description': 'Master bodyweight exercises anywhere, no equipment needed',
     },
     {
+      'id': 'program_5',
       'title': 'Marathon Prep',
       'trainer': 'Lisa Thompson',
       'trainerImage': 'LT',
@@ -85,6 +90,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'description': 'Complete training plan to conquer your first marathon',
     },
     {
+      'id': 'program_6',
       'title': 'Core Strength Elite',
       'trainer': 'David Kim',
       'trainerImage': 'DK',
