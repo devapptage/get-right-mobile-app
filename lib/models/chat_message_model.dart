@@ -5,7 +5,7 @@ class ChatMessageModel {
   final String senderId;
   final String receiverId;
   final String message;
-  final String type; // 'text', 'image', 'file'
+  final String type; // 'text', 'image', 'video', 'audio'
   final String? fileUrl;
   final String? fileName;
   final bool isRead;

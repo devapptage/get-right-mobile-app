@@ -32,6 +32,7 @@ import 'package:get_right/views/settings/notifications_screen.dart';
 import 'package:get_right/views/settings/help_feedback_screen.dart';
 import 'package:get_right/views/settings/about_screen.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
+import 'package:get_right/views/chat/chat_room_screen.dart';
 import 'package:get_right/views/tracker/progress_screen.dart';
 import 'package:get_right/views/search/search_screen.dart';
 import 'package:get_right/views/search/search_results_screen.dart';
@@ -121,6 +122,7 @@ class AppPages {
 
     // Chat Pages
     GetPage(name: AppRoutes.chatList, page: () => const ChatListScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.chatRoom, page: () => const ChatRoomScreen(), transition: Transition.rightToLeft),
 
     // Settings Pages
     GetPage(name: AppRoutes.settings, page: () => const SettingsScreen(), transition: Transition.rightToLeft),

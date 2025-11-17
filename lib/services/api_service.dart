@@ -177,14 +177,108 @@ class ApiService {
   Future<List<Map<String, dynamic>>> getConversations(String userId) async {
     // TODO: Implement actual API call
     await Future.delayed(const Duration(seconds: 1));
-    return [];
+
+    // Mock conversations for demo
+    final now = DateTime.now();
+    return [
+      {
+        'id': 'conv_1',
+        'userId': userId,
+        'trainerId': 'trainer_1',
+        'trainerName': 'Sarah Johnson',
+        'trainerImage': 'SJ',
+        'programId': 'prog_1',
+        'programTitle': 'Complete Strength Program',
+        'lastMessage': {
+          'id': 'msg_1',
+          'conversationId': 'conv_1',
+          'senderId': 'trainer_1',
+          'receiverId': userId,
+          'message': 'Great progress on your workout today! Keep it up! 💪',
+          'type': 'text',
+          'isRead': false,
+          'timestamp': now.subtract(const Duration(hours: 2)).toIso8601String(),
+        },
+        'unreadCount': 1,
+        'createdAt': now.subtract(const Duration(days: 5)).toIso8601String(),
+      },
+      {
+        'id': 'conv_2',
+        'userId': userId,
+        'trainerId': 'trainer_2',
+        'trainerName': 'Mike Chen',
+        'trainerImage': 'MC',
+        'programId': 'prog_2',
+        'programTitle': 'Cardio Blast Challenge',
+        'lastMessage': {
+          'id': 'msg_2',
+          'conversationId': 'conv_2',
+          'senderId': userId,
+          'receiverId': 'trainer_2',
+          'message': 'Thanks for the tips! I\'ll try that tomorrow.',
+          'type': 'text',
+          'isRead': true,
+          'timestamp': now.subtract(const Duration(days: 1)).toIso8601String(),
+        },
+        'unreadCount': 0,
+        'createdAt': now.subtract(const Duration(days: 3)).toIso8601String(),
+      },
+    ];
+  }
+
+  /// Create a new conversation
+  Future<String> createConversation({
+    required String userId,
+    required String trainerId,
+    required String trainerName,
+    String? trainerImage,
+    required String programId,
+    required String programTitle,
+  }) async {
+    // TODO: Implement actual API call
+    await Future.delayed(const Duration(seconds: 1));
+    return 'conv_${DateTime.now().millisecondsSinceEpoch}';
   }
 
   /// Get messages
   Future<List<Map<String, dynamic>>> getMessages(String conversationId) async {
     // TODO: Implement actual API call
     await Future.delayed(const Duration(seconds: 1));
-    return [];
+
+    // Mock message for demo
+    final now = DateTime.now();
+    final userId = _storage.getUserId() ?? 'user_1';
+
+    // Return different messages based on conversation ID
+    String messageText;
+    String senderId;
+
+    if (conversationId.contains('conv_1')) {
+      messageText =
+          'Welcome to the Complete Strength Program! I\'m here to help you achieve your fitness goals. Feel free to ask me any questions about your workouts, nutrition, or progress tracking. Let\'s get started! 💪';
+      senderId = 'trainer_1';
+    } else if (conversationId.contains('conv_2')) {
+      messageText =
+          'Hi! Welcome to the Cardio Blast Challenge. I\'m excited to work with you on this journey. Remember to stay hydrated and listen to your body. Ready to crush your goals? 🏃‍♂️';
+      senderId = 'trainer_2';
+    } else {
+      // Default welcome message for new conversations
+      messageText = 'Hello! Thanks for reaching out. I\'m here to help you with your fitness journey. Feel free to ask me any questions! 💪';
+      senderId = 'trainer_1'; // Default trainer
+    }
+
+    return [
+      {
+        'id': 'msg_mock_${conversationId}',
+        'conversationId': conversationId,
+        'senderId': senderId,
+        'receiverId': userId,
+        'message': messageText,
+        'type': 'text',
+        'isRead': false,
+        'timestamp': now.subtract(const Duration(hours: 1)).toIso8601String(),
+      },
+    ];
   }
 
   /// Send message
@@ -194,9 +288,74 @@ class ApiService {
     required String receiverId,
     required String message,
     String type = 'text',
+    String? fileUrl,
+    String? fileName,
   }) async {
     // TODO: Implement actual API call
     await Future.delayed(const Duration(seconds: 1));
-    return {'success': true, 'id': 'msg_${DateTime.now().millisecondsSinceEpoch}'};
+    return {
+      'id': 'msg_${DateTime.now().millisecondsSinceEpoch}',
+      'conversationId': conversationId,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      'message': message,
+      'type': type,
+      'fileUrl': fileUrl,
+      'fileName': fileName,
+      'isRead': false,
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+  }
+
+  /// Upload chat file (image, video, audio)
+  Future<Map<String, dynamic>> uploadChatFile({
+    required String filePath,
+    required String conversationId,
+    required String type, // 'image', 'video', 'audio'
+  }) async {
+    // TODO: Implement actual file upload API call
+    await Future.delayed(const Duration(seconds: 2));
+    return {'success': true, 'fileUrl': 'https://example.com/files/${filePath.split('/').last}', 'fileName': filePath.split('/').last};
+  }
+
+  /// Mark messages as read
+  Future<Map<String, dynamic>> markMessagesAsRead(String conversationId) async {
+    // TODO: Implement actual API call
+    await Future.delayed(const Duration(milliseconds: 500));
+    return {'success': true};
+  }
+
+  /// Report a trainer
+  Future<Map<String, dynamic>> reportTrainer({
+    required String conversationId,
+    required String reporterId,
+    required String reportedUserId,
+    required String reason,
+    String? description,
+  }) async {
+    // TODO: Implement actual API call
+    await Future.delayed(const Duration(seconds: 1));
+    return {'success': true, 'id': 'report_${DateTime.now().millisecondsSinceEpoch}', 'message': 'Report submitted successfully'};
+  }
+
+  /// Block a user
+  Future<Map<String, dynamic>> blockUser({required String blockerId, required String blockedUserId, String? reason}) async {
+    // TODO: Implement actual API call
+    await Future.delayed(const Duration(seconds: 1));
+    return {'success': true, 'id': 'block_${DateTime.now().millisecondsSinceEpoch}'};
+  }
+
+  /// Unblock a user
+  Future<Map<String, dynamic>> unblockUser({required String blockerId, required String blockedUserId}) async {
+    // TODO: Implement actual API call
+    await Future.delayed(const Duration(seconds: 1));
+    return {'success': true};
+  }
+
+  /// Get blocked users
+  Future<List<String>> getBlockedUsers(String userId) async {
+    // TODO: Implement actual API call
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [];
   }
 }

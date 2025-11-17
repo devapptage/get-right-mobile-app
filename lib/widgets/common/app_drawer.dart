@@ -5,6 +5,7 @@ import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/services/storage_service.dart';
+import 'package:get_right/views/chat/chat_list_screen.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Professional App Drawer
@@ -137,10 +138,10 @@ class AppDrawer extends StatelessWidget {
                 _buildDrawerItem(
                   icon: Icons.chat_bubble_outline,
                   activeIcon: Icons.chat_bubble,
-                  title: 'Messages',
+                  title: 'Chat',
                   onTap: () {
                     Get.back();
-                    Get.toNamed(AppRoutes.chatList);
+                    Get.to(() => const ChatListScreen());
                   },
                 ),
                 _buildDrawerItem(

@@ -288,6 +288,28 @@ class ActiveProgramDetailScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
 
+        // Chat with Trainer
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Get.toNamed(AppRoutes.chatRoom, arguments: program);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accent,
+              foregroundColor: AppColors.onAccent,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            icon: const Icon(Icons.chat),
+            label: Text(
+              'Chat with Trainer',
+              style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
         // Download Progress Report
         SizedBox(
           width: double.infinity,

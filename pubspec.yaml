@@ -48,6 +48,9 @@ dependencies:
   geolocator: ^12.0.0  # GPS for run tracking
   google_maps_flutter: ^2.6.1  # Google Maps for visualization
   table_calendar: ^3.0.9  # Calendar for program enrollment
+  flutter_sound: ^9.2.13  # Audio recording for chat messages
+  path_provider: ^2.1.2  # File path utilities
+  permission_handler: ^11.3.1  # Permissions for audio recording
   
 
 dev_dependencies:
