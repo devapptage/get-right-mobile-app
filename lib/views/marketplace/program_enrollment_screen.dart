@@ -19,6 +19,7 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _startDate;
   DateTime? _endDate;
+  bool _isSelectingStartDate = true; // Track which date is being selected
 
   @override
   void initState() {
@@ -50,18 +51,47 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
 
     setState(() {
       _focusedDay = focusedDay;
-      _startDate = selectedDay;
-      // Recalculate end date
-      if (program['duration'] != null && _startDate != null) {
-        final durationWeeks = _parseDuration(program['duration']);
-        _endDate = _startDate!.add(Duration(days: durationWeeks * 7));
+
+      if (_isSelectingStartDate) {
+        _startDate = selectedDay;
+        // If end date exists and is before new start date, clear it
+        if (_endDate != null && _endDate!.isBefore(selectedDay)) {
+          _endDate = null;
+        }
+        // Auto-calculate end date if not set
+        if (_endDate == null && program['duration'] != null) {
+          final durationWeeks = _parseDuration(program['duration']);
+          _endDate = _startDate!.add(Duration(days: durationWeeks * 7));
+        }
+      } else {
+        // Selecting end date
+        if (_startDate == null) {
+          Get.snackbar(
+            'Select Start Date First',
+            'Please select a start date before selecting an end date',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
+          return;
+        }
+        if (selectedDay.isBefore(_startDate!)) {
+          Get.snackbar('Invalid Date', 'End date must be after start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+          return;
+        }
+        _endDate = selectedDay;
       }
     });
   }
 
   void _proceedToCheckout() {
     if (_startDate == null || _endDate == null) {
-      Get.snackbar('Incomplete', 'Please select start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Incomplete', 'Please select both start and end dates', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
+    if (_endDate!.isBefore(_startDate!)) {
+      Get.snackbar('Invalid Dates', 'End date must be after start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
 
@@ -132,8 +162,91 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Select when you want to start this program. The end date will be calculated automatically.',
+                      'Select your program start and end dates. You can customize both dates or let us calculate the end date automatically.',
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Date Selection Toggle
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() {
+                        _isSelectingStartDate = true;
+                        if (_startDate != null) {
+                          _focusedDay = _startDate!;
+                        }
+                      }),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(color: _isSelectingStartDate ? AppColors.accent : Colors.transparent, borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.play_circle_outline, size: 18, color: _isSelectingStartDate ? AppColors.onAccent : AppColors.primaryGray),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Start Date',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: _isSelectingStartDate ? AppColors.onAccent : AppColors.onBackground,
+                                fontWeight: _isSelectingStartDate ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_startDate == null) {
+                          Get.snackbar(
+                            'Select Start Date First',
+                            'Please select a start date before selecting an end date',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.orange,
+                            colorText: Colors.white,
+                          );
+                          return;
+                        }
+                        setState(() {
+                          _isSelectingStartDate = false;
+                          if (_endDate != null) {
+                            _focusedDay = _endDate!;
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(color: !_isSelectingStartDate ? AppColors.accent : Colors.transparent, borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.flag_outlined, size: 18, color: !_isSelectingStartDate ? AppColors.onAccent : AppColors.primaryGray),
+                            const SizedBox(width: 8),
+                            Text(
+                              'End Date',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: !_isSelectingStartDate ? AppColors.onAccent : AppColors.onBackground,
+                                fontWeight: !_isSelectingStartDate ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -143,7 +256,7 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
 
             // Calendar
             Text(
-              'Select Start Date',
+              _isSelectingStartDate ? 'Select Start Date' : 'Select End Date',
               style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -158,7 +271,7 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
                 firstDay: DateTime.now(),
                 lastDay: DateTime.now().add(const Duration(days: 365)),
                 focusedDay: _focusedDay,
-                selectedDayPredicate: (day) => isSameDay(_startDate, day),
+                selectedDayPredicate: (day) => isSameDay(_startDate, day) || isSameDay(_endDate, day),
                 onDaySelected: _onDaySelected,
                 calendarFormat: CalendarFormat.month,
                 startingDayOfWeek: StartingDayOfWeek.monday,
@@ -202,11 +315,11 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
                 ),
                 child: Column(
                   children: [
-                    if (_startDate != null) _buildDateRow('Start Date', _formatDate(_startDate!), Icons.play_circle_outline),
+                    if (_startDate != null) _buildDateRow('Start Date', _formatDate(_startDate!), Icons.play_circle_outline, isSelected: _isSelectingStartDate),
                     const Divider(height: 24),
-                    if (_endDate != null) _buildDateRow('End Date', _formatDate(_endDate!), Icons.flag_outlined),
+                    if (_endDate != null) _buildDateRow('End Date', _formatDate(_endDate!), Icons.flag_outlined, isSelected: !_isSelectingStartDate),
                     const Divider(height: 24),
-                    _buildDateRow('Duration', program['duration'] ?? '', Icons.schedule),
+                    _buildDateRow('Duration', _calculateDuration(), Icons.schedule),
                   ],
                 ),
               ),
@@ -235,12 +348,16 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
     );
   }
 
-  Widget _buildDateRow(String label, String value, IconData icon) {
+  Widget _buildDateRow(String label, String value, IconData icon, {bool isSelected = false}) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.accent.withOpacity(0.2) : AppColors.accent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: isSelected ? Border.all(color: AppColors.accent, width: 1.5) : null,
+          ),
           child: Icon(icon, color: AppColors.accent, size: 20),
         ),
         const SizedBox(width: 12),
@@ -252,11 +369,17 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? AppColors.accent : AppColors.onSurface, fontWeight: FontWeight.bold),
               ),
             ],
           ),
         ),
+        if (isSelected)
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+            child: const Icon(Icons.check, size: 14, color: AppColors.onAccent),
+          ),
       ],
     );
   }
@@ -264,5 +387,23 @@ class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
   String _formatDate(DateTime date) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  String _calculateDuration() {
+    if (_startDate == null || _endDate == null) {
+      return program['duration'] ?? 'N/A';
+    }
+    final difference = _endDate!.difference(_startDate!);
+    final totalDays = difference.inDays;
+    final weeks = totalDays ~/ 7; // Integer division
+    final days = totalDays % 7; // Remainder
+
+    if (weeks > 0 && days > 0) {
+      return '$weeks week${weeks > 1 ? 's' : ''} ${days} day${days > 1 ? 's' : ''}';
+    } else if (weeks > 0) {
+      return '$weeks week${weeks > 1 ? 's' : ''}';
+    } else {
+      return '$days day${days > 1 ? 's' : ''}';
+    }
   }
 }

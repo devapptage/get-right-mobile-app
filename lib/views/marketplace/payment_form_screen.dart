@@ -16,7 +16,6 @@ class PaymentFormScreen extends StatefulWidget {
 
 class _PaymentFormScreenState extends State<PaymentFormScreen> {
   final Map<String, dynamic> paymentData = Get.arguments ?? {};
-  final _formKey = GlobalKey<FormState>();
 
   final _cardNumberController = TextEditingController();
   final _cardHolderController = TextEditingController();
@@ -35,10 +34,6 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
   }
 
   Future<void> _processPayment() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
     setState(() {
       _isProcessing = true;
     });
@@ -66,185 +61,144 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Amount Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Total Amount', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent.withOpacity(0.9))),
-                    const SizedBox(height: 4),
-                    Text(
-                      '\$${total.toStringAsFixed(2)}',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      paymentData['title'] ?? '',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.onAccent.withOpacity(0.8)),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Amount Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(height: 32),
-
-              // Payment Method Display
-              Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(_getPaymentIcon(paymentMethod), color: AppColors.accent, size: 24),
-                  const SizedBox(width: 8),
+                  Text('Total Amount', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent.withOpacity(0.9))),
+                  const SizedBox(height: 4),
                   Text(
-                    _getPaymentMethodName(paymentMethod),
-                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    '\$${total.toStringAsFixed(2)}',
+                    style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    paymentData['title'] ?? '',
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.onAccent.withOpacity(0.8)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 32),
 
-              // Card Number
-              Text(
-                'Card Number',
-                style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              CustomTextField(
-                controller: _cardNumberController,
-                hintText: '1234 5678 9012 3456',
-                keyboardType: TextInputType.number,
-                prefixIcon: Icon(Icons.credit_card),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(16), _CardNumberFormatter()],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter card number';
-                  }
-                  if (value.replaceAll(' ', '').length < 16) {
-                    return 'Please enter valid card number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
+            // Payment Method Display
+            Row(
+              children: [
+                Icon(_getPaymentIcon(paymentMethod), color: AppColors.accent, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  _getPaymentMethodName(paymentMethod),
+                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
 
-              // Card Holder Name
-              Text(
-                'Card Holder Name',
-                style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              CustomTextField(
-                controller: _cardHolderController,
-                hintText: 'JOHN DOE',
-                keyboardType: TextInputType.name,
-                prefixIcon: Icon(Icons.person),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter card holder name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
+            // Card Number
+            Text(
+              'Card Number',
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(
+              controller: _cardNumberController,
+              hintText: '1234 5678 9012 3456',
+              keyboardType: TextInputType.number,
+              prefixIcon: Icon(Icons.credit_card),
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(16), _CardNumberFormatter()],
+            ),
+            const SizedBox(height: 20),
 
-              // Expiry and CVV
-              Row(
+            // Card Holder Name
+            Text(
+              'Card Holder Name',
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            CustomTextField(controller: _cardHolderController, hintText: 'JOHN DOE', keyboardType: TextInputType.name, prefixIcon: Icon(Icons.person)),
+            const SizedBox(height: 20),
+
+            // Expiry and CVV
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Expiry Date',
+                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      CustomTextField(
+                        controller: _expiryController,
+                        hintText: 'MM/YY',
+                        keyboardType: TextInputType.number,
+                        prefixIcon: Icon(Icons.calendar_today),
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4), _ExpiryDateFormatter()],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'CVV',
+                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      CustomTextField(
+                        controller: _cvvController,
+                        hintText: '123',
+                        keyboardType: TextInputType.number,
+                        obscureText: false,
+                        prefixIcon: Icon(Icons.lock),
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(3)],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+
+            // Security Info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.completed.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.completed.withOpacity(0.3)),
+              ),
+              child: Row(
                 children: [
+                  Icon(Icons.security, color: AppColors.completed, size: 24),
+                  const SizedBox(width: 12),
                   Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Expiry Date',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _expiryController,
-                          hintText: 'MM/YY',
-                          keyboardType: TextInputType.number,
-                          prefixIcon: Icon(Icons.calendar_today),
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4), _ExpiryDateFormatter()],
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Required';
-                            }
-                            if (!value.contains('/') || value.length < 5) {
-                              return 'Invalid format';
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CVV',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 8),
-                        CustomTextField(
-                          controller: _cvvController,
-                          hintText: '123',
-                          keyboardType: TextInputType.number,
-                          obscureText: true,
-                          prefixIcon: Icon(Icons.lock),
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(3)],
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Required';
-                            }
-                            if (value.length < 3) {
-                              return 'Invalid';
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
-                    ),
+                    child: Text('Your payment is secured with 256-bit SSL encryption', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface)),
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
-
-              // Security Info
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.completed.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.completed.withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.security, color: AppColors.completed, size: 24),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text('Your payment is secured with 256-bit SSL encryption', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface)),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 80),
-            ],
-          ),
+            ),
+            const SizedBox(height: 80),
+          ],
         ),
       ),
       bottomNavigationBar: Container(

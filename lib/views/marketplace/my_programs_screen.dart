@@ -190,6 +190,24 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+            ),
+            child: const Icon(Icons.arrow_back_rounded, size: 20),
+          ),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Get.back();
+            } else {
+              Get.offAllNamed(AppRoutes.home);
+            }
+          },
+        ),
         title: Text('My Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         bottom: TabBar(
