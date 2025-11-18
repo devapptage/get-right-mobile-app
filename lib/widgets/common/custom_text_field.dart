@@ -80,7 +80,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             color: widget.enabled ? AppColors.surface : AppColors.surface.withOpacity(0.5),
             border: Border.all(
               color: _hasError
@@ -133,10 +133,10 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                     )
                   : null,
               suffixIcon: widget.suffixIcon != null ? Padding(padding: const EdgeInsets.only(right: 12), child: widget.suffixIcon) : null,
-              prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-              suffixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+              suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               filled: false,
-              contentPadding: EdgeInsets.symmetric(horizontal: widget.prefixIcon != null ? 0 : 20, vertical: 18),
+              contentPadding: EdgeInsets.symmetric(horizontal: widget.prefixIcon != null ? 0 : 18, vertical: 12),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,

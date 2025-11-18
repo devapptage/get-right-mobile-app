@@ -154,11 +154,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-
-                // Category Section
+                SizedBox(height: 24),
                 _buildFilterSectionHeader('Category', Icons.category_outlined),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(

@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
-import 'package:get_right/utils/helpers.dart';
 import 'package:get_right/services/storage_service.dart';
 
 /// Auth Controller - STATIC/DEMO VERSION (No API Integration)
@@ -162,6 +161,21 @@ class AuthController extends GetxController {
 
       _tempEmail = null; // Clear temp email
       Get.offAllNamed(AppRoutes.login);
+    } catch (e) {
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
+
+  /// Change password from settings - DEMO VERSION
+  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
+    try {
+      _isLoading = true;
+      update();
+
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
     } finally {
       _isLoading = false;

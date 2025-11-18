@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       'Login to continue your fitness journey',
                       style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 25),
 
                     // Email field
                     CustomTextField(
@@ -210,15 +210,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildSocialButton(
-                            icon: Icons.apple_rounded,
-                            label: 'Apple',
-                            onPressed: () {
-                              // TODO: Implement Apple login
-                            },
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: _buildSocialButton(
+                        //     icon: Icons.apple_rounded,
+                        //     label: 'Apple',
+                        //     onPressed: () {
+                        //       // TODO: Implement Apple login
+                        //     },
+                        //   ),
+                        // ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildSocialButton(

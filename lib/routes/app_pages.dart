@@ -28,6 +28,7 @@ import 'package:get_right/views/tracker/run_history_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/settings/settings_screen.dart';
+import 'package:get_right/views/settings/change_password_screen.dart';
 import 'package:get_right/views/settings/notifications_screen.dart';
 import 'package:get_right/views/settings/help_feedback_screen.dart';
 import 'package:get_right/views/settings/about_screen.dart';
@@ -68,6 +69,7 @@ class AppPages {
     GetPage(name: AppRoutes.otp, page: () => const OtpScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.forgotPassword, page: () => const ForgotPasswordScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.resetPassword, page: () => const ResetPasswordScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.changePassword, page: () => const ChangePasswordScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.profileSetup, page: () => const ProfileSetupScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.termsConditions, page: () => const TermsConditionsScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.privacyPolicy, page: () => const PrivacyPolicyScreen(), transition: Transition.rightToLeft),

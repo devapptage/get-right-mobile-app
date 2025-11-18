@@ -97,12 +97,11 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                       ),
                       onPressed: () => Get.back(),
                     ),
-                    const SizedBox(height: 16),
 
                     // Logo
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
 
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -113,7 +112,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         child: const AppLogo(size: 60, borderRadius: 14),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
 
                     // Title
                     Text(
@@ -125,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                       'Sign up to start your fitness journey',
                       style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 25),
 
                     // Email
                     CustomTextField(
@@ -200,7 +199,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 25),
 
                     // Signup button (disabled if terms not accepted)
                     GetBuilder<AuthController>(
@@ -249,15 +248,15 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildSocialButton(
-                            icon: Icons.apple_rounded,
-                            label: 'Apple',
-                            onPressed: () {
-                              // TODO: Implement Apple sign up
-                            },
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: _buildSocialButton(
+                        //     icon: Icons.apple_rounded,
+                        //     label: 'Apple',
+                        //     onPressed: () {
+                        //       // TODO: Implement Apple sign up
+                        //     },
+                        //   ),
+                        // ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildSocialButton(
@@ -270,7 +269,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 25),
 
                     // Login link
                     Center(

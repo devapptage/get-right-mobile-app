@@ -11,6 +11,7 @@ class AppRoutes {
   static const String otp = '/otp';
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
+  static const String changePassword = '/change-password';
   static const String profileSetup = '/profile-setup';
 
   // Main App Routes

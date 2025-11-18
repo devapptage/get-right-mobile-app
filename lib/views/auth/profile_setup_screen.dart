@@ -34,7 +34,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
   String? _selectedGender;
   String? _selectedFitnessGoal;
   String? _selectedActivityLevel;
-  String? _selectedUnits = 'Metric'; // Default to metric
+  String? _selectedUnits;
   List<String> _selectedWorkoutTypes = [];
   String? _profileImagePath;
 
@@ -258,7 +258,25 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 24),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.start,
+                    //   children: [
+                    //     IconButton(
+                    //       icon: Container(
+                    //         padding: const EdgeInsets.all(8),
+                    //         decoration: BoxDecoration(
+                    //           color: AppColors.surface,
+                    //           borderRadius: BorderRadius.circular(12),
+                    //           border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+                    //         ),
+                    //         child: const Icon(Icons.arrow_back_rounded, size: 20),
+                    //       ),
+                    //       onPressed: () => Get.offNamed(AppRoutes.otp),
+                    //     ),
+                    //   ],
+                    // ),
+                    const SizedBox(height: 8),
 
                     // Header
                     Column(
@@ -330,7 +348,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
 
                     // Units preference
                     _buildDropdownField(
-                      label: 'Units',
+                      label: 'Measurement System',
                       value: _selectedUnits,
                       items: AppConstants.unitsOptions,
                       icon: Icons.straighten_outlined,
@@ -355,7 +373,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                           child: CustomTextField(
                             controller: _weightController,
                             labelText: _selectedUnits == 'Metric' ? 'Weight (kg)' : 'Weight (lbs)',
-                            hintText: _selectedUnits == 'Metric' ? '70' : '154',
+                            hintText: _selectedUnits == 'Metric' ? 'e.g. 70 (kg)' : 'e.g. 154 (lbs)',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             prefixIcon: const Icon(Icons.monitor_weight_outlined),
                           ),
@@ -566,31 +584,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
           return DropdownMenuItem<String>(value: item, child: Text(item));
         }).toList(),
         onChanged: onChanged,
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.1), AppColors.surface], begin: Alignment.centerLeft, end: Alignment.centerRight),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-            child: Icon(icon, color: AppColors.accent, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-        ],
       ),
     );
   }

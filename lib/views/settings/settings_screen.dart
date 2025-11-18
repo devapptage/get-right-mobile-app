@@ -4,6 +4,7 @@ import 'package:get_right/controllers/settings_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/settings/change_password_screen.dart';
 
 /// Settings screen
 class SettingsScreen extends StatelessWidget {
@@ -39,6 +40,15 @@ class SettingsScreen extends StatelessWidget {
               activeColor: AppColors.accent,
               onChanged: controller.toggleNotifications,
             ),
+          ),
+
+          // Change Password
+          ListTile(
+            leading: const Icon(Icons.lock_outline, color: AppColors.onBackground),
+            title: Text('Change Password', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
+            subtitle: Text('Update your account password', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
+            onTap: () => Get.to(() => const ChangePasswordScreen()),
           ),
 
           // Notifications Settings
