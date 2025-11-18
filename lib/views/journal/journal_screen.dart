@@ -15,6 +15,11 @@ class JournalScreen extends StatefulWidget {
 class _JournalScreenState extends State<JournalScreen> {
   int _selectedDateIndex = 2; // Today is at index 2
 
+  // Streak analytics data
+  final int _currentStreak = 12;
+  final int _longestStreak = 28;
+  final List<bool> _weeklyStreak = [true, true, true, true, true, false, true]; // Last 7 days
+
   // Mock data for dates (showing 7 days)
   final List<Map<String, dynamic>> _dates = [
     {'day': 'Mon', 'date': 3},
@@ -271,6 +276,70 @@ class _JournalScreenState extends State<JournalScreen> {
 
             const SizedBox(height: 20),
 
+            // Day Streak Analytics - Dark Theme
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 8))],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                          child: const Icon(Icons.local_fire_department, color: AppColors.accent, size: 24),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Day Streak',
+                                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.bold),
+                              ),
+                              Text('Keep the fire burning!', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(child: _buildStreakStat('Current Streak', '$_currentStreak', 'days', Icons.whatshot, AppColors.accent)),
+                        const SizedBox(width: 16),
+                        Expanded(child: _buildStreakStat('Longest Streak', '$_longestStreak', 'days', Icons.emoji_events, const Color(0xFFFFD700))),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'This Week',
+                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.onPrimary.withOpacity(0.8), fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(7, (index) {
+                        final isActive = _weeklyStreak[index];
+                        final dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                        return _buildStreakDay(dayLabels[index], isActive, index == 2); // Today is at index 2
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
             // Daily Summary Card with Section Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -480,6 +549,72 @@ class _JournalScreenState extends State<JournalScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStreakStat(String label, String value, String unit, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.primaryVariant.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.onPrimary.withOpacity(0.7)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                value,
+                style: AppTextStyles.headlineSmall.copyWith(color: color, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(unit, style: AppTextStyles.labelSmall.copyWith(color: AppColors.onPrimary.withOpacity(0.6))),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStreakDay(String dayLabel, bool isActive, bool isToday) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: isActive ? (isToday ? AppColors.accent : AppColors.accent.withOpacity(0.3)) : AppColors.primaryVariant.withOpacity(0.3),
+        shape: BoxShape.circle,
+        border: Border.all(color: isToday ? AppColors.accent : Colors.transparent, width: 2),
+      ),
+      child: Center(
+        child: Text(
+          dayLabel,
+          style: AppTextStyles.labelMedium.copyWith(
+            color: isActive ? AppColors.onAccent : AppColors.onPrimary.withOpacity(0.4),
+            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
       ),
     );
   }
