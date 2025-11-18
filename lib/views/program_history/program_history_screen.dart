@@ -122,10 +122,138 @@ class _ProgramHistoryScreenState extends State<ProgramHistoryScreen> with Single
     }
   }
 
+  void _showCancelDialog(EnrolledProgramModel program) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 60),
+              const SizedBox(height: 20),
+              Text(
+                'Cancel Program?',
+                style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to cancel this program? This action cannot be undone.',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                child: Text(
+                  program.programTitle,
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: AppColors.primaryGray, width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('No', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                        _cancelProgram(program);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Yes, Cancel', style: AppTextStyles.buttonMedium.copyWith(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _cancelProgram(EnrolledProgramModel program) {
+    setState(() {
+      final index = _allPrograms.indexWhere((p) => p.id == program.id);
+      if (index != -1) {
+        // Create a new instance with cancelled status
+        final cancelledProgram = EnrolledProgramModel(
+          id: program.id,
+          programId: program.programId,
+          programTitle: program.programTitle,
+          trainerId: program.trainerId,
+          trainerName: program.trainerName,
+          trainerImage: program.trainerImage,
+          price: program.price,
+          category: program.category,
+          durationWeeks: program.durationWeeks,
+          startDate: program.startDate,
+          endDate: program.endDate,
+          status: ProgramStatus.cancelled,
+          progress: program.progress,
+          enrolledAt: program.enrolledAt,
+          completedAt: program.completedAt,
+          cancelledAt: DateTime.now(),
+          cancellationReason: 'User cancelled',
+          pendingModification: program.pendingModification,
+          review: program.review,
+        );
+        _allPrograms[index] = cancelledProgram;
+      }
+    });
+
+    Get.snackbar(
+      'Program Cancelled',
+      'Your enrollment in ${program.programTitle} has been cancelled',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.missed,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+            ),
+            child: const Icon(Icons.arrow_back_rounded, size: 20),
+          ),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Get.back();
+            } else {
+              Get.offAllNamed(AppRoutes.home);
+            }
+          },
+        ),
         title: Text('Program History', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         bottom: TabBar(
@@ -280,19 +408,37 @@ class _ProgramHistoryScreenState extends State<ProgramHistoryScreen> with Single
           ),
           const SizedBox(height: 16),
 
-          // Action Button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => _viewProgramDetails(program),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                side: BorderSide(color: AppColors.accent, width: 2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _viewProgramDetails(program),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    side: BorderSide(color: AppColors.accent, width: 2),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: Icon(Icons.visibility, size: 18, color: AppColors.accent),
+                  label: Text('View Details', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
+                ),
               ),
-              icon: Icon(Icons.visibility, size: 18, color: AppColors.accent),
-              label: Text('View Details', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
-            ),
+              if (isActive) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showCancelDialog(program),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.red, width: 2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    icon: Icon(Icons.cancel_outlined, size: 18, color: Colors.red),
+                    label: Text('Cancel', style: AppTextStyles.labelMedium.copyWith(color: Colors.red)),
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),

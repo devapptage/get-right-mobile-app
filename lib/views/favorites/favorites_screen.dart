@@ -54,6 +54,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+            ),
+            child: const Icon(Icons.arrow_back_rounded, size: 20),
+          ),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Get.back();
+            } else {
+              Get.offAllNamed(AppRoutes.home);
+            }
+          },
+        ),
         title: Text('Favorites', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         bottom: TabBar(
@@ -84,32 +102,55 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   Widget _buildFavoritesList(List<Map<String, dynamic>> items, String type) {
     if (items.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.favorite_border, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
-            const SizedBox(height: 16),
-            Text('No Favorites Yet', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
-            const SizedBox(height: 8),
-            Text(
-              type == 'program' ? 'Mark programs as favorites to see them here' : 'Mark workouts as favorites to see them here',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                if (type == 'program') {
-                  Get.toNamed(AppRoutes.marketplace);
-                } else {
-                  Get.toNamed(AppRoutes.journal);
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
-              icon: Icon(type == 'program' ? Icons.explore : Icons.fitness_center),
-              label: Text(type == 'program' ? 'Browse Programs' : 'View Workouts'),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.accent.withOpacity(0.1),
+                  border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 2),
+                ),
+                child: Icon(Icons.favorite_border, size: 60, color: AppColors.accent.withOpacity(0.6)),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'No Favorites Yet',
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                type == 'program' ? 'Mark programs as favorites to see them here' : 'Mark workouts as favorites to see them here',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (type == 'program') {
+                    Get.toNamed(AppRoutes.marketplace);
+                  } else {
+                    Get.toNamed(AppRoutes.journal);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                ),
+                icon: Icon(type == 'program' ? Icons.explore : Icons.fitness_center, color: AppColors.onAccent),
+                label: Text(
+                  type == 'program' ? 'Browse Programs' : 'View Workouts',
+                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -148,6 +189,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+            boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,11 +198,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                 children: [
                   // Icon
                   Container(
-                    width: 50,
-                    height: 50,
+                    width: 56,
+                    height: 56,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant]),
-                      borderRadius: BorderRadius.circular(8),
+                      gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.9), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
                     ),
                     child: Icon(type == 'program' ? Icons.school : Icons.fitness_center, color: AppColors.onAccent, size: 28),
                   ),
@@ -172,14 +215,26 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                         Text(
                           item['title'] ?? '',
                           style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        if (item['trainer'] != null) Text('by ${item['trainer']}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                        if (item['trainer'] != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              'by ${item['trainer']}',
+                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: () => _removeFavorite(id),
-                    icon: Icon(Icons.favorite, color: Colors.red),
+                    icon: const Icon(Icons.favorite, color: Colors.red, size: 24),
+                    tooltip: 'Remove from favorites',
                   ),
                 ],
               ),
@@ -196,18 +251,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
               Row(
                 children: [
                   if (item['category'] != null)
-                    Chip(label: Text(item['category']), padding: const EdgeInsets.symmetric(horizontal: 8), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.accent.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        item['category'],
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  if (item['category'] != null && item['duration'] != null) const SizedBox(width: 8),
                   if (item['duration'] != null) ...[
-                    Icon(Icons.schedule, size: 14, color: AppColors.primaryGray),
+                    Icon(Icons.schedule, size: 16, color: AppColors.primaryGray),
                     const SizedBox(width: 4),
                     Text(item['duration'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
                   ],
                   const Spacer(),
                   if (item['price'] != null)
-                    Text(
-                      '\$${item['price']}',
-                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                      child: Text(
+                        '\$${item['price']}',
+                        style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                      ),
                     ),
                 ],
               ),

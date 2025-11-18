@@ -136,6 +136,15 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
                 _buildDrawerItem(
+                  icon: Icons.favorite_outline,
+                  activeIcon: Icons.favorite,
+                  title: 'Favorites',
+                  onTap: () {
+                    Get.back();
+                    Get.toNamed(AppRoutes.favorites);
+                  },
+                ),
+                _buildDrawerItem(
                   icon: Icons.chat_bubble_outline,
                   activeIcon: Icons.chat_bubble,
                   title: 'Chat',
