@@ -1,4 +1,4 @@
-package com.example.get_right
+package com.apptage.getRight
 
 import io.flutter.embedding.android.FlutterActivity
 

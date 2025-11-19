@@ -17,11 +17,11 @@
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
-		<string>$(FLUTTER_BUILD_NAME)</string>
+		<string>$(MARKETING_VERSION)</string>
 		<key>CFBundleSignature</key>
 		<string>????</string>
 		<key>CFBundleVersion</key>
-		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<string>$(CURRENT_PROJECT_VERSION)</string>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>UILaunchStoryboardName</key>
@@ -46,6 +46,12 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<!-- Location permissions for GPS tracking -->
+		<key>NSCameraUsageDescription</key>
+		<string>Get Right needs camera access to allow you to take and upload photos for your profile and workout logs.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Get Right needs photo library access to allow you to select and upload photos for your profile and workout logs.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Get Right needs microphone access for video recording features in workout logs (if applicable).</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Get Right needs your location to track your runs and provide accurate distance and pace information.</string>
 		<key>NSLocationAlwaysUsageDescription</key>

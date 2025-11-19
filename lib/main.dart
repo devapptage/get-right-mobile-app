@@ -7,6 +7,25 @@ import 'package:get_right/routes/app_pages.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 
+// 1. DEFINE THE STYLE FOR DARK SCREENS (WHITE ICONS)
+// This constant ensures the status bar icons (time, battery, wifi) are white.
+const SystemUiOverlayStyle darkSystemOverlay = SystemUiOverlayStyle(
+  // Make status bar background transparent (or a dark color)
+  statusBarColor: Colors.transparent,
+
+  // *** THIS IS THE CRUCIAL LINE for Android/General ***
+  // Brightness.light makes the icons/text white for visibility against a dark background.
+  statusBarIconBrightness: Brightness.light,
+
+  // *** THIS IS THE CRUCIAL LINE for iOS ***
+  // Brightness.dark tells iOS the background is dark, so it should use light foreground elements.
+  statusBarBrightness: Brightness.dark,
+
+  // Optional: Ensure navigation bar (Android bottom bar) icons are also light if visible
+  systemNavigationBarIconBrightness: Brightness.light,
+  systemNavigationBarColor: Colors.black,
+);
+
 // Stub for Firebase Messaging background handler (to prevent errors if Firebase tries to initialize)
 @pragma('vm:entry-point')
 void _firebaseMessagingBackgroundHandler(dynamic message) async {
@@ -18,8 +37,8 @@ void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set system overlay style
-  SystemChrome.setSystemUIOverlayStyle(AppTheme.lightSystemOverlay);
+  // Remove SystemChrome.setSystemUIOverlayStyle from here,
+  // as it's less reliable than using AnnotatedRegion in the widget tree.
 
   // Set preferred orientations
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -45,20 +64,26 @@ class GetRightApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Get Right',
-      debugShowCheckedModeBanner: false,
+    // 2. WRAP the entire app in AnnotatedRegion
+    // This ensures the style is applied consistently across all screens
+    // unless explicitly overridden by a deeper AnnotatedRegion or AppBar.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: darkSystemOverlay,
+      child: GetMaterialApp(
+        title: 'Get Right',
+        debugShowCheckedModeBanner: false,
 
-      // Apply App Theme with Google Fonts fallback for Inter
-      theme: AppTheme.lightTheme.copyWith(textTheme: GoogleFonts.interTextTheme(AppTheme.lightTheme.textTheme)),
+        // Apply App Theme with Google Fonts fallback for Inter
+        theme: AppTheme.lightTheme.copyWith(textTheme: GoogleFonts.interTextTheme(AppTheme.lightTheme.textTheme)),
 
-      // GetX Routing
-      initialRoute: AppPages.initial,
-      getPages: AppPages.routes,
+        // GetX Routing
+        initialRoute: AppPages.initial,
+        getPages: AppPages.routes,
 
-      // Default transition
-      defaultTransition: Transition.cupertino,
-      transitionDuration: const Duration(milliseconds: 300),
+        // Default transition
+        defaultTransition: Transition.cupertino,
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
     );
   }
 }
