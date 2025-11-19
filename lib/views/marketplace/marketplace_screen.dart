@@ -21,17 +21,18 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   final List<Map<String, dynamic>> _bundles = [
     {
       'id': 'bundle_1',
-      'title': 'Complete Fitness Bundle',
+      'title': '100 Days of Code™: The Complete Python Pro Bootcamp',
       'description': 'Full body transformation program',
       'discount': 25,
-      'totalValue': 159.97,
-      'bundlePrice': 119.99,
+      'totalValue': 64.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&h=300&fit=crop',
       'programs': [
         {
           'id': 'program_1',
           'title': 'Complete Strength Program',
-          'trainer': 'Sarah Johnson',
-          'trainerImage': 'SJ',
+          'trainer': 'Dr Angela Yu, Developer and Lead Instructor',
+          'trainerImage': 'AY',
           'price': 49.99,
           'duration': '12 weeks',
           'category': 'Strength',
@@ -70,17 +71,18 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     },
     {
       'id': 'bundle_2',
-      'title': 'Elite Performance Bundle',
+      'title': 'AI Engineer Agent Course: Complete Agent Development',
       'description': 'Advanced training for serious athletes',
       'discount': 30,
-      'totalValue': 189.97,
-      'bundlePrice': 132.99,
+      'totalValue': 19.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=300&fit=crop',
       'programs': [
         {
           'id': 'program_5',
           'title': 'Marathon Prep',
-          'trainer': 'Lisa Thompson',
-          'trainerImage': 'LT',
+          'trainer': 'Ed Latimore, Ligency',
+          'trainerImage': 'EL',
           'price': 59.99,
           'duration': '16 weeks',
           'category': 'Running',
@@ -130,6 +132,198 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         },
       ],
     },
+    {
+      'id': 'bundle_3',
+      'title': 'The Complete Web Development Bootcamp',
+      'description': 'Full-stack web development from scratch',
+      'discount': 20,
+      'totalValue': 99.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_7',
+          'title': 'HTML & CSS Mastery',
+          'trainer': 'John Smith',
+          'trainerImage': 'JS',
+          'price': 29.99,
+          'duration': '8 weeks',
+          'category': 'Web Development',
+          'goal': 'Web Development',
+          'certified': true,
+          'rating': 4.7,
+          'students': 3200,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_4',
+      'title': 'Data Science & Machine Learning Masterclass',
+      'description': 'Complete data science course',
+      'discount': 35,
+      'totalValue': 129.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_8',
+          'title': 'Python for Data Science',
+          'trainer': 'Dr. Sarah Mitchell',
+          'trainerImage': 'SM',
+          'price': 49.99,
+          'duration': '14 weeks',
+          'category': 'Data Science',
+          'goal': 'Data Analysis',
+          'certified': true,
+          'rating': 4.9,
+          'students': 2800,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_5',
+      'title': 'React - The Complete Guide 2024',
+      'description': 'Master React with Hooks, Redux, and more',
+      'discount': 28,
+      'totalValue': 84.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1636731173387-f0d4d0e5b5d1?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_9',
+          'title': 'React Fundamentals',
+          'trainer': 'Michael Johnson',
+          'trainerImage': 'MJ',
+          'price': 39.99,
+          'duration': '10 weeks',
+          'category': 'Frontend',
+          'goal': 'Web Development',
+          'certified': true,
+          'rating': 4.8,
+          'students': 4100,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_6',
+      'title': 'AWS Certified Solutions Architect Course',
+      'description': 'Complete AWS certification preparation',
+      'discount': 40,
+      'totalValue': 149.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_10',
+          'title': 'AWS Fundamentals',
+          'trainer': 'David Chen',
+          'trainerImage': 'DC',
+          'price': 59.99,
+          'duration': '12 weeks',
+          'category': 'Cloud',
+          'goal': 'Cloud Computing',
+          'certified': true,
+          'rating': 4.9,
+          'students': 1850,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_7',
+      'title': 'The Complete Digital Marketing Course',
+      'description': 'SEO, Social Media, Email Marketing & More',
+      'discount': 32,
+      'totalValue': 109.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_11',
+          'title': 'Digital Marketing Basics',
+          'trainer': 'Emma Wilson',
+          'trainerImage': 'EW',
+          'price': 44.99,
+          'duration': '9 weeks',
+          'category': 'Marketing',
+          'goal': 'Marketing',
+          'certified': true,
+          'rating': 4.6,
+          'students': 2600,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_8',
+      'title': 'iOS & Swift Development Course',
+      'description': 'Build iOS apps from scratch',
+      'discount': 38,
+      'totalValue': 119.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_12',
+          'title': 'Swift Programming',
+          'trainer': 'James Taylor',
+          'trainerImage': 'JT',
+          'price': 54.99,
+          'duration': '13 weeks',
+          'category': 'Mobile Development',
+          'goal': 'iOS Development',
+          'certified': true,
+          'rating': 4.8,
+          'students': 1950,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_9',
+      'title': 'Blockchain & Cryptocurrency Complete Course',
+      'description': 'Master blockchain technology and crypto',
+      'discount': 45,
+      'totalValue': 159.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_13',
+          'title': 'Blockchain Fundamentals',
+          'trainer': 'Robert Anderson',
+          'trainerImage': 'RA',
+          'price': 69.99,
+          'duration': '15 weeks',
+          'category': 'Blockchain',
+          'goal': 'Blockchain Development',
+          'certified': true,
+          'rating': 4.7,
+          'students': 1420,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_10',
+      'title': 'UI/UX Design Masterclass',
+      'description': 'Complete guide to modern UI/UX design',
+      'discount': 30,
+      'totalValue': 94.99,
+      'bundlePrice': 9.99,
+      'imageUrl': 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=400&h=300&fit=crop',
+      'programs': [
+        {
+          'id': 'program_14',
+          'title': 'UI/UX Fundamentals',
+          'trainer': 'Sophie Martin',
+          'trainerImage': 'SM',
+          'price': 42.99,
+          'duration': '11 weeks',
+          'category': 'Design',
+          'goal': 'UI/UX Design',
+          'certified': true,
+          'rating': 4.8,
+          'students': 3300,
+        },
+      ],
+    },
   ];
 
   // Mock program data
@@ -147,6 +341,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'rating': 4.8,
       'students': 1250,
       'description': 'Build muscle and strength with this comprehensive program',
+      'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
     },
     {
       'id': 'program_2',
@@ -161,6 +356,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'rating': 4.9,
       'students': 2100,
       'description': 'High-intensity cardio program for maximum fat loss',
+      'imageUrl': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop',
     },
     {
       'id': 'program_3',
@@ -175,6 +371,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'rating': 4.7,
       'students': 850,
       'description': 'Improve flexibility and recovery through targeted yoga',
+      'imageUrl': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop',
     },
     {
       'id': 'program_4',
@@ -189,6 +386,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'rating': 4.5,
       'students': 640,
       'description': 'Master bodyweight exercises anywhere, no equipment needed',
+      'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
     },
     {
       'id': 'program_5',
@@ -203,6 +401,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'rating': 4.9,
       'students': 1520,
       'description': 'Complete training plan to conquer your first marathon',
+      'imageUrl': 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&h=300&fit=crop',
     },
     {
       'id': 'program_6',
@@ -217,6 +416,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'rating': 4.6,
       'students': 980,
       'description': 'Intensive core training for a solid foundation',
+      'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
     },
   ];
 
@@ -466,7 +666,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
+        initialChildSize: 0.7,
         minChildSize: 0.5,
         maxChildSize: 0.95,
         expand: false,
@@ -629,13 +829,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             Text('Bundle Programs', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
             const SizedBox(height: 12),
             SizedBox(
-              height: 360,
+              height: 235,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                itemCount: _bundles.length,
+                itemCount: 4, // Show 3 bundles + See More card
                 itemBuilder: (context, index) {
-                  return _buildBundleCard(_bundles[index]);
+                  if (index < 3) {
+                    return _buildBundleCard(_bundles[index]);
+                  } else {
+                    return _buildSeeMoreCard();
+                  }
                 },
               ),
             ),
@@ -684,14 +888,15 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       ),
                     ),
                   )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: filteredPrograms.length,
-                    itemBuilder: (context, index) {
-                      final program = filteredPrograms[index];
-                      return _buildProgramCard(program);
-                    },
+                : Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: filteredPrograms.map((program) {
+                      return SizedBox(
+                        width: (MediaQuery.of(context).size.width - 44) / 2, // Account for padding and spacing
+                        child: _buildProgramCard(program),
+                      );
+                    }).toList(),
                   ),
           ],
         ),
@@ -703,134 +908,130 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     final programs = bundle['programs'] as List<Map<String, dynamic>>;
     final totalValue = bundle['totalValue'] as double;
     final bundlePrice = bundle['bundlePrice'] as double;
-    final discount = bundle['discount'] as int;
+
+    // Calculate average rating from programs
+    final avgRating = programs.isNotEmpty ? programs.map((p) => p['rating'] as double).reduce((a, b) => a + b) / programs.length : 4.7;
+    final totalRatings = programs.isNotEmpty ? programs.map((p) => p['students'] as int).reduce((a, b) => a + b) : 1000;
+
+    // Get primary trainer (first program's trainer)
+    final primaryTrainer = programs.isNotEmpty ? programs[0]['trainer'] : 'Multiple Trainers';
 
     return GestureDetector(
       onTap: () {
         Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
+        width: MediaQuery.of(context).size.width * 0.5,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.accent, width: 2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.white, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Bundle Header
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(bundle['title'], style: AppTextStyles.titleLarge.copyWith(color: AppColors.onAccent)),
-
-                          const SizedBox(height: 4),
-                          Text(bundle['description'], style: AppTextStyles.bodySmall.copyWith(color: AppColors.onAccent.withOpacity(0.9))),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: AppColors.onAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                        child: Text(
-                          '$discount% OFF',
-                          style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            ),
-
-            // Programs Horizontal Scroll
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text('${programs.length} Programs', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      itemCount: programs.length,
-                      itemBuilder: (context, index) {
-                        return SizedBox(child: _buildCompactProgramCard(programs[index]));
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Bundle Price and Enroll Button
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.primaryVariant,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Total Value', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                          Text(
-                            '\$${totalValue.toStringAsFixed(2)}',
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text('Bundle Price', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent)),
-                          Text(
-                            '\$${bundlePrice.toStringAsFixed(2)}',
-                            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
+            // Thumbnail Image
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  child: Image.network(
+                    bundle['imageUrl'],
                     width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _enrollInBundle(bundle),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.onAccent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                       ),
-                      icon: const Icon(Icons.shopping_cart, size: 20),
-                      label: Text('Enroll Bundle', style: AppTextStyles.buttonMedium),
+                      child: const Center(child: Icon(Icons.fitness_center, size: 60, color: Colors.white)),
                     ),
                   ),
-                ],
+                ),
+                // Bestseller badge
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: const Color(0xFFF3D060), borderRadius: BorderRadius.circular(4)),
+                    child: Text(
+                      'Bestseller',
+                      style: AppTextStyles.labelSmall.copyWith(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Content section
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      bundle['title'],
+                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 15),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Instructor
+                    Text(
+                      primaryTrainer,
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Rating
+                    Row(
+                      children: [
+                        Text(
+                          avgRating.toStringAsFixed(1),
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
+                        const SizedBox(width: 4),
+                        ...List.generate(5, (index) => Icon(index < avgRating.floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14)),
+                        const SizedBox(width: 4),
+                        Text('(${_formatNumber(totalRatings)})', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Price
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('${programs.length} programs', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13)),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '\$${totalValue.toStringAsFixed(2)}',
+                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough, fontSize: 13),
+                            ),
+                            const SizedBox(width: 8),
+
+                            Text(
+                              '\$${bundlePrice.toStringAsFixed(2)}',
+                              style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -839,164 +1040,166 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     );
   }
 
-  Widget _buildCompactProgramCard(Map<String, dynamic> program) {
-    return Container(
-      width: 220,
-      height: 350,
-      margin: const EdgeInsets.only(right: 12),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.primaryVariant,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 6),
-
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.accent,
-                child: Text(program['trainerImage'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent)),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      program['trainer'],
-                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.star, color: AppColors.upcoming, size: 12),
-                        const SizedBox(width: 2),
-                        Text('${program['rating']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            program['title'],
-            style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          const SizedBox(height: 6),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '\$${program['price']}',
-                style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
-                  const SizedBox(width: 4),
-                  Text(program['duration'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                ],
-              ),
-            ],
-          ),
-        ],
+  Widget _buildSeeMoreCard() {
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(AppRoutes.allBundles, arguments: _bundles);
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: AppColors.primaryVariant,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.white, width: 2),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
+              child: const Icon(Icons.grid_view_rounded, size: 30, color: AppColors.accent),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'See More',
+              style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('${_bundles.length - 3}+ more bundles', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+          ],
+        ),
       ),
     );
   }
 
-  void _enrollInBundle(Map<String, dynamic> bundle) {
-    Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
+  String _formatNumber(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    }
+    return number.toString();
   }
 
   Widget _buildProgramCard(Map<String, dynamic> program) {
     return GestureDetector(
       onTap: () => _showProgramDetail(program),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        height: 235,
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primaryGray, width: 1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.white, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            // Thumbnail Image
+            Stack(
               children: [
-                GestureDetector(
-                  onTap: () => _navigateToTrainerProfile(program),
-                  child: CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.accent,
-                    child: Text(program['trainerImage'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onAccent)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _navigateToTrainerProfile(program),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(program['trainer'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                            ),
-                            if (program['certified']) Icon(Icons.verified, color: AppColors.completed, size: 16),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: AppColors.upcoming, size: 14),
-                            const SizedBox(width: 4),
-                            Text('${program['rating']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
-                            const SizedBox(width: 8),
-                            Text('${program['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                          ],
-                        ),
-                      ],
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  child: Image.network(
+                    program['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
+                    width: double.infinity,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      ),
+                      child: const Center(child: Icon(Icons.fitness_center, size: 40, color: Colors.white)),
                     ),
                   ),
                 ),
+                // Certified badge
+                if (program['certified'])
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(color: AppColors.completed, shape: BoxShape.circle),
+                      child: const Icon(Icons.verified, color: Colors.white, size: 14),
+                    ),
+                  ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(program['title'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-            const SizedBox(height: 8),
-            Text(
-              program['description'],
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Chip(label: Text(program['category']), padding: const EdgeInsets.symmetric(horizontal: 8), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                const SizedBox(width: 8),
-                Icon(Icons.schedule, size: 14, color: AppColors.primaryGray),
-                const SizedBox(width: 4),
-                Text(program['duration'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                const Spacer(),
-                Text(
-                  '\$${program['price']}',
-                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+
+            // Content section
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      program['title'],
+                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 15),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Instructor
+                    Text(
+                      program['trainer'],
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Rating
+                    Row(
+                      children: [
+                        Text(
+                          program['rating'].toStringAsFixed(1),
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
+                        const SizedBox(width: 4),
+                        ...List.generate(
+                          5,
+                          (index) => Icon(index < (program['rating'] as double).floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            '(${_formatNumber(program['students'] as int)})',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(),
+
+                    // Price and Duration
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
+                            const SizedBox(width: 4),
+                            Text(program['duration'], style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                          ],
+                        ),
+                        Text(
+                          '\$${program['price'].toStringAsFixed(2)}',
+                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
