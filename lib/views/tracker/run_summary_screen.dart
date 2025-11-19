@@ -377,12 +377,6 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
   /// Save run to journal
   void _saveToJournal(RunModel run) async {
     final storageService = Get.find<StorageService>();
-    final isAlreadySynced = storageService.isRunSyncedToJournal(run.id);
-
-    if (isAlreadySynced) {
-      Get.snackbar('Already Synced', 'This run is already in your journal', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.upcoming, colorText: AppColors.white);
-      return;
-    }
 
     final success = await storageService.syncRunToJournal(run);
     if (success) {
@@ -394,6 +388,7 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
         colorText: AppColors.white,
         icon: const Icon(Icons.check_circle, color: AppColors.white),
       );
+      Get.back();
     } else {
       Get.snackbar('Error', 'Failed to save run to journal', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.error, colorText: AppColors.white);
     }

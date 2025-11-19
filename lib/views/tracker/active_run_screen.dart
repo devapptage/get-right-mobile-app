@@ -20,6 +20,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
   GoogleMapController? _mapController;
   late AnimationController _pulseController;
   Timer? _mapUpdateTimer;
+  bool _isLocked = false;
 
   @override
   void initState() {
@@ -62,14 +63,17 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
             // Map Layer
             _buildMap(),
 
-            // Overlay with stats
-            _buildStatsOverlay(),
+            // Overlay with stats (hidden when locked)
+            if (!_isLocked) _buildStatsOverlay(),
 
-            // Control buttons at bottom
-            _buildControlButtons(),
+            // Control buttons at bottom (hidden when locked)
+            if (!_isLocked) _buildControlButtons(),
 
-            // Top safe area with back button
-            _buildTopBar(),
+            // Top safe area with back button (hidden when locked)
+            if (!_isLocked) _buildTopBar(),
+
+            // Lock overlay (shown when locked)
+            if (_isLocked) _buildLockOverlay(),
           ],
         ),
       ),
@@ -312,12 +316,13 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
               const SizedBox(width: 20),
               // Lock button
               _buildControlButton(
-                icon: Icons.lock_rounded,
-                label: 'Lock',
-                color: AppColors.primaryGray,
+                icon: _isLocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                label: _isLocked ? 'Unlock' : 'Lock',
+                color: _isLocked ? AppColors.accent : AppColors.primaryGray,
                 onPressed: () {
-                  // TODO: Implement screen lock
-                  Get.snackbar('Coming Soon', 'Screen lock feature', snackPosition: SnackPosition.BOTTOM);
+                  setState(() {
+                    _isLocked = !_isLocked;
+                  });
                 },
               ),
             ],
@@ -417,6 +422,98 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
           ),
         ],
       ),
+    );
+  }
+
+  /// Build lock overlay - shows minimal stats when screen is locked
+  Widget _buildLockOverlay() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isLocked = false;
+        });
+      },
+      child: Container(
+        color: AppColors.black,
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Lock icon
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGray.withOpacity(0.3),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.accent.withOpacity(0.5), width: 2),
+                ),
+                child: Icon(Icons.lock_rounded, color: AppColors.accent, size: 48),
+              ),
+              const SizedBox(height: 32),
+
+              // Minimal stats display
+              Obx(() {
+                return Column(
+                  children: [
+                    // Time (large)
+                    Text(
+                      _controller.formatDuration(_controller.elapsedTime.value),
+                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 64),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Distance and Pace
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLockStat('Distance', _controller.formatDistance(_controller.distanceMeters.value)),
+                        const SizedBox(width: 32),
+                        _buildLockStat('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km'),
+                      ],
+                    ),
+                  ],
+                );
+              }),
+
+              const SizedBox(height: 48),
+
+              // Unlock hint
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.accent.withOpacity(0.5), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.touch_app_rounded, color: AppColors.accent, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Tap to unlock',
+                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLockStat(String label, String value) {
+    return Column(
+      children: [
+        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 12)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.titleLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+      ],
     );
   }
 }
