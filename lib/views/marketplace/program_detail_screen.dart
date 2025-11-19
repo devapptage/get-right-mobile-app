@@ -195,16 +195,6 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                   const SizedBox(height: 24),
 
                   // Program Structure
-                  Text(
-                    'Program Structure',
-                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildWeekCard('Week 1-2', 'Foundation & Technique', 'Focus on proper form and building the foundation'),
-                  _buildWeekCard('Week 3-6', 'Progressive Overload', 'Gradually increase intensity and volume'),
-                  _buildWeekCard('Week 7-10', 'Peak Performance', 'Maximum effort and strength gains'),
-                  _buildWeekCard('Week 11-12', 'Consolidation', 'Solidify gains and prepare for next phase'),
-                  const SizedBox(height: 24),
 
                   // Student Reviews
                   Row(
@@ -225,7 +215,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                   ),
                   const SizedBox(height: 12),
                   ..._getMockReviews().take(2).map((review) => _buildReviewCard(review)),
-                  const SizedBox(height: 100), // Space for bottom bar
+                  const SizedBox(height: 20), // Space for bottom bar
                 ],
               ),
             ),
@@ -257,8 +247,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // Navigate to enrollment screen
-                    Get.toNamed(AppRoutes.programEnrollment, arguments: safeProgram);
+                    Get.toNamed(AppRoutes.purchaseDetails);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
@@ -313,44 +302,6 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
           Expanded(
             child: Text(text, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeekCard(String week, String title, String description) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(12)),
-                child: Text(
-                  week,
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
         ],
       ),
     );

@@ -41,11 +41,11 @@ import 'package:get_right/views/search/search_results_screen.dart';
 import 'package:get_right/views/trainer/trainer_profile_screen.dart';
 import 'package:get_right/views/trainer/trainer_reviews_screen.dart';
 import 'package:get_right/views/marketplace/program_detail_screen.dart';
-import 'package:get_right/views/marketplace/program_enrollment_screen.dart';
 import 'package:get_right/views/marketplace/purchase_details_screen.dart';
 import 'package:get_right/views/marketplace/payment_form_screen.dart';
 import 'package:get_right/views/marketplace/program_terms_screen.dart';
 import 'package:get_right/views/marketplace/my_programs_screen.dart';
+import 'package:get_right/views/marketplace/bundle_detail_screen.dart';
 import 'package:get_right/views/favorites/favorites_screen.dart';
 import 'package:get_right/views/program_history/program_history_screen.dart';
 import 'package:get_right/views/program_history/active_program_detail_screen.dart';
@@ -105,7 +105,6 @@ class AppPages {
     // Marketplace Pages
     GetPage(name: AppRoutes.marketplace, page: () => const MarketplaceScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.programDetail, page: () => const ProgramDetailScreen(), transition: Transition.rightToLeft),
-    GetPage(name: AppRoutes.programEnrollment, page: () => const ProgramEnrollmentScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.purchaseDetails, page: () => const PurchaseDetailsScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.paymentForm, page: () => const PaymentFormScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.programTerms, page: () => const ProgramTermsScreen(), transition: Transition.rightToLeft),
@@ -119,6 +118,7 @@ class AppPages {
     GetPage(name: AppRoutes.programModificationRequest, page: () => const ProgramModificationRequestScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.transactionHistory, page: () => TransactionHistoryScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.transactionDetail, page: () => const TransactionDetailScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.bundleDetail, page: () => const BundleDetailScreen(), transition: Transition.rightToLeft),
 
     // Search Pages
     GetPage(name: AppRoutes.search, page: () => SearchScreen(), transition: Transition.rightToLeft),

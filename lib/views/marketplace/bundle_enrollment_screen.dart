@@ -5,36 +5,50 @@
 // import 'package:get_right/theme/text_styles.dart';
 // import 'package:table_calendar/table_calendar.dart';
 
-// /// Program Enrollment Date Selection Screen
-// class ProgramEnrollmentScreen extends StatefulWidget {
-//   const ProgramEnrollmentScreen({super.key});
+// /// Bundle Enrollment Date Selection Screen
+// class BundleEnrollmentScreen extends StatefulWidget {
+//   const BundleEnrollmentScreen({super.key});
 
 //   @override
-//   State<ProgramEnrollmentScreen> createState() => _ProgramEnrollmentScreenState();
+//   State<BundleEnrollmentScreen> createState() => _BundleEnrollmentScreenState();
 // }
 
-// class _ProgramEnrollmentScreenState extends State<ProgramEnrollmentScreen> {
-//   final Map<String, dynamic> program = Get.arguments ?? {};
+// class _BundleEnrollmentScreenState extends State<BundleEnrollmentScreen> {
+//   final Map<String, dynamic> bundle = Get.arguments ?? {};
+//   final List<Map<String, dynamic>> programs = [];
 
 //   DateTime _focusedDay = DateTime.now();
 //   DateTime? _startDate;
 //   DateTime? _endDate;
-//   bool _isSelectingStartDate = true; // Track which date is being selected
+//   bool _isSelectingStartDate = true;
 
 //   @override
 //   void initState() {
 //     super.initState();
+//     // Extract programs from bundle
+//     if (bundle['programs'] != null && bundle['programs'] is List) {
+//       programs.addAll((bundle['programs'] as List).cast<Map<String, dynamic>>());
+//     }
+
 //     // Set default start date to tomorrow
 //     _startDate = DateTime.now().add(const Duration(days: 1));
-//     // Calculate end date based on program duration
-//     if (program['duration'] != null && _startDate != null) {
-//       final durationWeeks = _parseDuration(program['duration']);
-//       _endDate = _startDate!.add(Duration(days: durationWeeks * 7));
+
+//     // Calculate end date based on longest program duration
+//     if (programs.isNotEmpty && _startDate != null) {
+//       int maxDurationWeeks = 0;
+//       for (var program in programs) {
+//         final duration = _parseDuration(program['duration'] ?? '12 weeks');
+//         if (duration > maxDurationWeeks) {
+//           maxDurationWeeks = duration;
+//         }
+//       }
+//       if (maxDurationWeeks > 0) {
+//         _endDate = _startDate!.add(Duration(days: maxDurationWeeks * 7));
+//       }
 //     }
 //   }
 
 //   int _parseDuration(String duration) {
-//     // Parse "12 weeks" to 12
 //     final match = RegExp(r'(\d+)').firstMatch(duration);
 //     if (match != null && match.group(1) != null) {
 //       return int.parse(match.group(1)!);
@@ -43,9 +57,8 @@
 //   }
 
 //   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-//     // Only allow selecting dates from today onwards
 //     if (selectedDay.isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
-//       Get.snackbar('Invalid Date', 'Please select a date from today onwards', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+//       Get.snackbar('Invalid Date', 'Please select a date from today onwards', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.missed, colorText: Colors.white);
 //       return;
 //     }
 
@@ -54,29 +67,35 @@
 
 //       if (_isSelectingStartDate) {
 //         _startDate = selectedDay;
-//         // If end date exists and is before new start date, clear it
 //         if (_endDate != null && _endDate!.isBefore(selectedDay)) {
 //           _endDate = null;
 //         }
-//         // Auto-calculate end date if not set
-//         if (_endDate == null && program['duration'] != null) {
-//           final durationWeeks = _parseDuration(program['duration']);
-//           _endDate = _startDate!.add(Duration(days: durationWeeks * 7));
+//         // Auto-calculate end date based on longest program
+//         if (_endDate == null && programs.isNotEmpty) {
+//           int maxDurationWeeks = 0;
+//           for (var program in programs) {
+//             final duration = _parseDuration(program['duration'] ?? '12 weeks');
+//             if (duration > maxDurationWeeks) {
+//               maxDurationWeeks = duration;
+//             }
+//           }
+//           if (maxDurationWeeks > 0) {
+//             _endDate = _startDate!.add(Duration(days: maxDurationWeeks * 7));
+//           }
 //         }
 //       } else {
-//         // Selecting end date
 //         if (_startDate == null) {
 //           Get.snackbar(
 //             'Select Start Date First',
 //             'Please select a start date before selecting an end date',
 //             snackPosition: SnackPosition.BOTTOM,
-//             backgroundColor: Colors.orange,
+//             backgroundColor: AppColors.upcoming,
 //             colorText: Colors.white,
 //           );
 //           return;
 //         }
 //         if (selectedDay.isBefore(_startDate!)) {
-//           Get.snackbar('Invalid Date', 'End date must be after start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+//           Get.snackbar('Invalid Date', 'End date must be after start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.missed, colorText: Colors.white);
 //           return;
 //         }
 //         _endDate = selectedDay;
@@ -86,23 +105,27 @@
 
 //   void _proceedToCheckout() {
 //     if (_startDate == null || _endDate == null) {
-//       Get.snackbar('Incomplete', 'Please select both start and end dates', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+//       Get.snackbar('Incomplete', 'Please select both start and end dates', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.missed, colorText: Colors.white);
 //       return;
 //     }
 
 //     if (_endDate!.isBefore(_startDate!)) {
-//       Get.snackbar('Invalid Dates', 'End date must be after start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+//       Get.snackbar('Invalid Dates', 'End date must be after start date', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.missed, colorText: Colors.white);
 //       return;
 //     }
 
-//     // Pass program data with selected dates to purchase details screen
+//     // Pass bundle data with selected dates to purchase details screen
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
+//     final bundlePrice = bundle['bundlePrice'] as double? ?? 0.0;
+//     final totalValue = bundle['totalValue'] as double? ?? 0.0;
+//     final discount = bundle['discount'] as int? ?? 0;
+
 //     return Scaffold(
 //       appBar: AppBar(
-//         title: Text('Select Program Dates', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+//         title: Text('Select Bundle Dates', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
 //         centerTitle: true,
 //       ),
 //       body: SingleChildScrollView(
@@ -110,37 +133,68 @@
 //         child: Column(
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             // Program Info Card
+//             // Bundle Info Card
 //             Container(
 //               padding: const EdgeInsets.all(16),
 //               decoration: BoxDecoration(
-//                 color: AppColors.surface,
+//                 gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.1), AppColors.accentVariant.withOpacity(0.05)]),
 //                 borderRadius: BorderRadius.circular(12),
-//                 border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+//                 border: Border.all(color: AppColors.accent, width: 2),
 //               ),
 //               child: Column(
 //                 crossAxisAlignment: CrossAxisAlignment.start,
 //                 children: [
-//                   Text(
-//                     program['title'] ?? 'Program',
-//                     style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-//                   ),
-//                   const SizedBox(height: 8),
 //                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                     children: [
-//                       Icon(Icons.person, size: 16, color: AppColors.primaryGray),
-//                       const SizedBox(width: 4),
-//                       Text(program['trainer'] ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
-//                       const SizedBox(width: 12),
-//                       Icon(Icons.schedule, size: 16, color: AppColors.primaryGray),
-//                       const SizedBox(width: 4),
-//                       Text(program['duration'] ?? '', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+//                       Expanded(
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               bundle['title'] ?? 'Bundle',
+//                               style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+//                             ),
+//                             const SizedBox(height: 4),
+//                             Text('${programs.length} Programs Included', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+//                           ],
+//                         ),
+//                       ),
+//                       Container(
+//                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+//                         decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+//                         child: Text(
+//                           '$discount% OFF',
+//                           style: AppTextStyles.labelSmall.copyWith(color: AppColors.completed, fontWeight: FontWeight.bold),
+//                         ),
+//                       ),
 //                     ],
 //                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     '\$${program['price']}',
-//                     style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+//                   const SizedBox(height: 12),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Text('Total Value', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+//                           Text(
+//                             '\$${totalValue.toStringAsFixed(2)}',
+//                             style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
+//                           ),
+//                         ],
+//                       ),
+//                       Column(
+//                         crossAxisAlignment: CrossAxisAlignment.end,
+//                         children: [
+//                           Text('Bundle Price', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent)),
+//                           Text(
+//                             '\$${bundlePrice.toStringAsFixed(2)}',
+//                             style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
 //                   ),
 //                 ],
 //               ),
@@ -161,7 +215,7 @@
 //                   const SizedBox(width: 12),
 //                   Expanded(
 //                     child: Text(
-//                       'Select your program start and end dates. You can customize both dates or let us calculate the end date automatically.',
+//                       'Select your bundle start and end dates. All programs in the bundle will start on the same date.',
 //                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface),
 //                     ),
 //                   ),
@@ -216,7 +270,7 @@
 //                             'Select Start Date First',
 //                             'Please select a start date before selecting an end date',
 //                             snackPosition: SnackPosition.BOTTOM,
-//                             backgroundColor: Colors.orange,
+//                             backgroundColor: AppColors.upcoming,
 //                             colorText: Colors.white,
 //                           );
 //                           return;
@@ -298,10 +352,61 @@
 //             ),
 //             const SizedBox(height: 24),
 
+//             // Programs List
+//             if (programs.isNotEmpty) ...[
+//               Text(
+//                 'Bundle Programs',
+//                 style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+//               ),
+//               const SizedBox(height: 12),
+//               ...programs.asMap().entries.map((entry) {
+//                 final index = entry.key;
+//                 final program = entry.value;
+//                 return Container(
+//                   margin: const EdgeInsets.only(bottom: 8),
+//                   padding: const EdgeInsets.all(12),
+//                   decoration: BoxDecoration(
+//                     color: AppColors.surface,
+//                     borderRadius: BorderRadius.circular(8),
+//                     border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+//                   ),
+//                   child: Row(
+//                     children: [
+//                       Container(
+//                         width: 32,
+//                         height: 32,
+//                         decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+//                         child: Center(
+//                           child: Text(
+//                             '${index + 1}',
+//                             style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(width: 12),
+//                       Expanded(
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               program['title'] ?? 'Program',
+//                               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w500),
+//                             ),
+//                             Text(program['duration'] ?? '', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               }),
+//               const SizedBox(height: 24),
+//             ],
+
 //             // Selected Dates Summary
 //             if (_startDate != null && _endDate != null) ...[
 //               Text(
-//                 'Program Duration',
+//                 'Bundle Duration',
 //                 style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
 //               ),
 //               const SizedBox(height: 12),
@@ -314,9 +419,9 @@
 //                 ),
 //                 child: Column(
 //                   children: [
-//                     if (_startDate != null) _buildDateRow('Start Date', _formatDate(_startDate!), Icons.play_circle_outline, isSelected: _isSelectingStartDate),
+//                     _buildDateRow('Start Date', _formatDate(_startDate!), Icons.play_circle_outline, isSelected: _isSelectingStartDate),
 //                     const Divider(height: 24),
-//                     if (_endDate != null) _buildDateRow('End Date', _formatDate(_endDate!), Icons.flag_outlined, isSelected: !_isSelectingStartDate),
+//                     _buildDateRow('End Date', _formatDate(_endDate!), Icons.flag_outlined, isSelected: !_isSelectingStartDate),
 //                     const Divider(height: 24),
 //                     _buildDateRow('Duration', _calculateDuration(), Icons.schedule),
 //                   ],
@@ -333,14 +438,15 @@
 //           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
 //         ),
 //         child: SafeArea(
-//           child: ElevatedButton(
+//           child: ElevatedButton.icon(
 //             onPressed: _proceedToCheckout,
 //             style: ElevatedButton.styleFrom(
 //               backgroundColor: AppColors.accent,
 //               padding: const EdgeInsets.symmetric(vertical: 16),
 //               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
 //             ),
-//             child: Text('Next', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onAccent)),
+//             icon: const Icon(Icons.shopping_cart, size: 20),
+//             label: Text('Next', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onAccent)),
 //           ),
 //         ),
 //       ),
@@ -390,12 +496,12 @@
 
 //   String _calculateDuration() {
 //     if (_startDate == null || _endDate == null) {
-//       return program['duration'] ?? 'N/A';
+//       return 'N/A';
 //     }
 //     final difference = _endDate!.difference(_startDate!);
 //     final totalDays = difference.inDays;
-//     final weeks = totalDays ~/ 7; // Integer division
-//     final days = totalDays % 7; // Remainder
+//     final weeks = totalDays ~/ 7;
+//     final days = totalDays % 7;
 
 //     if (weeks > 0 && days > 0) {
 //       return '$weeks week${weeks > 1 ? 's' : ''} ${days} day${days > 1 ? 's' : ''}';

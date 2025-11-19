@@ -17,6 +17,121 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   String _selectedGoal = 'All';
   bool _showCertifiedOnly = false;
 
+  // Mock bundle data
+  final List<Map<String, dynamic>> _bundles = [
+    {
+      'id': 'bundle_1',
+      'title': 'Complete Fitness Bundle',
+      'description': 'Full body transformation program',
+      'discount': 25,
+      'totalValue': 159.97,
+      'bundlePrice': 119.99,
+      'programs': [
+        {
+          'id': 'program_1',
+          'title': 'Complete Strength Program',
+          'trainer': 'Sarah Johnson',
+          'trainerImage': 'SJ',
+          'price': 49.99,
+          'duration': '12 weeks',
+          'category': 'Strength',
+          'goal': 'Muscle Building',
+          'certified': true,
+          'rating': 4.8,
+          'students': 1250,
+        },
+        {
+          'id': 'program_2',
+          'title': 'Cardio Blast Challenge',
+          'trainer': 'Mike Chen',
+          'trainerImage': 'MC',
+          'price': 29.99,
+          'duration': '8 weeks',
+          'category': 'Cardio',
+          'goal': 'Weight Loss',
+          'certified': true,
+          'rating': 4.9,
+          'students': 2100,
+        },
+        {
+          'id': 'program_3',
+          'title': 'Yoga for Athletes',
+          'trainer': 'Emma Davis',
+          'trainerImage': 'ED',
+          'price': 39.99,
+          'duration': '6 weeks',
+          'category': 'Flexibility',
+          'goal': 'Flexibility',
+          'certified': true,
+          'rating': 4.7,
+          'students': 850,
+        },
+      ],
+    },
+    {
+      'id': 'bundle_2',
+      'title': 'Elite Performance Bundle',
+      'description': 'Advanced training for serious athletes',
+      'discount': 30,
+      'totalValue': 189.97,
+      'bundlePrice': 132.99,
+      'programs': [
+        {
+          'id': 'program_5',
+          'title': 'Marathon Prep',
+          'trainer': 'Lisa Thompson',
+          'trainerImage': 'LT',
+          'price': 59.99,
+          'duration': '16 weeks',
+          'category': 'Running',
+          'goal': 'Endurance',
+          'certified': true,
+          'rating': 4.9,
+          'students': 1520,
+        },
+        {
+          'id': 'program_4',
+          'title': 'Bodyweight Mastery',
+          'trainer': 'Alex Rodriguez',
+          'trainerImage': 'AR',
+          'price': 34.99,
+          'duration': '10 weeks',
+          'category': 'Bodyweight',
+          'goal': 'General Fitness',
+          'certified': false,
+          'rating': 4.5,
+          'students': 640,
+        },
+        {
+          'id': 'program_6',
+          'title': 'Core Strength Elite',
+          'trainer': 'David Kim',
+          'trainerImage': 'DK',
+          'price': 24.99,
+          'duration': '4 weeks',
+          'category': 'Core',
+          'goal': 'Strength',
+          'certified': false,
+          'rating': 4.6,
+          'students': 980,
+        },
+        {
+          'id': 'program_1',
+          'title': 'Complete Strength Program',
+          'trainer': 'Sarah Johnson',
+          'trainerImage': 'SJ',
+          'price': 49.99,
+          'duration': '12 weeks',
+          'category': 'Strength',
+          'goal': 'Muscle Building',
+          'certified': true,
+          'rating': 4.8,
+          'students': 1250,
+        },
+      ],
+    },
+  ];
+
   // Mock program data
   final List<Map<String, dynamic>> _programs = [
     {
@@ -476,7 +591,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             Scaffold.of(context).openDrawer();
           },
         ),
-        title: Text('Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Market Place', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -510,23 +625,18 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Featured banner
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.star, color: AppColors.onAccent, size: 32),
-                  const SizedBox(height: 8),
-                  Text('Explore Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onAccent)),
-                  const SizedBox(height: 4),
-                  Text('From certified trainers and fitness influencers', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent.withOpacity(0.9))),
-                ],
+            // Bundle Programs Section
+            Text('Bundle Programs', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 360,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                itemCount: _bundles.length,
+                itemBuilder: (context, index) {
+                  return _buildBundleCard(_bundles[index]);
+                },
               ),
             ),
             const SizedBox(height: 24),
@@ -587,6 +697,227 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildBundleCard(Map<String, dynamic> bundle) {
+    final programs = bundle['programs'] as List<Map<String, dynamic>>;
+    final totalValue = bundle['totalValue'] as double;
+    final bundlePrice = bundle['bundlePrice'] as double;
+    final discount = bundle['discount'] as int;
+
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.accent, width: 2),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Bundle Header
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(bundle['title'], style: AppTextStyles.titleLarge.copyWith(color: AppColors.onAccent)),
+
+                          const SizedBox(height: 4),
+                          Text(bundle['description'], style: AppTextStyles.bodySmall.copyWith(color: AppColors.onAccent.withOpacity(0.9))),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: AppColors.onAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        child: Text(
+                          '$discount% OFF',
+                          style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+
+            // Programs Horizontal Scroll
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text('${programs.length} Programs', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: programs.length,
+                      itemBuilder: (context, index) {
+                        return SizedBox(child: _buildCompactProgramCard(programs[index]));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Bundle Price and Enroll Button
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.primaryVariant,
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Total Value', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                          Text(
+                            '\$${totalValue.toStringAsFixed(2)}',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text('Bundle Price', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent)),
+                          Text(
+                            '\$${bundlePrice.toStringAsFixed(2)}',
+                            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _enrollInBundle(bundle),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                      icon: const Icon(Icons.shopping_cart, size: 20),
+                      label: Text('Enroll Bundle', style: AppTextStyles.buttonMedium),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactProgramCard(Map<String, dynamic> program) {
+    return Container(
+      width: 220,
+      height: 350,
+      margin: const EdgeInsets.only(right: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.primaryVariant,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 6),
+
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: AppColors.accent,
+                child: Text(program['trainerImage'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      program['trainer'],
+                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: AppColors.upcoming, size: 12),
+                        const SizedBox(width: 2),
+                        Text('${program['rating']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            program['title'],
+            style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          const SizedBox(height: 6),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '\$${program['price']}',
+                style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: [
+                  Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
+                  const SizedBox(width: 4),
+                  Text(program['duration'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _enrollInBundle(Map<String, dynamic> bundle) {
+    Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
   }
 
   Widget _buildProgramCard(Map<String, dynamic> program) {

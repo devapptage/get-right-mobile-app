@@ -66,6 +66,8 @@ class AppRoutes {
   static const String programModificationRequest = '/program-modification-request';
   static const String transactionHistory = '/transaction-history';
   static const String transactionDetail = '/transaction-detail';
+  static const String bundleDetail = '/bundle-detail';
+  static const String bundleEnrollment = '/bundle-enrollment';
 
   // Search Routes
   static const String search = '/search';

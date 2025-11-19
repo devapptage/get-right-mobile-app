@@ -85,7 +85,18 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
       // Add the newly enrolled program to scheduled programs
       final program = args['program'];
       if (program != null) {
-        _scheduledPrograms.insert(0, {...program, 'id': DateTime.now().millisecondsSinceEpoch.toString(), 'progress': 0, 'status': 'scheduled'});
+        // Ensure dates are properly set
+        final startDate = program['startDate'] ?? DateTime.now().add(const Duration(days: 1));
+        final calculatedEndDate = startDate is DateTime ? startDate.add(const Duration(days: 84)) : DateTime.now().add(const Duration(days: 85));
+        final endDate = program['endDate'] ?? calculatedEndDate;
+        _scheduledPrograms.insert(0, {
+          ...program,
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'progress': 0,
+          'status': 'scheduled',
+          'startDate': startDate,
+          'endDate': endDate,
+        });
       }
     }
   }
@@ -269,8 +280,19 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
   }
 
   Widget _buildProgramCard(Map<String, dynamic> program, {required bool isActive}) {
-    final startDate = program['startDate'] as DateTime;
-    final endDate = program['endDate'] as DateTime;
+    // Handle null dates safely
+    final startDate = program['startDate'] is DateTime
+        ? program['startDate'] as DateTime
+        : program['startDate'] != null && program['startDate'] is String
+        ? DateTime.parse(program['startDate'] as String)
+        : DateTime.now().add(const Duration(days: 1));
+
+    final endDate = program['endDate'] is DateTime
+        ? program['endDate'] as DateTime
+        : program['endDate'] != null && program['endDate'] is String
+        ? DateTime.parse(program['endDate'] as String)
+        : DateTime.now().add(const Duration(days: 84));
+
     final progress = program['progress'] ?? 0;
     final canCancel = !isActive || startDate.isAfter(DateTime.now());
 
