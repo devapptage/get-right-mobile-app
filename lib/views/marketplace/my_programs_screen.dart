@@ -89,9 +89,16 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
         final startDate = program['startDate'] ?? DateTime.now().add(const Duration(days: 1));
         final calculatedEndDate = startDate is DateTime ? startDate.add(const Duration(days: 84)) : DateTime.now().add(const Duration(days: 85));
         final endDate = program['endDate'] ?? calculatedEndDate;
+
+        // Ensure all required string fields have defaults
         _scheduledPrograms.insert(0, {
           ...program,
-          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'id': program['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+          'title': program['title']?.toString() ?? 'Program',
+          'trainer': program['trainer']?.toString() ?? 'Trainer',
+          'trainerImage': program['trainerImage']?.toString() ?? 'UT',
+          'duration': program['duration']?.toString() ?? '12 weeks',
+          'category': program['category']?.toString() ?? 'General',
           'progress': 0,
           'status': 'scheduled',
           'startDate': startDate,
@@ -182,14 +189,17 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
   }
 
   void _cancelProgram(Map<String, dynamic> program) {
+    final programId = program['id']?.toString();
+    if (programId == null) return;
+
     setState(() {
-      _scheduledPrograms.removeWhere((p) => p['id'] == program['id']);
-      _activePrograms.removeWhere((p) => p['id'] == program['id']);
+      _scheduledPrograms.removeWhere((p) => p['id']?.toString() == programId);
+      _activePrograms.removeWhere((p) => p['id']?.toString() == programId);
     });
 
     Get.snackbar(
       'Program Cancelled',
-      'Your enrollment in ${program['title']} has been cancelled',
+      'Your enrollment in ${program['title']?.toString() ?? 'program'} has been cancelled',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: AppColors.completed,
       colorText: Colors.white,
@@ -312,7 +322,7 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppColors.accent,
-                child: Text(program['trainerImage'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onAccent)),
+                child: Text(program['trainerImage']?.toString() ?? 'UT', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onAccent)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -320,10 +330,10 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      program['title'],
+                      program['title']?.toString() ?? 'Program',
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                     ),
-                    Text('by ${program['trainer']}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                    Text('by ${program['trainer']?.toString() ?? 'Trainer'}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
                   ],
                 ),
               ),
