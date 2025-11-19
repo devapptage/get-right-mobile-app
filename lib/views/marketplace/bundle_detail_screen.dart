@@ -282,7 +282,7 @@ class _BundleDetailScreenState extends State<BundleDetailScreen> {
         Get.toNamed(AppRoutes.programDetail, arguments: program);
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 13),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.surface,
