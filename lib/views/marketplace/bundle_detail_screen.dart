@@ -68,25 +68,53 @@ class _BundleDetailScreenState extends State<BundleDetailScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
+                  // Bundle Thumbnail Image
+                  Image.network(
+                    bundle['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=400&fit=crop',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.inventory_2, size: 80, color: AppColors.onAccent.withOpacity(0.3)),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(color: AppColors.onAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                              child: Text(
+                                '$discount% OFF',
+                                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Dark overlay for better text visibility
                   Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inventory_2, size: 80, color: AppColors.onAccent.withOpacity(0.3)),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(color: AppColors.onAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-                            child: Text(
-                              '$discount% OFF',
-                              style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
+                  ),
+                  // Discount badge overlay
+                  Positioned(
+                    top: 50,
+                    right: 40,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3D060),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4, offset: const Offset(0, 2))],
+                      ),
+                      child: Text(
+                        '$discount% OFF',
+                        style: AppTextStyles.titleMedium.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),

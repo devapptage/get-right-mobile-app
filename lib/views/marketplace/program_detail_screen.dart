@@ -15,14 +15,23 @@ class ProgramDetailScreen extends StatefulWidget {
 
 class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
   final FavoritesController _favoritesController = Get.put(FavoritesController());
+  bool _isEnrolled = false; // Mock enrollment status - in real app, check from enrolled programs
+  late Map<String, dynamic> _safeProgram; // Store program data for use in methods
+
+  // Mock enrolled content URLs
+  final String _enrolledVideoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
+  final String _pdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
 
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> program = Get.arguments ?? _getMockProgramData();
     final programId = (program['id']?.toString() ?? program['title']?.toString() ?? 'unknown_program').replaceAll(' ', '_');
 
+    // Check if user is enrolled (mock - in real app, check from enrolled programs list)
+    _isEnrolled = program['isEnrolled'] ?? false;
+
     // Ensure required fields have defaults
-    final safeProgram = {
+    _safeProgram = {
       'id': programId,
       'title': program['title'] ?? 'Program',
       'trainer': program['trainer'] ?? 'Unknown Trainer',
@@ -52,7 +61,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                 final isFavorite = _favoritesController.isFavorite(programId);
                 return IconButton(
                   onPressed: () {
-                    _favoritesController.toggleFavorite(programId, {...safeProgram, 'type': 'program'});
+                    _favoritesController.toggleFavorite(programId, {..._safeProgram, 'type': 'program'});
                     Get.snackbar(
                       isFavorite ? 'Removed' : 'Added',
                       isFavorite ? 'Removed from favorites' : 'Added to favorites',
@@ -70,11 +79,35 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
+                  // Demo Video
                   Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                    color: AppColors.primaryVariant,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Video thumbnail/placeholder
+                        Image.network(
+                          _safeProgram['imageUrl'] ?? 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=400&fit=crop',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                            ),
+                            child: Center(child: Icon(Icons.fitness_center, size: 80, color: AppColors.onAccent.withOpacity(0.3))),
+                          ),
+                        ),
+                        // Play button overlay
+                        Container(
+                          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), shape: BoxShape.circle),
+                          child: IconButton(
+                            icon: const Icon(Icons.play_circle_filled, size: 64, color: Colors.white),
+                            onPressed: () => _playDemoVideo(),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: Center(child: Icon(Icons.fitness_center, size: 80, color: AppColors.onAccent.withOpacity(0.3))),
                   ),
                   Positioned(
                     bottom: 0,
@@ -101,7 +134,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                 children: [
                   // Program Title
                   Text(
-                    safeProgram['title'] ?? 'Program',
+                    _safeProgram['title'] ?? 'Program',
                     style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
@@ -123,7 +156,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: AppColors.accent,
-                            child: Text(safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
+                            child: Text(_safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -132,8 +165,8 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    Text(safeProgram['trainer'] ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-                                    if (safeProgram['certified'] == true)
+                                    Text(_safeProgram['trainer'] ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                                    if (_safeProgram['certified'] == true)
                                       Padding(
                                         padding: const EdgeInsets.only(left: 8),
                                         child: Icon(Icons.verified, color: AppColors.completed, size: 18),
@@ -144,9 +177,9 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                                   children: [
                                     Icon(Icons.star, color: AppColors.upcoming, size: 16),
                                     const SizedBox(width: 4),
-                                    Text('${safeProgram['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
+                                    Text('${_safeProgram['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
                                     const SizedBox(width: 8),
-                                    Text('${safeProgram['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                    Text('${_safeProgram['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
                                   ],
                                 ),
                               ],
@@ -162,11 +195,11 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                   // Quick Info Cards
                   Row(
                     children: [
-                      Expanded(child: _buildInfoCard(Icons.schedule, 'Duration', safeProgram['duration'] ?? '12 weeks')),
+                      Expanded(child: _buildInfoCard(Icons.schedule, 'Duration', _safeProgram['duration'] ?? '12 weeks')),
                       const SizedBox(width: 12),
-                      Expanded(child: _buildInfoCard(Icons.category, 'Category', safeProgram['category'] ?? 'General')),
+                      Expanded(child: _buildInfoCard(Icons.category, 'Category', _safeProgram['category'] ?? 'General')),
                       const SizedBox(width: 12),
-                      Expanded(child: _buildInfoCard(Icons.flag, 'Goal', safeProgram['goal'] ?? 'Fitness')),
+                      Expanded(child: _buildInfoCard(Icons.flag, 'Goal', _safeProgram['goal'] ?? 'Fitness')),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -177,7 +210,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                     style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  Text(safeProgram['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
+                  Text(_safeProgram['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
                   const SizedBox(height: 24),
 
                   // What's Included
@@ -194,7 +227,18 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                   _buildFeatureItem(Icons.calendar_today, 'Lifetime access to program'),
                   const SizedBox(height: 24),
 
-                  // Program Structure
+                  // Enrolled Content Section (only visible if enrolled)
+                  if (_isEnrolled) ...[
+                    Text(
+                      'Program Content',
+                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEnrolledContentCard(icon: Icons.video_library, title: 'Full Program Video', subtitle: 'Complete training video', onTap: () => _openEnrolledVideo()),
+                    const SizedBox(height: 12),
+                    _buildEnrolledContentCard(icon: Icons.picture_as_pdf, title: 'Program Guide PDF', subtitle: 'Download program guide', onTap: () => _openPDF()),
+                    const SizedBox(height: 24),
+                  ],
 
                   // Student Reviews
                   Row(
@@ -208,7 +252,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                         children: [
                           Icon(Icons.star, color: AppColors.upcoming, size: 20),
                           const SizedBox(width: 4),
-                          Text('${safeProgram['rating']} (${safeProgram['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+                          Text('${_safeProgram['rating']} (${_safeProgram['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
                         ],
                       ),
                     ],
@@ -238,7 +282,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                 children: [
                   Text('Total Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
                   Text(
-                    '\$${safeProgram['price']}',
+                    '\$${_safeProgram['price']}',
                     style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -247,15 +291,25 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Get.toNamed(AppRoutes.purchaseDetails);
+                    if (_isEnrolled) {
+                      Get.snackbar(
+                        'Already Enrolled',
+                        'You are already enrolled in this program',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: AppColors.primaryGray,
+                        colorText: Colors.white,
+                      );
+                    } else {
+                      Get.toNamed(AppRoutes.purchaseDetails);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: _isEnrolled ? AppColors.completed : AppColors.accent,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  icon: const Icon(Icons.school, size: 20),
-                  label: Text('Enroll Now', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
+                  icon: Icon(_isEnrolled ? Icons.check_circle : Icons.school, size: 20),
+                  label: Text(_isEnrolled ? 'Enrolled' : 'Enroll Now', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
                 ),
               ),
             ],
@@ -407,5 +461,207 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
         'date': '2 weeks ago',
       },
     ];
+  }
+
+  void _playDemoVideo() {
+    // Show video player dialog or navigate to video player screen
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Demo Video', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: AppColors.onSurface),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              // Video placeholder
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: AppColors.primaryVariant, borderRadius: BorderRadius.circular(8)),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Video thumbnail
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          _safeProgram['imageUrl'] ?? 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=400&fit=crop',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: AppColors.primaryVariant,
+                            child: Icon(Icons.fitness_center, size: 60, color: AppColors.primaryGray),
+                          ),
+                        ),
+                      ),
+                      // Play button
+                      Container(
+                        decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                        child: IconButton(
+                          icon: const Icon(Icons.play_circle_filled, size: 64, color: Colors.white),
+                          onPressed: () {
+                            // In a real app, this would open a video player
+                            Get.snackbar(
+                              'Video Player',
+                              'Demo video would play here. In production, use a video player package like video_player.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.accent,
+                              colorText: Colors.white,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openEnrolledVideo() {
+    // Open enrolled video
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Program Video', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: AppColors.onSurface),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: AppColors.primaryVariant, borderRadius: BorderRadius.circular(8)),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          _safeProgram['imageUrl'] ?? 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=400&fit=crop',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: AppColors.primaryVariant,
+                            child: Icon(Icons.fitness_center, size: 60, color: AppColors.primaryGray),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                        child: IconButton(
+                          icon: const Icon(Icons.play_circle_filled, size: 64, color: Colors.white),
+                          onPressed: () {
+                            Get.snackbar(
+                              'Video Player',
+                              'Program video would play here. URL: $_enrolledVideoUrl',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.accent,
+                              colorText: Colors.white,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openPDF() {
+    // Open PDF viewer
+    Get.snackbar(
+      'PDF Viewer',
+      'PDF would open here. In production, use a package like flutter_pdfview or open with url_launcher.\nURL: $_pdfUrl',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.accent,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 4),
+    );
+
+    // In a real app, you would use:
+    // - url_launcher to open PDF in external app
+    // - flutter_pdfview to display PDF in-app
+    // Example: launchUrl(Uri.parse(_pdfUrl));
+  }
+
+  Widget _buildEnrolledContentCard({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.accent, width: 2),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+              child: Icon(icon, color: AppColors.accent, size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.accent),
+          ],
+        ),
+      ),
+    );
   }
 }

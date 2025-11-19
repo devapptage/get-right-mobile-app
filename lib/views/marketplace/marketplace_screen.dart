@@ -418,6 +418,282 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'description': 'Intensive core training for a solid foundation',
       'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
     },
+    // Additional Strength Programs
+    {
+      'id': 'program_7',
+      'title': 'Powerlifting Fundamentals',
+      'trainer': 'John Martinez',
+      'trainerImage': 'JM',
+      'price': 54.99,
+      'duration': '14 weeks',
+      'category': 'Strength',
+      'goal': 'Muscle Building',
+      'certified': true,
+      'rating': 4.9,
+      'students': 1890,
+      'description': 'Master the big three lifts: squat, bench, and deadlift',
+      'imageUrl': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_8',
+      'title': 'Hypertrophy Builder',
+      'trainer': 'Chris Wilson',
+      'trainerImage': 'CW',
+      'price': 44.99,
+      'duration': '10 weeks',
+      'category': 'Strength',
+      'goal': 'Muscle Building',
+      'certified': true,
+      'rating': 4.7,
+      'students': 1420,
+      'description': 'Science-based muscle building program',
+      'imageUrl': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_9',
+      'title': 'Beginner Strength Training',
+      'trainer': 'Maria Garcia',
+      'trainerImage': 'MG',
+      'price': 39.99,
+      'duration': '8 weeks',
+      'category': 'Strength',
+      'goal': 'Muscle Building',
+      'certified': true,
+      'rating': 4.8,
+      'students': 2100,
+      'description': 'Perfect for beginners starting their strength journey',
+      'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
+    },
+    // Additional Cardio Programs
+    {
+      'id': 'program_10',
+      'title': 'HIIT Burn Challenge',
+      'trainer': 'Jessica Lee',
+      'trainerImage': 'JL',
+      'price': 32.99,
+      'duration': '6 weeks',
+      'category': 'Cardio',
+      'goal': 'Weight Loss',
+      'certified': true,
+      'rating': 4.8,
+      'students': 1750,
+      'description': 'High-intensity interval training for maximum calorie burn',
+      'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_11',
+      'title': 'Dance Cardio Workout',
+      'trainer': 'Amanda Brown',
+      'trainerImage': 'AB',
+      'price': 27.99,
+      'duration': '5 weeks',
+      'category': 'Cardio',
+      'goal': 'Weight Loss',
+      'certified': false,
+      'rating': 4.6,
+      'students': 980,
+      'description': 'Fun and energetic dance-based cardio sessions',
+      'imageUrl': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_12',
+      'title': 'Cycling Endurance',
+      'trainer': 'Tom Anderson',
+      'trainerImage': 'TA',
+      'price': 36.99,
+      'duration': '9 weeks',
+      'category': 'Cardio',
+      'goal': 'Endurance',
+      'certified': true,
+      'rating': 4.7,
+      'students': 1200,
+      'description': 'Build cardiovascular endurance through cycling',
+      'imageUrl': 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&h=300&fit=crop',
+    },
+    // Additional Flexibility Programs
+    {
+      'id': 'program_13',
+      'title': 'Stretching for Beginners',
+      'trainer': 'Sophie Taylor',
+      'trainerImage': 'ST',
+      'price': 29.99,
+      'duration': '4 weeks',
+      'category': 'Flexibility',
+      'goal': 'Flexibility',
+      'certified': true,
+      'rating': 4.5,
+      'students': 850,
+      'description': 'Gentle stretching routines for improved flexibility',
+      'imageUrl': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_14',
+      'title': 'Advanced Yoga Flow',
+      'trainer': 'Rachel Green',
+      'trainerImage': 'RG',
+      'price': 42.99,
+      'duration': '8 weeks',
+      'category': 'Flexibility',
+      'goal': 'Flexibility',
+      'certified': true,
+      'rating': 4.9,
+      'students': 1650,
+      'description': 'Advanced yoga sequences for experienced practitioners',
+      'imageUrl': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_15',
+      'title': 'Pilates Core & Flexibility',
+      'trainer': 'Nicole White',
+      'trainerImage': 'NW',
+      'price': 37.99,
+      'duration': '7 weeks',
+      'category': 'Flexibility',
+      'goal': 'Flexibility',
+      'certified': true,
+      'rating': 4.7,
+      'students': 1100,
+      'description': 'Pilates-based program for core strength and flexibility',
+      'imageUrl': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop',
+    },
+    // Additional Bodyweight Programs
+    {
+      'id': 'program_16',
+      'title': 'Calisthenics Mastery',
+      'trainer': 'Ryan Park',
+      'trainerImage': 'RP',
+      'price': 41.99,
+      'duration': '12 weeks',
+      'category': 'Bodyweight',
+      'goal': 'General Fitness',
+      'certified': true,
+      'rating': 4.8,
+      'students': 1950,
+      'description': 'Master advanced bodyweight movements and skills',
+      'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_17',
+      'title': 'Home Workout Essentials',
+      'trainer': 'Kevin Smith',
+      'trainerImage': 'KS',
+      'price': 31.99,
+      'duration': '6 weeks',
+      'category': 'Bodyweight',
+      'goal': 'General Fitness',
+      'certified': false,
+      'rating': 4.5,
+      'students': 720,
+      'description': 'Effective workouts you can do at home with no equipment',
+      'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_18',
+      'title': 'Push-Up Progression',
+      'trainer': 'Mark Thompson',
+      'trainerImage': 'MT',
+      'price': 26.99,
+      'duration': '5 weeks',
+      'category': 'Bodyweight',
+      'goal': 'Strength',
+      'certified': true,
+      'rating': 4.6,
+      'students': 1050,
+      'description': 'Progressive push-up program from beginner to advanced',
+      'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
+    },
+    // Additional Running Programs
+    {
+      'id': 'program_19',
+      'title': '5K Training Plan',
+      'trainer': 'Jennifer Adams',
+      'trainerImage': 'JA',
+      'price': 34.99,
+      'duration': '8 weeks',
+      'category': 'Running',
+      'goal': 'Endurance',
+      'certified': true,
+      'rating': 4.7,
+      'students': 1380,
+      'description': 'Complete training plan to run your first 5K',
+      'imageUrl': 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_20',
+      'title': 'Sprint Training',
+      'trainer': 'Michael Johnson',
+      'trainerImage': 'MJ',
+      'price': 38.99,
+      'duration': '6 weeks',
+      'category': 'Running',
+      'goal': 'Endurance',
+      'certified': true,
+      'rating': 4.8,
+      'students': 920,
+      'description': 'Improve your speed and sprint performance',
+      'imageUrl': 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_21',
+      'title': 'Trail Running Adventure',
+      'trainer': 'Patricia Moore',
+      'trainerImage': 'PM',
+      'price': 43.99,
+      'duration': '10 weeks',
+      'category': 'Running',
+      'goal': 'Endurance',
+      'certified': true,
+      'rating': 4.9,
+      'students': 1120,
+      'description': 'Master trail running techniques and build endurance',
+      'imageUrl': 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&h=300&fit=crop',
+    },
+    // Additional Core Programs
+    {
+      'id': 'program_22',
+      'title': 'Abs & Core Blast',
+      'trainer': 'Daniel Lee',
+      'trainerImage': 'DL',
+      'price': 28.99,
+      'duration': '5 weeks',
+      'category': 'Core',
+      'goal': 'Strength',
+      'certified': true,
+      'rating': 4.7,
+      'students': 1450,
+      'description': 'Intensive ab and core workout program',
+      'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_23',
+      'title': 'Functional Core Training',
+      'trainer': 'Laura Davis',
+      'trainerImage': 'LD',
+      'price': 35.99,
+      'duration': '7 weeks',
+      'category': 'Core',
+      'goal': 'General Fitness',
+      'certified': true,
+      'rating': 4.8,
+      'students': 1280,
+      'description': 'Build a strong core for everyday activities',
+      'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+    },
+    {
+      'id': 'program_24',
+      'title': 'Core Stability & Balance',
+      'trainer': 'Robert Chen',
+      'trainerImage': 'RC',
+      'price': 33.99,
+      'duration': '6 weeks',
+      'category': 'Core',
+      'goal': 'Strength',
+      'certified': false,
+      'rating': 4.6,
+      'students': 890,
+      'description': 'Improve balance and stability through core work',
+      'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+    },
   ];
 
   List<Map<String, dynamic>> get _filteredPrograms {
@@ -861,11 +1137,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
               const SizedBox(height: 16),
             ],
 
-            // Programs header
-            Text('${filteredPrograms.length} Programs Available', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-            const SizedBox(height: 16),
-
-            // Programs grid
+            // Programs by Category
             filteredPrograms.isEmpty
                 ? Center(
                     child: Padding(
@@ -888,16 +1160,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       ),
                     ),
                   )
-                : Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: filteredPrograms.map((program) {
-                      return SizedBox(
-                        width: (MediaQuery.of(context).size.width - 44) / 2, // Account for padding and spacing
-                        child: _buildProgramCard(program),
-                      );
-                    }).toList(),
-                  ),
+                : _buildProgramsByCategory(filteredPrograms),
           ],
         ),
       ),
@@ -1083,11 +1346,87 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     return number.toString();
   }
 
+  Widget _buildProgramsByCategory(List<Map<String, dynamic>> programs) {
+    // Group programs by category
+    final Map<String, List<Map<String, dynamic>>> programsByCategory = {};
+    for (var program in programs) {
+      final category = program['category'] ?? 'Other';
+      if (!programsByCategory.containsKey(category)) {
+        programsByCategory[category] = [];
+      }
+      programsByCategory[category]!.add(program);
+    }
+
+    // Category display names
+    final categoryNames = {
+      'Strength': 'Strength Programs',
+      'Cardio': 'Cardio Programs',
+      'Flexibility': 'Flexibility Programs',
+      'Bodyweight': 'Bodyweight Programs',
+      'Running': 'Running Programs',
+      'Core': 'Core Programs',
+      'Web Development': 'Web Development Programs',
+      'Data Science': 'Data Science Programs',
+      'Frontend': 'Frontend Programs',
+      'Cloud': 'Cloud Programs',
+      'Marketing': 'Marketing Programs',
+      'Mobile Development': 'Mobile Development Programs',
+      'Blockchain': 'Blockchain Programs',
+      'Design': 'Design Programs',
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: programsByCategory.entries.map((entry) {
+        final category = entry.key;
+        final categoryPrograms = entry.value;
+        final displayName = categoryNames[category] ?? '${category} Programs';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  displayName,
+                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                  child: Text(
+                    '${categoryPrograms.length}',
+                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 235,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                itemCount: categoryPrograms.length,
+                itemBuilder: (context, index) {
+                  return SizedBox(width: MediaQuery.of(context).size.width * 0.5, child: _buildProgramCard(categoryPrograms[index]));
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildProgramCard(Map<String, dynamic> program) {
     return GestureDetector(
       onTap: () => _showProgramDetail(program),
       child: Container(
         height: 235,
+        margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(8),

@@ -123,7 +123,7 @@ class AppDrawer extends StatelessWidget {
                 _buildDrawerItem(
                   icon: Icons.track_changes_outlined,
                   activeIcon: Icons.track_changes,
-                  title: 'Program',
+                  title: 'Marketplace',
                   onTap: () {
                     navController.changeTab(4);
                     Get.back();
@@ -136,15 +136,7 @@ class AppDrawer extends StatelessWidget {
 
                 // Community Section
                 _buildSectionLabel('COMMUNITY'),
-                _buildDrawerItem(
-                  icon: Icons.store_outlined,
-                  activeIcon: Icons.store,
-                  title: 'Marketplace',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.marketplace);
-                  },
-                ),
+
                 _buildDrawerItem(
                   icon: Icons.favorite_outline,
                   activeIcon: Icons.favorite,
