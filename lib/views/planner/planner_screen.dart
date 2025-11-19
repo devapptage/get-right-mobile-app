@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
-import 'package:get_right/views/home/dashboard_screen.dart';
 
 /// Planner screen - workout plans and calendar with color-coded entries
 class PlannerScreen extends StatefulWidget {
@@ -92,7 +91,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
               trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Navigate to create plan
+                Get.toNamed(AppRoutes.createPlan);
               },
             ),
             const SizedBox(height: 16),

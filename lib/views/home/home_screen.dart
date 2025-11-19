@@ -40,11 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => Scaffold(
-        key: _scaffoldKey,
-        drawer: const AppDrawer(), // Professional app drawer
-        body: IndexedStack(index: _navController.currentIndex, children: _screens),
-        bottomNavigationBar: _buildProfessionalBottomNav(),
+      () => PopScope(
+        canPop: false,
+        child: Scaffold(
+          key: _scaffoldKey,
+          drawer: const AppDrawer(), // Professional app drawer
+          body: IndexedStack(index: _navController.currentIndex, children: _screens),
+          bottomNavigationBar: _buildProfessionalBottomNav(),
+        ),
       ),
     );
   }
@@ -56,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       {'icon': Icons.book_outlined, 'activeIcon': Icons.book_rounded, 'label': 'Journal'},
       {'icon': Icons.calendar_today_outlined, 'activeIcon': Icons.calendar_today_rounded, 'label': 'Planner'},
       {'icon': Icons.directions_run_outlined, 'activeIcon': Icons.directions_run_rounded, 'label': 'Run'},
-      {'icon': Icons.store_outlined, 'activeIcon': Icons.store_rounded, 'label': 'Programs'},
+      {'icon': Icons.store_outlined, 'activeIcon': Icons.store_rounded, 'label': 'Market Place'},
     ];
 
     return Container(

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_right/constants/app_constants.dart';
 import 'package:get_right/theme/color_constants.dart';
@@ -24,11 +25,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _lastNameController = TextEditingController();
   final _ageController = TextEditingController();
   final _bioController = TextEditingController();
-  String? _selectedFitnessGoal;
-  String? _profileImagePath;
+  final _phoneController = TextEditingController();
+  final _heightController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _targetWeightController = TextEditingController();
+  final _medicalConditionsController = TextEditingController();
+  final _emergencyContactNameController = TextEditingController();
+  final _emergencyContactPhoneController = TextEditingController();
 
+  String? _selectedFitnessGoal;
   String? _selectedGender;
+  String? _selectedActivityLevel;
+  String? _selectedUnits; // Default to metric
   List<String> _selectedWorkoutTypes = [];
+  String? _profileImagePath;
 
   @override
   void dispose() {
@@ -36,6 +46,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _lastNameController.dispose();
     _ageController.dispose();
     _bioController.dispose();
+    _phoneController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _targetWeightController.dispose();
+    _medicalConditionsController.dispose();
+    _emergencyContactNameController.dispose();
+    _emergencyContactPhoneController.dispose();
     super.dispose();
   }
 
@@ -277,9 +294,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               CustomTextField(
                 controller: _ageController,
                 labelText: 'Age',
+                hintText: 'Enter your age',
                 keyboardType: TextInputType.number,
                 prefixIcon: const Icon(Icons.cake_outlined),
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: Validators.validateAge,
+              ),
+              const SizedBox(height: 16),
+
+              // Phone Number
+              CustomTextField(
+                controller: _phoneController,
+                labelText: 'Contact Number',
+                hintText: '+1 234 567 8900',
+                keyboardType: TextInputType.phone,
+                prefixIcon: const Icon(Icons.phone_outlined),
               ),
               const SizedBox(height: 16),
 
@@ -287,29 +316,54 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 32),
 
               // Gender Selection
-              _buildSectionHeader('Gender', Icons.wc),
+              _buildSectionHeader('Gender', Icons.wc_outlined),
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                children: AppConstants.genderOptions.map((gender) {
-                  final isSelected = _selectedGender == gender;
-                  return ChoiceChip(
-                    label: Text(gender),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedGender = selected ? gender : null;
-                      });
-                    },
-                    selectedColor: AppColors.accent,
-                    labelStyle: TextStyle(color: isSelected ? AppColors.onAccent : AppColors.onBackground, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
-                    backgroundColor: AppColors.surface,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
+              _buildDropdownField(
+                label: 'Gender',
+                value: _selectedGender,
+                items: AppConstants.genderOptions,
+                icon: Icons.wc_outlined,
+                onChanged: (value) => setState(() => _selectedGender = value),
+              ),
+              const SizedBox(height: 32),
+
+              // Units preference
+              _buildSectionHeader('Measurement System', Icons.straighten_outlined),
+              const SizedBox(height: 12),
+              _buildDropdownField(
+                label: 'Measurement System',
+                value: _selectedUnits,
+                items: AppConstants.unitsOptions,
+                icon: Icons.straighten_outlined,
+                onChanged: (value) => setState(() => _selectedUnits = value),
+              ),
+              const SizedBox(height: 32),
+
+              // Height and Weight
+              _buildSectionHeader('Body Measurements', Icons.monitor_weight_outlined),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField(
+                      controller: _heightController,
+                      labelText: _selectedUnits == 'Metric' ? 'Height (cm)' : 'Height (ft)',
+                      hintText: _selectedUnits == 'Metric' ? '170' : '5.7',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      prefixIcon: const Icon(Icons.height_outlined),
                     ),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomTextField(
+                      controller: _weightController,
+                      labelText: _selectedUnits == 'Metric' ? 'Weight (kg)' : 'Weight (lbs)',
+                      hintText: _selectedUnits == 'Metric' ? 'e.g. 70 (kg)' : 'e.g. 154 (lbs)',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      prefixIcon: const Icon(Icons.monitor_weight_outlined),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 32),
 
@@ -322,6 +376,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 items: AppConstants.fitnessGoals,
                 icon: Icons.flag_outlined,
                 onChanged: (value) => setState(() => _selectedFitnessGoal = value),
+              ),
+              const SizedBox(height: 20),
+
+              // Target Weight (optional)
+              if (_selectedFitnessGoal == 'Weight Loss' || _selectedFitnessGoal == 'Muscle Gain')
+                Column(
+                  children: [
+                    CustomTextField(
+                      controller: _targetWeightController,
+                      labelText: _selectedUnits == 'Metric' ? 'Target Weight (kg)' : 'Target Weight (lbs)',
+                      hintText: _selectedUnits == 'Metric' ? '65' : '143',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      prefixIcon: const Icon(Icons.track_changes_outlined),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+                )
+              else
+                const SizedBox(height: 32),
+
+              // Activity Level dropdown
+              _buildSectionHeader('Activity Level', Icons.directions_run_outlined),
+              const SizedBox(height: 12),
+              _buildDropdownField(
+                label: 'Activity Level',
+                value: _selectedActivityLevel,
+                items: AppConstants.activityLevels,
+                icon: Icons.directions_run_outlined,
+                onChanged: (value) => setState(() => _selectedActivityLevel = value),
               ),
               const SizedBox(height: 32),
 
@@ -363,6 +446,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     );
                   }).toList(),
                 ),
+              ),
+              const SizedBox(height: 32),
+
+              // Medical & Emergency Section Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Health & Safety Information',
+                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Medical Conditions (Optional)
+              CustomTextField(
+                controller: _medicalConditionsController,
+                labelText: 'Medical Conditions (Optional)',
+                hintText: 'e.g., Asthma, Diabetes, Allergies',
+                maxLines: 3,
+                prefixIcon: const Icon(Icons.health_and_safety_outlined),
+              ),
+              const SizedBox(height: 20),
+
+              // Emergency Contact Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.emergency_outlined, color: AppColors.accent, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Emergency Contact',
+                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Emergency Contact Name
+              CustomTextField(
+                controller: _emergencyContactNameController,
+                labelText: 'Emergency Contact Name',
+                hintText: 'Enter contact name',
+                prefixIcon: const Icon(Icons.person_outline_rounded),
+              ),
+              const SizedBox(height: 16),
+
+              // Emergency Contact Phone
+              CustomTextField(
+                controller: _emergencyContactPhoneController,
+                labelText: 'Emergency Contact Phone',
+                hintText: '+1 234 567 8900',
+                keyboardType: TextInputType.phone,
+                prefixIcon: const Icon(Icons.phone_in_talk_outlined),
               ),
               const SizedBox(height: 40),
 

@@ -120,6 +120,16 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
+                _buildDrawerItem(
+                  icon: Icons.track_changes_outlined,
+                  activeIcon: Icons.track_changes,
+                  title: 'Program',
+                  onTap: () {
+                    navController.changeTab(4);
+                    Get.back();
+                  },
+                ),
+
                 const SizedBox(height: 16),
                 const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
                 const SizedBox(height: 16),

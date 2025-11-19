@@ -34,6 +34,7 @@ class _JournalScreenState extends State<JournalScreen> {
   // Mock journal entries with more details
   final List<Map<String, dynamic>> _journalEntries = [
     {
+      'id': '1',
       'date': 'Nov 5, 2025',
       'time': '6:30 AM',
       'entry': 'Had an intense leg workout today! Feeling strong.',
@@ -43,6 +44,7 @@ class _JournalScreenState extends State<JournalScreen> {
       'duration': '45 mins',
     },
     {
+      'id': '2',
       'date': 'Nov 4, 2025',
       'time': '10:00 AM',
       'entry': 'Took a rest day. Focused on hydration and stretching.',
@@ -52,6 +54,7 @@ class _JournalScreenState extends State<JournalScreen> {
       'duration': '30 mins',
     },
     {
+      'id': '3',
       'date': 'Nov 3, 2025',
       'time': '5:45 AM',
       'entry': 'Morning cardio + meal prep for the week.',
@@ -61,6 +64,186 @@ class _JournalScreenState extends State<JournalScreen> {
       'duration': '60 mins',
     },
   ];
+
+  void _showEntryOptions(Map<String, dynamic> entry, int index) {
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12),
+                decoration: BoxDecoration(color: AppColors.primaryGray, borderRadius: BorderRadius.circular(2)),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  entry['type'] as String,
+                  style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text('${entry['date']} • ${entry['time']}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+              ),
+              const SizedBox(height: 24),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                  child: const Icon(Icons.edit, color: AppColors.accent, size: 20),
+                ),
+                title: Text(
+                  'Edit Entry',
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Get.back();
+                  _editEntry(entry, index);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                  child: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                ),
+                title: Text(
+                  'Delete Entry',
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.red, fontWeight: FontWeight.w600),
+                ),
+                onTap: () {
+                  Get.back();
+                  _showDeleteConfirmation(entry, index);
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _editEntry(Map<String, dynamic> entry, int index) {
+    final entryType = entry['type'] as String;
+
+    // Navigate to appropriate edit screen based on entry type
+    if (entryType == 'Workout') {
+      Get.toNamed(AppRoutes.addWorkout, arguments: {'edit': true, 'entry': entry});
+    } else if (entryType == 'Cardio' || entryType == 'Run') {
+      Get.toNamed(AppRoutes.logRun, arguments: {'edit': true, 'entry': entry});
+    } else if (entryType == 'Meal') {
+      Get.toNamed(AppRoutes.logMeal, arguments: {'edit': true, 'entry': entry});
+    } else if (entryType == 'Note' || entryType == 'Rest Day') {
+      Get.toNamed(AppRoutes.writeNote, arguments: {'edit': true, 'entry': entry});
+    } else {
+      Get.snackbar(
+        'Edit Entry',
+        'Edit functionality for this entry type is coming soon!',
+        backgroundColor: AppColors.accent,
+        colorText: AppColors.onAccent,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+    }
+  }
+
+  void _showDeleteConfirmation(Map<String, dynamic> entry, int index) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 60),
+              const SizedBox(height: 20),
+              Text(
+                'Delete Entry?',
+                style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to delete this journal entry? This action cannot be undone.',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                child: Text(
+                  '${entry['type']} • ${entry['date']}',
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: AppColors.primaryGray, width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Cancel', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                        _deleteEntry(index);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Delete', style: AppTextStyles.buttonMedium.copyWith(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _deleteEntry(int index) {
+    setState(() {
+      _journalEntries.removeAt(index);
+    });
+
+    Get.snackbar(
+      'Entry Deleted',
+      'Journal entry has been deleted',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.completed,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(16),
+    );
+  }
 
   void _showAddEntryOptions() {
     Get.bottomSheet(
@@ -423,16 +606,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        Get.snackbar(
-                          'Entry Details',
-                          'View entry details coming soon!',
-                          backgroundColor: AppColors.accent,
-                          colorText: AppColors.onAccent,
-                          snackPosition: SnackPosition.BOTTOM,
-                          margin: const EdgeInsets.all(16),
-                        );
-                      },
+                      onTap: () => _showEntryOptions(entry, index),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
@@ -466,6 +640,14 @@ class _JournalScreenState extends State<JournalScreen> {
                                     entry['duration'] as String,
                                     style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                                   ),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: Icon(Icons.more_vert, color: AppColors.primaryGray, size: 20),
+                                  onPressed: () => _showEntryOptions(entry, index),
+                                  tooltip: 'More options',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
                                 ),
                               ],
                             ),

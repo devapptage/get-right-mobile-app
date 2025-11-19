@@ -26,6 +26,7 @@ import 'package:get_right/views/tracker/active_run_screen.dart';
 import 'package:get_right/views/tracker/run_summary_screen.dart';
 import 'package:get_right/views/tracker/run_history_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
+import 'package:get_right/views/planner/create_plan_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/settings/settings_screen.dart';
 import 'package:get_right/views/settings/change_password_screen.dart';
@@ -99,6 +100,7 @@ class AppPages {
 
     // Planner Pages
     GetPage(name: AppRoutes.planner, page: () => const PlannerScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.createPlan, page: () => const CreatePlanScreen(), transition: Transition.downToUp),
 
     // Marketplace Pages
     GetPage(name: AppRoutes.marketplace, page: () => const MarketplaceScreen(), transition: Transition.fade),
