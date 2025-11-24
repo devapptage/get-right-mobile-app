@@ -165,14 +165,7 @@ class TrainerProfileScreen extends StatelessWidget {
                           ),
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              Get.snackbar(
-                                'Chat',
-                                'Opening chat with ${trainer['name']}',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: AppColors.accent,
-                                colorText: Colors.white,
-                                duration: const Duration(seconds: 2),
-                              );
+                              Get.toNamed(AppRoutes.chatRoom, arguments: {'trainerId': trainer['id'], 'trainerName': trainer['name']});
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,

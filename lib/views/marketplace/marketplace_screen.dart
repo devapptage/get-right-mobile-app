@@ -1189,7 +1189,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.white, width: 1),
+          border: Border.all(color: AppColors.white.withOpacity(0.3), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1314,7 +1314,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         decoration: BoxDecoration(
           color: AppColors.primaryVariant,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.white, width: 2),
+          border: Border.all(color: AppColors.white.withOpacity(0.3), width: 2),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1430,7 +1430,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.white, width: 1),
+          border: Border.all(color: AppColors.white.withOpacity(0.3), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

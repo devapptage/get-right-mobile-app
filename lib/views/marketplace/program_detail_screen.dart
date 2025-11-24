@@ -71,7 +71,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                       duration: const Duration(seconds: 2),
                     );
                   },
-                  icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.onPrimary),
+                  icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.completed),
                 );
               }),
             ],
@@ -95,7 +95,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
                             ),
-                            child: Center(child: Icon(Icons.fitness_center, size: 80, color: AppColors.onAccent.withOpacity(0.3))),
+                            child: Center(child: Icon(Icons.fitness_center, size: 80, color: AppColors.accent.withOpacity(0.3))),
                           ),
                         ),
                         // Play button overlay
