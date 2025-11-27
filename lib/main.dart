@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get_right/theme/app_theme.dart';
@@ -69,20 +70,27 @@ class GetRightApp extends StatelessWidget {
     // unless explicitly overridden by a deeper AnnotatedRegion or AppBar.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: darkSystemOverlay,
-      child: GetMaterialApp(
-        title: 'Get Right',
-        debugShowCheckedModeBanner: false,
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812), // iPhone X design size (standard)
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return GetMaterialApp(
+            title: 'Get Right',
+            debugShowCheckedModeBanner: false,
 
-        // Apply App Theme with Google Fonts fallback for Inter
-        theme: AppTheme.lightTheme.copyWith(textTheme: GoogleFonts.interTextTheme(AppTheme.lightTheme.textTheme)),
+            // Apply App Theme with Google Fonts fallback for Inter
+            theme: AppTheme.lightTheme.copyWith(textTheme: GoogleFonts.interTextTheme(AppTheme.lightTheme.textTheme)),
 
-        // GetX Routing
-        initialRoute: AppPages.initial,
-        getPages: AppPages.routes,
+            // GetX Routing
+            initialRoute: AppPages.initial,
+            getPages: AppPages.routes,
 
-        // Default transition
-        defaultTransition: Transition.cupertino,
-        transitionDuration: const Duration(milliseconds: 300),
+            // Default transition
+            defaultTransition: Transition.cupertino,
+            transitionDuration: const Duration(milliseconds: 300),
+          );
+        },
       ),
     );
   }

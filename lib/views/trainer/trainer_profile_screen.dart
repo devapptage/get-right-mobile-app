@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
@@ -408,7 +409,20 @@ class TrainerProfileScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      ..._getMockReviews().take(3).map((review) => _buildReviewCard(review)),
+                      SizedBox(
+                        height: 220.h,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          itemCount: _getMockReviews().length,
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.85,
+                              child: Padding(padding: const EdgeInsets.only(right: 16), child: _buildReviewCard(_getMockReviews()[index])),
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -427,16 +441,6 @@ class TrainerProfileScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionDivider() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        height: 1,
-        decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AppColors.primaryGray.withOpacity(0.2), Colors.transparent])),
       ),
     );
   }
@@ -470,7 +474,6 @@ class TrainerProfileScreen extends StatelessWidget {
 
   Widget _buildReviewCard(Map<String, dynamic> review) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -620,7 +623,21 @@ class TrainerProfileScreen extends StatelessWidget {
               ),
             )
           else
-            ...programs.map((program) => _buildProgramCard(program)),
+            SizedBox(
+              height: 285,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                itemCount: programs.length + 1, // +1 for "See All" card
+                itemBuilder: (context, index) {
+                  if (index < programs.length) {
+                    return SizedBox(width: MediaQuery.of(context).size.width * 0.5, child: _buildProgramCard(programs[index]));
+                  } else {
+                    return SizedBox(width: MediaQuery.of(context).size.width * 0.4, child: _buildSeeAllProgramsCard(programs, title));
+                  }
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -630,89 +647,115 @@ class TrainerProfileScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.programDetail, arguments: program),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2)),
-          boxShadow: [BoxShadow(color: AppColors.primaryGray.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
-        ),
+        height: 285,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with gradient
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.accent.withOpacity(0.1), AppColors.accentVariant.withOpacity(0.05)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            // Thumbnail Image
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  child: Image.network(
+                    program['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
+                    width: double.infinity,
+                    height: 130,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      ),
+                      child: const Center(child: Icon(Icons.fitness_center, size: 40, color: Colors.white)),
+                    ),
+                  ),
                 ),
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          program['title'],
-                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, letterSpacing: 0.3),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          program['description'],
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, height: 1.5),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                // Certified badge
+                if (program['certified'] ?? false)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(color: AppColors.completed, shape: BoxShape.circle),
+                      child: const Icon(Icons.verified, color: Colors.white, size: 14),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant]),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
-                    ),
-                    child: Text(
-                      '\$${program['price']}',
-                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-            // Stats section
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  _buildProgramStat(Icons.schedule_rounded, program['duration']),
-                  const SizedBox(width: 16),
-                  _buildProgramStat(Icons.people_rounded, '${program['students']}'),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: AppColors.upcoming.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+
+            // Content section
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      program['title'],
+                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 15),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Instructor
+                    Text(
+                      program['trainer'] ?? 'Trainer',
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Rating
+                    Row(
                       children: [
-                        Icon(Icons.star_rounded, size: 16, color: AppColors.upcoming),
-                        const SizedBox(width: 4),
                         Text(
-                          '${program['rating']}',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                          (program['rating'] ?? 0.0).toStringAsFixed(1),
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
+                        const SizedBox(width: 4),
+                        ...List.generate(
+                          5,
+                          (index) => Icon(index < ((program['rating'] ?? 0.0) as double).floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            '(${_formatNumber(program['students'] ?? 0)})',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+
+                    const Spacer(),
+
+                    // Price and Duration
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
+                            const SizedBox(width: 4),
+                            Text(program['duration'] ?? 'N/A', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                          ],
+                        ),
+                        Text(
+                          '\$${(program['price'] ?? 0.0).toStringAsFixed(2)}',
+                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -721,21 +764,60 @@ class TrainerProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProgramStat(IconData icon, String value) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), shape: BoxShape.circle),
-          child: Icon(icon, size: 14, color: AppColors.accent),
+  String _formatNumber(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    }
+    return number.toString();
+  }
+
+  Widget _buildSeeAllProgramsCard(List<Map<String, dynamic>> programs, String sectionTitle) {
+    return GestureDetector(
+      onTap: () {
+        // Convert to a format that GetX can handle properly
+        final List<dynamic> programsList = programs
+            .map(
+              (p) => {
+                'title': p['title'] ?? '',
+                'description': p['description'] ?? '',
+                'trainer': p['trainer'] ?? '',
+                'price': p['price'] ?? 0.0,
+                'duration': p['duration'] ?? '',
+                'students': p['students'] ?? 0,
+                'rating': p['rating'] ?? 0.0,
+                'category': p['category'] ?? '',
+                'certified': p['certified'] ?? false,
+                'imageUrl': p['imageUrl'] ?? '',
+                'status': p['status'] ?? '',
+              },
+            )
+            .toList();
+
+        Get.toNamed(AppRoutes.trainerAllPrograms, arguments: {'programs': programsList, 'section': sectionTitle});
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(color: AppColors.primaryVariant, borderRadius: BorderRadius.circular(8)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
+              child: const Icon(Icons.grid_view_rounded, size: 30, color: AppColors.accent),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'See All',
+              style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('${programs.length}+ programs', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+          ],
         ),
-        const SizedBox(width: 6),
-        Text(
-          value,
-          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
-        ),
-      ],
+      ),
     );
   }
 
@@ -798,51 +880,66 @@ class TrainerProfileScreen extends StatelessWidget {
       {
         'title': 'Complete Strength Program',
         'description': 'Build muscle and strength with this comprehensive 12-week program',
+        'trainer': 'Sarah Johnson',
         'price': 49.99,
         'duration': '12 weeks',
         'students': 1250,
         'rating': 4.8,
         'category': 'Strength',
+        'certified': true,
+        'imageUrl': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
         'status': 'active',
       },
       {
         'title': 'Weight Loss Challenge',
         'description': 'Transform your body with this intensive 8-week weight loss program',
+        'trainer': 'Sarah Johnson',
         'price': 39.99,
         'duration': '8 weeks',
         'students': 890,
         'rating': 4.9,
         'category': 'Weight Loss',
+        'certified': true,
+        'imageUrl': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop',
         'status': 'active',
       },
       {
         'title': 'Functional Fitness',
         'description': 'Improve everyday movement and build practical strength',
+        'trainer': 'Sarah Johnson',
         'price': 44.99,
         'duration': '10 weeks',
         'students': 650,
         'rating': 4.7,
         'category': 'Functional',
+        'certified': true,
+        'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
         'status': 'active',
       },
       {
         'title': 'Beginner Bootcamp',
         'description': 'Perfect introduction to fitness for newcomers',
+        'trainer': 'Sarah Johnson',
         'price': 29.99,
         'duration': '6 weeks',
         'students': 1100,
         'rating': 4.6,
         'category': 'Beginner',
+        'certified': true,
+        'imageUrl': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=300&fit=crop',
         'status': 'completed',
       },
       {
         'title': 'Advanced Athletics',
         'description': 'Take your performance to the next level',
+        'trainer': 'Sarah Johnson',
         'price': 59.99,
         'duration': '16 weeks',
         'students': 420,
         'rating': 4.9,
         'category': 'Advanced',
+        'certified': true,
+        'imageUrl': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop',
         'status': 'completed',
       },
     ];

@@ -48,271 +48,293 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
       ...program, // Keep any additional fields
     };
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // App Bar with Program Image
-          SliverAppBar(
-            expandedHeight: 250,
-            pinned: true,
-            actions: [
-              // Favorite Icon
-              Obx(() {
-                final isFavorite = _favoritesController.isFavorite(programId);
-                return IconButton(
-                  onPressed: () {
-                    _favoritesController.toggleFavorite(programId, {..._safeProgram, 'type': 'program'});
-                    Get.snackbar(
-                      isFavorite ? 'Removed' : 'Added',
-                      isFavorite ? 'Removed from favorites' : 'Added to favorites',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: isFavorite ? AppColors.primaryGray : AppColors.completed,
-                      colorText: Colors.white,
-                      duration: const Duration(seconds: 2),
-                    );
-                  },
-                  icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.completed),
-                );
-              }),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Demo Video
-                  Container(
-                    color: AppColors.primaryVariant,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Video thumbnail/placeholder
-                        Image.network(
-                          _safeProgram['imageUrl'] ?? 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=400&fit=crop',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                            ),
-                            child: Center(child: Icon(Icons.fitness_center, size: 80, color: AppColors.accent.withOpacity(0.3))),
-                          ),
-                        ),
-                        // Play button overlay
-                        Container(
-                          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), shape: BoxShape.circle),
-                          child: IconButton(
-                            icon: const Icon(Icons.play_circle_filled, size: 64, color: Colors.white),
-                            onPressed: () => _playDemoVideo(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, AppColors.background]),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Content
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Program Title
-                  Text(
-                    _safeProgram['title'] ?? 'Program',
-                    style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Trainer Section (Tappable)
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed(AppRoutes.trainerProfile, arguments: _getMockTrainerData());
+    return SafeArea(
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            // App Bar with Program Image
+            SliverAppBar(
+              expandedHeight: 250,
+              pinned: true,
+              automaticallyImplyLeading: false,
+              actions: [
+                // Favorite Icon
+                Obx(() {
+                  final isFavorite = _favoritesController.isFavorite(programId);
+                  return IconButton(
+                    onPressed: () {
+                      _favoritesController.toggleFavorite(programId, {..._safeProgram, 'type': 'program'});
+                      Get.snackbar(
+                        isFavorite ? 'Removed' : 'Added',
+                        isFavorite ? 'Removed from favorites' : 'Added to favorites',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: isFavorite ? AppColors.primaryGray : AppColors.completed,
+                        colorText: Colors.white,
+                        duration: const Duration(seconds: 2),
+                      );
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.accent),
-                      ),
-                      child: Row(
+                    icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.completed),
+                  );
+                }),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Demo Video
+                    Container(
+                      color: AppColors.primaryVariant,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: AppColors.accent,
-                            child: Text(_safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(_safeProgram['trainer'] ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-                                    if (_safeProgram['certified'] == true)
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Icon(Icons.verified, color: AppColors.completed, size: 18),
-                                      ),
-                                  ],
+                          // Video thumbnail/placeholder
+                          Image.network(
+                            _safeProgram['imageUrl'] ?? 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=400&fit=crop',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
-                                Row(
-                                  children: [
-                                    Icon(Icons.star, color: AppColors.upcoming, size: 16),
-                                    const SizedBox(width: 4),
-                                    Text('${_safeProgram['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
-                                    const SizedBox(width: 8),
-                                    Text('${_safeProgram['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                                  ],
-                                ),
-                              ],
+                              ),
+                              child: Center(child: Icon(Icons.fitness_center, size: 80, color: AppColors.accent.withOpacity(0.3))),
                             ),
                           ),
-                          Icon(Icons.chevron_right, color: AppColors.accent),
+                          // Play button overlay
+                          Container(
+                            decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), shape: BoxShape.circle),
+                            child: IconButton(
+                              icon: const Icon(Icons.play_circle_filled, size: 64, color: Colors.white),
+                              onPressed: () => _playDemoVideo(),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    // Back button
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: SafeArea(
+                        child: Container(
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 60,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, AppColors.background]),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
-                  // Quick Info Cards
-                  Row(
-                    children: [
-                      Expanded(child: _buildInfoCard(Icons.schedule, 'Duration', _safeProgram['duration'] ?? '12 weeks')),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildInfoCard(Icons.category, 'Category', _safeProgram['category'] ?? 'General')),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildInfoCard(Icons.flag, 'Goal', _safeProgram['goal'] ?? 'Fitness')),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Description
-                  Text(
-                    'About This Program',
-                    style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(_safeProgram['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
-                  const SizedBox(height: 24),
-
-                  // What's Included
-                  Text(
-                    'What\'s Included',
-                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildFeatureItem(Icons.fitness_center, 'Full workout plans and schedules'),
-                  _buildFeatureItem(Icons.video_library, 'Video demonstrations for all exercises'),
-                  _buildFeatureItem(Icons.track_changes, 'Progress tracking and analytics'),
-                  _buildFeatureItem(Icons.chat, 'Direct messaging with trainer'),
-                  _buildFeatureItem(Icons.library_books, 'Nutrition guide included'),
-                  _buildFeatureItem(Icons.calendar_today, 'Lifetime access to program'),
-                  const SizedBox(height: 24),
-
-                  // Enrolled Content Section (only visible if enrolled)
-                  if (_isEnrolled) ...[
+            // Content
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Program Title
                     Text(
-                      'Program Content',
+                      _safeProgram['title'] ?? 'Program',
+                      style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Trainer Section (Tappable)
+                    GestureDetector(
+                      onTap: () {
+                        Get.toNamed(AppRoutes.trainerProfile, arguments: _getMockTrainerData());
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.accent),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundColor: AppColors.accent,
+                              child: Text(_safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(_safeProgram['trainer'] ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                                      if (_safeProgram['certified'] == true)
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 8),
+                                          child: Icon(Icons.verified, color: AppColors.completed, size: 18),
+                                        ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.star, color: AppColors.upcoming, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text('${_safeProgram['rating']}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
+                                      const SizedBox(width: 8),
+                                      Text('${_safeProgram['students']} students', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.chevron_right, color: AppColors.accent),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Quick Info Cards
+                    Row(
+                      children: [
+                        Expanded(child: _buildInfoCard(Icons.schedule, 'Duration', _safeProgram['duration'] ?? '12 weeks')),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildInfoCard(Icons.category, 'Category', _safeProgram['category'] ?? 'General')),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildInfoCard(Icons.flag, 'Goal', _safeProgram['goal'] ?? 'Fitness')),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Description
+                    Text(
+                      'About This Program',
+                      style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(_safeProgram['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
+                    const SizedBox(height: 24),
+
+                    // What's Included
+                    Text(
+                      'What\'s Included',
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
-                    _buildEnrolledContentCard(icon: Icons.video_library, title: 'Full Program Video', subtitle: 'Complete training video', onTap: () => _openEnrolledVideo()),
-                    const SizedBox(height: 12),
-                    _buildEnrolledContentCard(icon: Icons.picture_as_pdf, title: 'Program Guide PDF', subtitle: 'Download program guide', onTap: () => _openPDF()),
+                    _buildFeatureItem(Icons.fitness_center, 'Full workout plans and schedules'),
+                    _buildFeatureItem(Icons.video_library, 'Video demonstrations for all exercises'),
+                    _buildFeatureItem(Icons.track_changes, 'Progress tracking and analytics'),
+                    _buildFeatureItem(Icons.chat, 'Direct messaging with trainer'),
+                    _buildFeatureItem(Icons.library_books, 'Nutrition guide included'),
+                    _buildFeatureItem(Icons.calendar_today, 'Lifetime access to program'),
                     const SizedBox(height: 24),
-                  ],
 
-                  // Student Reviews
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    // Enrolled Content Section (only visible if enrolled)
+                    if (_isEnrolled) ...[
                       Text(
-                        'Student Reviews',
+                        'Program Content',
                         style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                       ),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: AppColors.upcoming, size: 20),
-                          const SizedBox(width: 4),
-                          Text('${_safeProgram['rating']} (${_safeProgram['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-                        ],
-                      ),
+                      const SizedBox(height: 12),
+                      _buildEnrolledContentCard(icon: Icons.video_library, title: 'Full Program Video', subtitle: 'Complete training video', onTap: () => _openEnrolledVideo()),
+                      const SizedBox(height: 12),
+                      _buildEnrolledContentCard(icon: Icons.picture_as_pdf, title: 'Program Guide PDF', subtitle: 'Download program guide', onTap: () => _openPDF()),
+                      const SizedBox(height: 24),
                     ],
-                  ),
-                  const SizedBox(height: 12),
-                  ..._getMockReviews().take(2).map((review) => _buildReviewCard(review)),
-                  const SizedBox(height: 20), // Space for bottom bar
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      // Bottom Purchase Bar
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
-        ),
-        child: SafeArea(
-          child: Row(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Total Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
-                  Text(
-                    '\$${_safeProgram['price']}',
-                    style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    if (_isEnrolled) {
-                      Get.snackbar(
-                        'Already Enrolled',
-                        'You are already enrolled in this program',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: AppColors.primaryGray,
-                        colorText: Colors.white,
-                      );
-                    } else {
-                      Get.toNamed(AppRoutes.purchaseDetails);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isEnrolled ? AppColors.completed : AppColors.accent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  icon: Icon(_isEnrolled ? Icons.check_circle : Icons.school, size: 20),
-                  label: Text(_isEnrolled ? 'Enrolled' : 'Enroll Now', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
+
+                    // Student Reviews
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Student Reviews',
+                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.star, color: AppColors.upcoming, size: 20),
+                            const SizedBox(width: 4),
+                            Text('${_safeProgram['rating']} (${_safeProgram['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ..._getMockReviews().take(2).map((review) => _buildReviewCard(review)),
+                    const SizedBox(height: 20), // Space for bottom bar
+                  ],
                 ),
               ),
-            ],
+            ),
+          ],
+        ),
+        // Bottom Purchase Bar
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
+          ),
+          child: SafeArea(
+            child: Row(
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Total Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+                    Text(
+                      '\$${_safeProgram['price']}',
+                      style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (_isEnrolled) {
+                        Get.snackbar(
+                          'Already Enrolled',
+                          'You are already enrolled in this program',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.primaryGray,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.toNamed(AppRoutes.purchaseDetails);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isEnrolled ? AppColors.completed : AppColors.accent,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    icon: Icon(_isEnrolled ? Icons.check_circle : Icons.school, size: 20),
+                    label: Text(_isEnrolled ? 'Enrolled' : 'Enroll Now', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

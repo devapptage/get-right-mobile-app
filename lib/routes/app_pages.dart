@@ -47,6 +47,7 @@ import 'package:get_right/views/marketplace/program_terms_screen.dart';
 import 'package:get_right/views/marketplace/my_programs_screen.dart';
 import 'package:get_right/views/marketplace/bundle_detail_screen.dart';
 import 'package:get_right/views/marketplace/all_bundles_screen.dart';
+import 'package:get_right/views/trainer/all_programs_screen.dart';
 import 'package:get_right/views/favorites/favorites_screen.dart';
 import 'package:get_right/views/program_history/program_history_screen.dart';
 import 'package:get_right/views/program_history/active_program_detail_screen.dart';
@@ -121,6 +122,7 @@ class AppPages {
     GetPage(name: AppRoutes.transactionDetail, page: () => const TransactionDetailScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.bundleDetail, page: () => const BundleDetailScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.allBundles, page: () => const AllBundlesScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.trainerAllPrograms, page: () => const AllProgramsScreen(), transition: Transition.rightToLeft),
 
     // Search Pages
     GetPage(name: AppRoutes.search, page: () => SearchScreen(), transition: Transition.rightToLeft),

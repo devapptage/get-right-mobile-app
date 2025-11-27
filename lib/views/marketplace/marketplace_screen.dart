@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
@@ -1105,7 +1106,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             Text('Bundle Programs', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
             const SizedBox(height: 12),
             SizedBox(
-              height: 235,
+              height: 280.h,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -1184,13 +1185,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.5,
+        width: MediaQuery.of(context).size.width * 0.65,
         margin: const EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.white.withOpacity(0.3), width: 1),
-        ),
+        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1202,7 +1199,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   child: Image.network(
                     bundle['imageUrl'],
                     width: double.infinity,
-                    height: 100,
+                    height: 130.h,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       width: double.infinity,
@@ -1311,11 +1308,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.4,
         margin: const EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          color: AppColors.primaryVariant,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.white.withOpacity(0.3), width: 2),
-        ),
+        decoration: BoxDecoration(color: AppColors.primaryVariant, borderRadius: BorderRadius.circular(8)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1327,7 +1320,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             const SizedBox(height: 16),
             Text(
               'See More',
-              style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+              style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text('${_bundles.length - 3}+ more bundles', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
@@ -1347,7 +1340,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   }
 
   Widget _buildProgramsByCategory(List<Map<String, dynamic>> programs) {
-    // Group programs by category
     final Map<String, List<Map<String, dynamic>>> programsByCategory = {};
     for (var program in programs) {
       final category = program['category'] ?? 'Other';
@@ -1404,7 +1396,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 235,
+              height: 275.h,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -1425,13 +1417,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     return GestureDetector(
       onTap: () => _showProgramDetail(program),
       child: Container(
-        height: 235,
+        height: 285,
         margin: const EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.white.withOpacity(0.3), width: 1),
-        ),
+        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1443,11 +1431,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   child: Image.network(
                     program['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
                     width: double.infinity,
-                    height: 100,
+                    height: 130,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       width: double.infinity,
-                      height: 100,
+                      height: 130.h,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                       ),

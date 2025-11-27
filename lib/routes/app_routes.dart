@@ -69,6 +69,7 @@ class AppRoutes {
   static const String bundleDetail = '/bundle-detail';
   static const String bundleEnrollment = '/bundle-enrollment';
   static const String allBundles = '/all-bundles';
+  static const String trainerAllPrograms = '/trainer-all-programs';
 
   // Search Routes
   static const String search = '/search';
