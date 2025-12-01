@@ -127,30 +127,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Progress Stats Card
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primaryGray, width: 1),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Your Progress', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildProgressStat('${_progressStats['currentStreak']}', 'Day Streak', Icons.local_fire_department, AppColors.accent),
-                      _buildProgressStat('${_progressStats['completionRate']}%', 'Completion', Icons.check_circle, AppColors.completed),
-                      _buildProgressStat('${_progressStats['totalWorkouts']}', 'Workouts', Icons.fitness_center, AppColors.upcoming),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            const SizedBox(height: 16),
 
             // Calendar Legend
             Padding(
@@ -245,30 +222,30 @@ class _PlannerScreenState extends State<PlannerScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'planner_fab',
-        onPressed: _showAddWorkoutDialog,
-        backgroundColor: AppColors.accent,
-        foregroundColor: AppColors.onAccent,
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   heroTag: 'planner_fab',
+      //   onPressed: _showAddWorkoutDialog,
+      //   backgroundColor: AppColors.accent,
+      //   foregroundColor: AppColors.onAccent,
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 
-  Widget _buildProgressStat(String value, String label, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: AppTextStyles.titleLarge.copyWith(color: color, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-      ],
-    );
-  }
+  // Widget _buildProgressStat(String value, String label, IconData icon, Color color) {
+  //   return Column(
+  //     children: [
+  //       Icon(icon, color: color, size: 24),
+  //       const SizedBox(height: 8),
+  //       Text(
+  //         value,
+  //         style: AppTextStyles.titleLarge.copyWith(color: color, fontWeight: FontWeight.bold),
+  //       ),
+  //       const SizedBox(height: 4),
+  //       Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+  //     ],
+  //   );
+  // }
 
   Widget _buildLegendItem(Color color, String label) {
     return Row(
