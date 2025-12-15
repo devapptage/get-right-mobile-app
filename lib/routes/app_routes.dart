@@ -1,6 +1,6 @@
 /// Route names for navigation
 class AppRoutes {
-  AppRoutes._(); // Private constructor
+  AppRoutes._();
 
   // Auth Routes
   static const String splash = '/splash';
@@ -25,9 +25,18 @@ class AppRoutes {
 
   // Journal Routes
   static const String journal = '/journal';
+  static const String workoutJournal = '/workout-journal';
   static const String addWorkout = '/add-workout';
+  static const String addExercise = '/add-exercise';
+  static const String exerciseSelection = '/exercise-selection';
+  static const String exerciseConfiguration = '/exercise-configuration';
+  static const String exerciseLibraryDetail = '/exercise-library-detail';
+  static const String addNotes = '/add-notes';
+  static const String videoWalkthrough = '/video-walkthrough';
+  static const String reorderExercises = '/reorder-exercises';
   static const String editWorkout = '/edit-workout';
   static const String workoutDetail = '/workout-detail';
+  static const String workoutTimer = '/workout-timer';
   static const String logRun = '/log-run';
   static const String logMeal = '/log-meal';
   static const String writeNote = '/write-note';
@@ -37,9 +46,11 @@ class AppRoutes {
   static const String calendar = '/calendar';
   static const String progress = '/progress';
   static const String runTracker = '/run-tracker';
-  static const String runTracking = '/run-tracking'; // Live GPS tracking
+  static const String runTracking = '/run-tracking';
   static const String runHistory = '/run-history';
   static const String runDetail = '/run-detail';
+  static const String routePlanning = '/route-planning';
+  static const String activityTypeSelection = '/activity-type-selection';
 
   // Planner Routes
   static const String planner = '/planner';
@@ -70,6 +81,11 @@ class AppRoutes {
   static const String bundleEnrollment = '/bundle-enrollment';
   static const String allBundles = '/all-bundles';
   static const String trainerAllPrograms = '/trainer-all-programs';
+
+  // Library Routes
+  static const String library = '/library';
+  static const String exerciseList = '/exercise-list';
+  static const String exerciseDetail = '/exercise-detail';
 
   // Search Routes
   static const String search = '/search';

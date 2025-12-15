@@ -103,9 +103,9 @@ class WorkoutCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.onPrimaryGray), // Black icon
+          Icon(icon, size: 14, color: AppColors.onSurface), // Black icon
           const SizedBox(width: 4),
-          Text(text, style: AppTextStyles.labelSmall.copyWith(color: AppColors.onPrimaryGray)), // Black text
+          Text(text, style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)), // Black text
         ],
       ),
     );

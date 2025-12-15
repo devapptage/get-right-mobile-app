@@ -27,6 +27,17 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     super.initState();
     _pulseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat(reverse: true);
     _startMapUpdates();
+
+    // Get activity type from arguments if provided
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null && args['activityType'] != null) {
+      _controller.activityType.value = args['activityType'];
+    }
+
+    // Start tracking automatically
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _controller.startTracking(activity: _controller.activityType.value);
+    });
   }
 
   @override
@@ -229,20 +240,39 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
       child: Obx(() {
         return Column(
           children: [
-            // Main stat cards
+            // Main stat cards - Row 1
             Row(
               children: [
                 Expanded(child: _buildStatCard('Distance', _controller.formatDistance(_controller.distanceMeters.value), Icons.straighten_rounded)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km', Icons.speed_rounded)),
+                Expanded(child: _buildStatCard('Time', _controller.formatDuration(_controller.elapsedTime.value), Icons.timer_rounded)),
               ],
             ),
             const SizedBox(height: 12),
+            // Row 2
             Row(
               children: [
-                Expanded(child: _buildStatCard('Time', _controller.formatDuration(_controller.elapsedTime.value), Icons.timer_rounded)),
+                Expanded(child: _buildStatCard('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km', Icons.speed_rounded)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Elevation', _controller.formatElevation(_controller.elevationGain.value), Icons.terrain_rounded)),
+                Expanded(child: _buildStatCard('Avg Pace', '${_controller.formatPace(_controller.averagePace.value)}/km', Icons.insights_rounded)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Row 3
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    'Heart Rate',
+                    _controller.currentHeartRate.value > 0 ? '${_controller.currentHeartRate.value} BPM' : '--',
+                    Icons.favorite_rounded,
+                    isHeartRate: true,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard('Calories', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value} cal' : '--', Icons.local_fire_department_rounded),
+                ),
               ],
             ),
           ],
@@ -251,7 +281,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon) {
+  Widget _buildStatCard(String label, String value, IconData icon, {bool isHeartRate = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -265,7 +295,17 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.accent, size: 18),
+              isHeartRate
+                  ? AnimatedBuilder(
+                      animation: _pulseController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: 1.0 + (_pulseController.value * 0.2),
+                          child: Icon(icon, color: Colors.red, size: 18),
+                        );
+                      },
+                    )
+                  : Icon(icon, color: AppColors.accent, size: 18),
               const SizedBox(width: 6),
               Text(label, style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray, fontSize: 12)),
             ],
@@ -462,13 +502,22 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
                     ),
                     const SizedBox(height: 24),
 
-                    // Distance and Pace
+                    // Distance, Pace, and Heart Rate
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildLockStat('Distance', _controller.formatDistance(_controller.distanceMeters.value)),
                         const SizedBox(width: 32),
                         _buildLockStat('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLockStat('HR', _controller.currentHeartRate.value > 0 ? '${_controller.currentHeartRate.value}' : '--'),
+                        const SizedBox(width: 32),
+                        _buildLockStat('Cal', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value}' : '--'),
                       ],
                     ),
                   ],

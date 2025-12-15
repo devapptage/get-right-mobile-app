@@ -128,49 +128,48 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-          onPressed: () {
-            Get.find<HomeNavigationController>().openDrawer();
-          },
-        ),
-        title: Text('Run Tracker', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history, color: AppColors.onPrimary),
-            onPressed: () {
-              Get.toNamed(AppRoutes.runHistory);
-            },
+      body: Stack(
+        children: [
+          // Map Preview - Full Screen
+          _buildMapPreview(),
+
+          // Bottom Sheet with Activity Selection
+          Positioned(left: 0, right: 0, bottom: 0, child: _buildActionButtons()),
+
+          // Plan Route Button - Top Right
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            right: 16,
+            child: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.accent,
+              child: InkWell(
+                onTap: () => Get.toNamed(AppRoutes.routePlanning),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.map_outlined, color: AppColors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Plan Route',
+                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Map Preview
-            _buildMapPreview(),
-
-            // Ready to Run Card
-            _buildReadyCard(),
-
-            // Stats Section
-            _buildStatsSection(),
-
-            // Action Buttons
-            _buildActionButtons(),
-
-            // Features List
-            _buildFeaturesList(),
-          ],
-        ),
       ),
     );
   }
 
-  /// Build map preview with Google Maps
+  /// Build map preview with Google Maps - Full Screen
   Widget _buildMapPreview() {
     return Obx(() {
       final position = _trackingController.currentPosition.value;
@@ -178,15 +177,11 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
 
       debugPrint('🗺️ Building map preview - hasPosition: $hasPosition, mapError: $_mapLoadError');
 
-      return Container(
-        height: 320,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
-        ),
+      return SizedBox(
+        height: double.infinity,
+        width: double.infinity,
         child: Stack(
           children: [
-            // Google Map layer - only build once when position is available
             hasPosition
                 ? _mapLoadError
                       ? _buildMapErrorState(position)
@@ -231,8 +226,8 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
             // Map info badge
             if (hasPosition)
               Positioned(
-                top: 16,
-                right: 16,
+                top: MediaQuery.of(Get.context!).padding.top + 16,
+                left: 16,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
@@ -253,17 +248,6 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
                   ),
                 ),
               ),
-
-            // Bottom border accent
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 3,
-                decoration: BoxDecoration(gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0), AppColors.accent, AppColors.accent.withOpacity(0)])),
-              ),
-            ),
           ],
         ),
       );
@@ -463,205 +447,80 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
     controller.setMapStyle(mapStyle);
   }
 
-  /// Build ready to run card
-  Widget _buildReadyCard() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.15), AppColors.surface], begin: Alignment.topLeft, end: Alignment.bottomRight),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
-        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 4))],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.2),
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.accent, width: 2),
-            ),
-            child: const Icon(Icons.directions_run_rounded, size: 40, color: AppColors.accent),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Ready to Run?',
-            style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Track distance, pace, route, and elevation',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build stats section
-  Widget _buildStatsSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'Your Running Stats',
-            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem('${(_totalDistance / 1000).toStringAsFixed(1)}', 'km', 'Total Distance'),
-              _buildStatItem('$_totalRuns', 'runs', 'Total Runs'),
-              _buildStatItem('0:00', 'avg', 'Avg Pace'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String value, String unit, String label) {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              value,
-              style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-            const SizedBox(width: 4),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 3),
-              child: Text(unit, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  /// Build action buttons
+  /// Build activity type selector and action buttons
   Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, -5))],
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Start Run Button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: () async {
-                final success = await _trackingController.startTracking();
-                if (success) {
-                  Get.toNamed(AppRoutes.runTracking);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accent,
-                foregroundColor: AppColors.onAccent,
-                elevation: 4,
-                shadowColor: AppColors.accent.withOpacity(0.5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.play_arrow_rounded, size: 28),
-                  const SizedBox(width: 8),
-                  Text('Start Run', style: AppTextStyles.buttonLarge),
-                ],
-              ),
+          const SizedBox(height: 24),
+
+          // Activity Type Label
+
+          // Activity Type Buttons
+
+          // Action Buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                // Start Tracking Button
+                Expanded(
+                  child: SizedBox(
+                    height: 52,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Get.toNamed(AppRoutes.activityTypeSelection);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.accent.withOpacity(0.5), width: 2),
+                        foregroundColor: AppColors.accent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Start Tracking',
+                        style: AppTextStyles.labelLarge.copyWith(color: AppColors.black),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // View History Button
+                Expanded(
+                  child: SizedBox(
+                    height: 52,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Get.toNamed(AppRoutes.runHistory);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.primaryGray.withOpacity(0.5), width: 2),
+                        foregroundColor: AppColors.onSurface,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.history_rounded, size: 20),
+                      label: Text(
+                        'View History',
+                        style: AppTextStyles.labelLarge.copyWith(color: AppColors.onSurface),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-
-          // View History Button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: OutlinedButton(
-              onPressed: () {
-                Get.toNamed(AppRoutes.runHistory);
-              },
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.accent.withOpacity(0.5), width: 2),
-                foregroundColor: AppColors.accent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.history_rounded, size: 24),
-                  const SizedBox(width: 8),
-                  Text('View History', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.accent)),
-                ],
-              ),
-            ),
-          ),
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  /// Build features list
-  Widget _buildFeaturesList() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Features',
-            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          _buildFeatureItem(Icons.gps_fixed_rounded, 'Live GPS Tracking'),
-          _buildFeatureItem(Icons.speed_rounded, 'Real-time Pace & Distance'),
-          _buildFeatureItem(Icons.map_rounded, 'Route Visualization'),
-          _buildFeatureItem(Icons.terrain_rounded, 'Elevation Tracking'),
-          _buildFeatureItem(Icons.history_rounded, 'Run History & Stats'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureItem(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-            child: Icon(icon, color: AppColors.accent, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(text, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-          ),
-        ],
-      ),
-    );
-  }
+  /// Build activity type button
 }

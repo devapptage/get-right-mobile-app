@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_right/constants/app_constants.dart';
 import 'package:get_right/models/run_model.dart';
+import 'package:get_right/models/workout_model.dart';
 
 /// Local storage service using SharedPreferences
 class StorageService {
@@ -242,5 +243,52 @@ class StorageService {
     final journalSync = await syncRunToJournal(run);
     final calendarSync = await syncRunToCalendar(run);
     return journalSync && calendarSync;
+  }
+
+  // Workout storage methods
+
+  /// Save workouts list
+  Future<bool> saveWorkouts(List<WorkoutModel> workouts) async {
+    final jsonList = workouts.map((workout) => json.encode(workout.toJson())).toList();
+    return await saveStringList('user_workouts', jsonList);
+  }
+
+  /// Get workouts list
+  Future<List<WorkoutModel>> getWorkouts() async {
+    final jsonList = getStringList('user_workouts') ?? [];
+    return jsonList.map((jsonStr) => WorkoutModel.fromJson(json.decode(jsonStr))).toList();
+  }
+
+  /// Add a single workout
+  Future<bool> addWorkout(WorkoutModel workout) async {
+    final workouts = await getWorkouts();
+    workouts.add(workout);
+    return await saveWorkouts(workouts);
+  }
+
+  /// Get workouts for specific date
+  Future<List<WorkoutModel>> getWorkoutsForDate(DateTime date) async {
+    final allWorkouts = await getWorkouts();
+    return allWorkouts.where((workout) {
+      return workout.date.year == date.year && workout.date.month == date.month && workout.date.day == date.day;
+    }).toList();
+  }
+
+  /// Delete workout by ID
+  Future<bool> deleteWorkout(String workoutId) async {
+    final workouts = await getWorkouts();
+    workouts.removeWhere((workout) => workout.id == workoutId);
+    return await saveWorkouts(workouts);
+  }
+
+  /// Update workout
+  Future<bool> updateWorkout(WorkoutModel updatedWorkout) async {
+    final workouts = await getWorkouts();
+    final index = workouts.indexWhere((workout) => workout.id == updatedWorkout.id);
+    if (index != -1) {
+      workouts[index] = updatedWorkout;
+      return await saveWorkouts(workouts);
+    }
+    return false;
   }
 }

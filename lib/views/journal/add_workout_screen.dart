@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/constants/app_constants.dart';
+import 'package:get_right/models/workout_model.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/utils/validators.dart';
 import 'package:get_right/widgets/common/custom_button.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
+import 'package:intl/intl.dart';
 
 /// Add workout screen - Redesigned to match app theme
 class AddWorkoutScreen extends StatefulWidget {
@@ -24,6 +27,41 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   final _notesController = TextEditingController();
   final List<String> _selectedTags = [];
   DateTime _selectedDate = DateTime.now();
+  bool _isLoading = false;
+  bool _isEditMode = false;
+  String? _editWorkoutId;
+  StorageService? _storageService;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeStorage();
+    _loadEditData();
+  }
+
+  Future<void> _initializeStorage() async {
+    _storageService = await StorageService.getInstance();
+  }
+
+  void _loadEditData() {
+    final arguments = Get.arguments;
+    if (arguments != null && arguments['edit'] == true && arguments['entry'] != null) {
+      setState(() {
+        _isEditMode = true;
+        final entry = arguments['entry'] as Map<String, dynamic>;
+        _editWorkoutId = entry['id'];
+        _exerciseController.text = entry['entry'] ?? '';
+        // Try to parse existing data if available
+        if (entry['date'] != null) {
+          try {
+            _selectedDate = DateFormat('MMM d, yyyy').parse(entry['date']);
+          } catch (e) {
+            _selectedDate = DateTime.now();
+          }
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -57,18 +95,87 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
     }
   }
 
-  void _saveWorkout() {
+  Future<void> _saveWorkout() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Save workout
-      Get.snackbar(
-        'Success',
-        'Workout logged successfully!',
-        backgroundColor: AppColors.accent,
-        colorText: AppColors.onAccent,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-      );
-      Get.back();
+      if (_storageService == null) {
+        await _initializeStorage();
+      }
+
+      if (_storageService == null) {
+        Get.snackbar(
+          'Error',
+          'Failed to initialize storage. Please try again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final userId = _storageService!.getUserId() ?? 'anonymous';
+        final workout = WorkoutModel(
+          id: _isEditMode && _editWorkoutId != null ? _editWorkoutId! : DateTime.now().millisecondsSinceEpoch.toString(),
+          userId: userId,
+          exerciseName: _exerciseController.text.trim(),
+          sets: int.parse(_setsController.text.trim()),
+          reps: int.parse(_repsController.text.trim()),
+          weight: _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
+          notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+          tags: _selectedTags.isNotEmpty ? _selectedTags : null,
+          date: _selectedDate,
+          createdAt: DateTime.now(),
+        );
+
+        bool success;
+        if (_isEditMode) {
+          success = await _storageService!.updateWorkout(workout);
+        } else {
+          success = await _storageService!.addWorkout(workout);
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (success) {
+          Get.snackbar(
+            'Success',
+            _isEditMode ? 'Workout updated successfully!' : 'Workout logged successfully!',
+            backgroundColor: AppColors.accent,
+            colorText: AppColors.onAccent,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: const EdgeInsets.all(16),
+          );
+          Get.back(result: true); // Pass result to refresh journal screen
+        } else {
+          Get.snackbar(
+            'Error',
+            'Failed to save workout. Please try again.',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: const EdgeInsets.all(16),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        Get.snackbar(
+          'Error',
+          'An error occurred: ${e.toString()}',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+        );
+      }
     }
   }
 
@@ -325,7 +432,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
               const SizedBox(height: 40),
 
               // Action Buttons
-              CustomButton(text: 'Save Workout', onPressed: _saveWorkout),
+              CustomButton(text: _isLoading ? 'Saving...' : (_isEditMode ? 'Update Workout' : 'Save Workout'), onPressed: _isLoading ? null : _saveWorkout),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,

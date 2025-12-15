@@ -7,24 +7,25 @@ import 'package:get_right/theme/app_theme.dart';
 import 'package:get_right/routes/app_pages.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/controllers/auth_controller.dart';
+import 'package:get_right/theme/color_constants.dart';
 
-// 1. DEFINE THE STYLE FOR DARK SCREENS (WHITE ICONS)
-// This constant ensures the status bar icons (time, battery, wifi) are white.
-const SystemUiOverlayStyle darkSystemOverlay = SystemUiOverlayStyle(
-  // Make status bar background transparent (or a dark color)
+// 1. DEFINE THE STYLE FOR LIGHT SCREENS (DARK ICONS)
+// Updated for Steel Grey background - dark icons for visibility
+const SystemUiOverlayStyle lightSystemOverlay = SystemUiOverlayStyle(
+  // Make status bar background transparent
   statusBarColor: Colors.transparent,
 
   // *** THIS IS THE CRUCIAL LINE for Android/General ***
-  // Brightness.light makes the icons/text white for visibility against a dark background.
-  statusBarIconBrightness: Brightness.light,
+  // Brightness.dark makes the icons/text dark for visibility against a light background.
+  statusBarIconBrightness: Brightness.dark,
 
   // *** THIS IS THE CRUCIAL LINE for iOS ***
-  // Brightness.dark tells iOS the background is dark, so it should use light foreground elements.
-  statusBarBrightness: Brightness.dark,
+  // Brightness.light tells iOS the background is light, so it should use dark foreground elements.
+  statusBarBrightness: Brightness.light,
 
-  // Optional: Ensure navigation bar (Android bottom bar) icons are also light if visible
-  systemNavigationBarIconBrightness: Brightness.light,
-  systemNavigationBarColor: Colors.black,
+  // Ensure navigation bar (Android bottom bar) icons are also dark if visible
+  systemNavigationBarIconBrightness: Brightness.dark,
+  systemNavigationBarColor: AppColors.primary, // Steel Grey
 );
 
 // Stub for Firebase Messaging background handler (to prevent errors if Firebase tries to initialize)
@@ -66,10 +67,9 @@ class GetRightApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 2. WRAP the entire app in AnnotatedRegion
-    // This ensures the style is applied consistently across all screens
-    // unless explicitly overridden by a deeper AnnotatedRegion or AppBar.
+    // Updated for Steel Grey background with dark icons
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: darkSystemOverlay,
+      value: lightSystemOverlay,
       child: ScreenUtilInit(
         designSize: const Size(375, 812), // iPhone X design size (standard)
         minTextAdapt: true,

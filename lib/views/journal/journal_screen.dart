@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/models/workout_model.dart';
 import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:intl/intl.dart';
 
 /// Journal screen - workout logs and daily tracking
 class JournalScreen extends StatefulWidget {
@@ -14,56 +17,113 @@ class JournalScreen extends StatefulWidget {
 
 class _JournalScreenState extends State<JournalScreen> {
   int _selectedDateIndex = 2; // Today is at index 2
+  bool _isLoading = true;
+  StorageService? _storageService;
 
   // Streak analytics data
   final int _currentStreak = 12;
   final int _longestStreak = 28;
   final List<bool> _weeklyStreak = [true, true, true, true, true, false, true]; // Last 7 days
 
-  // Mock data for dates (showing 7 days)
-  final List<Map<String, dynamic>> _dates = [
-    {'day': 'Mon', 'date': 3},
-    {'day': 'Tue', 'date': 4},
-    {'day': 'Wed', 'date': 5}, // Today
-    {'day': 'Thu', 'date': 6},
-    {'day': 'Fri', 'date': 7},
-    {'day': 'Sat', 'date': 8},
-    {'day': 'Sun', 'date': 9},
-  ];
+  // Dynamic dates list (7 days centered around today)
+  late List<Map<String, dynamic>> _dates;
 
-  // Mock journal entries with more details
-  final List<Map<String, dynamic>> _journalEntries = [
-    {
-      'id': '1',
-      'date': 'Nov 5, 2025',
-      'time': '6:30 AM',
-      'entry': 'Had an intense leg workout today! Feeling strong.',
-      'mood': 'Motivated 🔥',
+  // Journal entries loaded from storage
+  List<Map<String, dynamic>> _journalEntries = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDates();
+    _initializeStorage();
+    _loadWorkouts();
+  }
+
+  void _initializeDates() {
+    final now = DateTime.now();
+    _dates = List.generate(7, (index) {
+      final date = now.subtract(Duration(days: 2 - index)); // Center today at index 2
+      final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      return {'day': dayNames[date.weekday - 1], 'date': date.day, 'dateTime': date, 'month': date.month, 'year': date.year};
+    });
+  }
+
+  Future<void> _initializeStorage() async {
+    _storageService = await StorageService.getInstance();
+  }
+
+  Future<void> _loadWorkouts() async {
+    if (_storageService == null) {
+      await _initializeStorage();
+    }
+
+    if (_storageService == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final workouts = await _storageService!.getWorkouts();
+      setState(() {
+        _journalEntries = workouts.map((workout) => _workoutToJournalEntry(workout)).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      Get.snackbar('Error', 'Failed to load workouts: ${e.toString()}', backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  Map<String, dynamic> _workoutToJournalEntry(WorkoutModel workout) {
+    final dateFormat = DateFormat('MMM d, yyyy');
+    final timeFormat = DateFormat('h:mm a');
+    final workoutDate = workout.date;
+
+    // Calculate which date index this workout belongs to
+    int dateIndex = -1;
+    for (int i = 0; i < _dates.length; i++) {
+      final dateInfo = _dates[i];
+      final dateTime = dateInfo['dateTime'] as DateTime;
+      if (workoutDate.year == dateTime.year && workoutDate.month == dateTime.month && workoutDate.day == dateTime.day) {
+        dateIndex = i;
+        break;
+      }
+    }
+
+    // Calculate duration (simplified - you might want to store actual duration)
+    final duration = '${workout.sets} sets × ${workout.reps} reps';
+
+    return {
+      'id': workout.id,
+      'date': dateFormat.format(workoutDate),
+      'time': timeFormat.format(workout.createdAt),
+      'entry': '${workout.exerciseName}${workout.weight != null ? ' - ${workout.weight}kg' : ''}',
+      'mood': 'Great 💪', // Default mood
       'type': 'Workout',
       'icon': Icons.fitness_center,
-      'duration': '45 mins',
-    },
-    {
-      'id': '2',
-      'date': 'Nov 4, 2025',
-      'time': '10:00 AM',
-      'entry': 'Took a rest day. Focused on hydration and stretching.',
-      'mood': 'Relaxed 😌',
-      'type': 'Rest Day',
-      'icon': Icons.self_improvement,
-      'duration': '30 mins',
-    },
-    {
-      'id': '3',
-      'date': 'Nov 3, 2025',
-      'time': '5:45 AM',
-      'entry': 'Morning cardio + meal prep for the week.',
-      'mood': 'Productive ✅',
-      'type': 'Cardio',
-      'icon': Icons.directions_run,
-      'duration': '60 mins',
-    },
-  ];
+      'duration': duration,
+      'dateIndex': dateIndex,
+      'workout': workout, // Store original workout model
+    };
+  }
+
+  // Get workout entries for the selected date
+  List<Map<String, dynamic>> _getWorkoutsForSelectedDate() {
+    final selectedDateInfo = _dates[_selectedDateIndex];
+    final selectedDateTime = selectedDateInfo['dateTime'] as DateTime;
+
+    return _journalEntries.where((entry) {
+      final workout = entry['workout'] as WorkoutModel?;
+      if (workout == null) return false;
+
+      final workoutDate = workout.date;
+      return workoutDate.year == selectedDateTime.year && workoutDate.month == selectedDateTime.month && workoutDate.day == selectedDateTime.day;
+    }).toList();
+  }
 
   void _showEntryOptions(Map<String, dynamic> entry, int index) {
     Get.bottomSheet(
@@ -229,20 +289,63 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  void _deleteEntry(int index) {
-    setState(() {
-      _journalEntries.removeAt(index);
-    });
+  Future<void> _deleteEntry(int index) async {
+    final entry = _journalEntries[index];
+    final workout = entry['workout'] as WorkoutModel?;
 
-    Get.snackbar(
-      'Entry Deleted',
-      'Journal entry has been deleted',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.completed,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(16),
-    );
+    if (workout != null && _storageService != null) {
+      try {
+        final success = await _storageService!.deleteWorkout(workout.id);
+        if (success) {
+          setState(() {
+            _journalEntries.removeAt(index);
+          });
+          Get.snackbar(
+            'Entry Deleted',
+            'Journal entry has been deleted',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppColors.completed,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 2),
+            margin: const EdgeInsets.all(16),
+          );
+        } else {
+          Get.snackbar(
+            'Error',
+            'Failed to delete entry',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 2),
+            margin: const EdgeInsets.all(16),
+          );
+        }
+      } catch (e) {
+        Get.snackbar(
+          'Error',
+          'Failed to delete entry: ${e.toString()}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+          margin: const EdgeInsets.all(16),
+        );
+      }
+    } else {
+      // Fallback for non-workout entries
+      setState(() {
+        _journalEntries.removeAt(index);
+      });
+      Get.snackbar(
+        'Entry Deleted',
+        'Journal entry has been deleted',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.completed,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(16),
+      );
+    }
   }
 
   void _showAddEntryOptions() {
@@ -273,9 +376,12 @@ class _JournalScreenState extends State<JournalScreen> {
                   title: 'Log Workout',
                   subtitle: 'Record exercise details',
                   color: AppColors.accent,
-                  onTap: () {
+                  onTap: () async {
                     Get.back();
-                    Get.toNamed(AppRoutes.addWorkout);
+                    final result = await Get.toNamed(AppRoutes.addWorkout);
+                    if (result == true) {
+                      _loadWorkouts(); // Refresh workouts when returning
+                    }
                   },
                 ),
                 const SizedBox(height: 12),
@@ -392,296 +498,331 @@ class _JournalScreenState extends State<JournalScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: AppColors.accent))
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
 
-            // Date Selector Row
-            Container(
-              height: 90,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _dates.length,
-                itemBuilder: (context, index) {
-                  final dateInfo = _dates[index];
-                  final isSelected = index == _selectedDateIndex;
-                  final isToday = index == 2;
+                  // Date Selector Row
+                  Container(
+                    height: 90,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: _dates.length,
+                      itemBuilder: (context, index) {
+                        final dateInfo = _dates[index];
+                        final isSelected = index == _selectedDateIndex;
+                        final isToday = index == 2;
 
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedDateIndex = index;
-                      });
-                    },
-                    child: Container(
-                      width: 70,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.accent : AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
-                        boxShadow: isSelected ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            dateInfo['day'],
-                            style: AppTextStyles.labelMedium.copyWith(
-                              color: isSelected ? AppColors.onAccent : AppColors.primaryGray,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedDateIndex = index;
+                            });
+                          },
+                          child: Container(
+                            width: 70,
+                            margin: const EdgeInsets.only(right: 12),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.accent : AppColors.surface,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
+                              boxShadow: isSelected ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  dateInfo['day'],
+                                  style: AppTextStyles.labelMedium.copyWith(
+                                    color: isSelected ? AppColors.onAccent : AppColors.primaryGray,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${dateInfo['date']}',
+                                  style: AppTextStyles.titleLarge.copyWith(color: isSelected ? AppColors.onAccent : AppColors.onSurface, fontWeight: FontWeight.bold),
+                                ),
+                                if (isToday) ...[
+                                  const SizedBox(height: 2),
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(color: isSelected ? AppColors.onAccent : AppColors.accent, shape: BoxShape.circle),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            '${dateInfo['date']}',
-                            style: AppTextStyles.titleLarge.copyWith(color: isSelected ? AppColors.onAccent : AppColors.onSurface, fontWeight: FontWeight.bold),
-                          ),
-                          if (isToday) ...[
-                            const SizedBox(height: 4),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Day Streak Analytics - Dark Theme
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 16),
+                  //   child: Container(
+                  //     padding: const EdgeInsets.all(20),
+                  //     decoration: BoxDecoration(
+                  //       gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  //       borderRadius: BorderRadius.circular(16),
+                  //       boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 8))],
+                  //     ),
+                  //     child: Column(
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       children: [
+                  //         Row(
+                  //           children: [
+                  //             Container(
+                  //               padding: const EdgeInsets.all(10),
+                  //               decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                  //               child: const Icon(Icons.local_fire_department, color: AppColors.accent, size: 24),
+                  //             ),
+                  //             const SizedBox(width: 12),
+                  //             Expanded(
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: [
+                  //                   Text(
+                  //                     'Day Streak',
+                  //                     style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.bold),
+                  //                   ),
+                  //                   Text('Keep the fire burning!', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                  //                 ],
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //         const SizedBox(height: 20),
+                  //         Row(
+                  //           children: [
+                  //             Expanded(child: _buildStreakStat('Current Streak', '$_currentStreak', 'days', Icons.whatshot, AppColors.accent)),
+                  //             const SizedBox(width: 16),
+                  //             Expanded(child: _buildStreakStat('Longest Streak', '$_longestStreak', 'days', Icons.emoji_events, const Color(0xFFFFD700))),
+                  //           ],
+                  //         ),
+                  //         const SizedBox(height: 20),
+                  //         Text(
+                  //           'This Week',
+                  //           style: AppTextStyles.labelMedium.copyWith(color: AppColors.onPrimary.withOpacity(0.8), fontWeight: FontWeight.w600),
+                  //         ),
+                  //         const SizedBox(height: 12),
+                  //         Row(
+                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //           children: List.generate(7, (index) {
+                  //             final isActive = _weeklyStreak[index];
+                  //             final dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                  //             return _buildStreakDay(dayLabels[index], isActive, index == 2); // Today is at index 2
+                  //           }),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  const SizedBox(height: 20),
+
+                  // Workouts for Selected Day Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
                             Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(color: isSelected ? AppColors.onAccent : AppColors.accent, shape: BoxShape.circle),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                              child: const Icon(Icons.fitness_center, color: AppColors.accent, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Builder(
+                              builder: (context) {
+                                final dateInfo = _dates[_selectedDateIndex];
+                                final dateTime = dateInfo['dateTime'] as DateTime;
+                                final dateFormat = DateFormat('MMM d, yyyy');
+                                return Text('Workouts for ${dateFormat.format(dateTime)}', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground));
+                              },
                             ),
                           ],
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Day Streak Analytics - Dark Theme
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 8))],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-                          child: const Icon(Icons.local_fire_department, color: AppColors.accent, size: 24),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Day Streak',
-                                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.bold),
-                              ),
-                              Text('Keep the fire burning!', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
-                            ],
-                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(child: _buildStreakStat('Current Streak', '$_currentStreak', 'days', Icons.whatshot, AppColors.accent)),
-                        const SizedBox(width: 16),
-                        Expanded(child: _buildStreakStat('Longest Streak', '$_longestStreak', 'days', Icons.emoji_events, const Color(0xFFFFD700))),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'This Week',
-                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.onPrimary.withOpacity(0.8), fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(7, (index) {
-                        final isActive = _weeklyStreak[index];
-                        final dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                        return _buildStreakDay(dayLabels[index], isActive, index == 2); // Today is at index 2
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Daily Summary Card with Section Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.insights, color: AppColors.accent, size: 20),
                   ),
-                  const SizedBox(width: 12),
-                  Text('Today\'s Summary', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-                ],
-              ),
-            ),
 
-            const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-            Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(child: _buildSummaryItem(Icons.local_fire_department, 'Calories', '420', 'kcal', AppColors.accent)),
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildSummaryItem(Icons.directions_walk, 'Steps', '7,850', '', AppColors.completed)),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(child: _buildSummaryItem(Icons.timer, 'Workout', '45', 'mins', const Color(0xFFFF9800))),
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildSummaryItem(Icons.emoji_events, 'Mood', 'Great', '💪', const Color(0xFF9C27B0))),
-                  ],
-                ),
-              ],
-            ).paddingSymmetric(horizontal: 16),
-
-            const SizedBox(height: 28),
-
-            // Journal Entries Section with Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                        child: const Icon(Icons.history, color: AppColors.accent, size: 20),
-                      ),
-                      const SizedBox(width: 12),
-                      Text('Recent Entries', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-                    ],
-                  ),
-                  Text('${_journalEntries.length} entries', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Journal Entries List
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _journalEntries.length,
-              itemBuilder: (context, index) {
-                final entry = _journalEntries[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primaryGray, width: 1),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () => _showEntryOptions(entry, index),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                  // Workouts List for Selected Day
+                  Builder(
+                    builder: (context) {
+                      final workoutsForDay = _getWorkoutsForSelectedDate();
+                      if (workoutsForDay.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.primaryGray, width: 1),
+                            ),
+                            child: Column(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
-                                  child: Icon(entry['icon'] as IconData, color: AppColors.accent, size: 20),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
+                                Icon(Icons.fitness_center_outlined, color: AppColors.primaryGray, size: 48),
+                                const SizedBox(height: 12),
+                                Text('No workouts logged', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
+                                const SizedBox(height: 4),
+                                Text('Tap the + button to add a workout', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: workoutsForDay.length,
+                        itemBuilder: (context, index) {
+                          final entry = workoutsForDay[index];
+                          final originalIndex = _journalEntries.indexWhere((e) => e['id'] == entry['id']);
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.primaryGray, width: 1),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () => _showEntryOptions(entry, originalIndex),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        entry['type'] as String,
-                                        style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                                            child: Icon(entry['icon'] as IconData, color: AppColors.accent, size: 20),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  entry['type'] as String,
+                                                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text('${entry['date']} • ${entry['time']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                                            child: Text(
+                                              entry['duration'] as String,
+                                              style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          IconButton(
+                                            icon: Icon(Icons.more_vert, color: AppColors.primaryGray, size: 20),
+                                            onPressed: () => _showEntryOptions(entry, originalIndex),
+                                            tooltip: 'More options',
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text('${entry['date']} • ${entry['time']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                      const SizedBox(height: 12),
+                                      Text(entry['entry'] as String, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface.withOpacity(0.9))),
+                                      // const SizedBox(height: 10),
+                                      // Container(
+                                      //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      //   decoration: BoxDecoration(
+                                      //     color: AppColors.primaryVariant,
+                                      //     borderRadius: BorderRadius.circular(8),
+                                      //     border: Border.all(color: AppColors.primaryGray, width: 1),
+                                      //   ),
+                                      //   child: Row(
+                                      //     mainAxisSize: MainAxisSize.min,
+                                      //     children: [
+                                      //       Text('Mood: ', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                      //       Text(entry['mood'] as String, style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
+                                      //     ],
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                                  child: Text(
-                                    entry['duration'] as String,
-                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: Icon(Icons.more_vert, color: AppColors.primaryGray, size: 20),
-                                  onPressed: () => _showEntryOptions(entry, index),
-                                  tooltip: 'More options',
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(entry['entry'] as String, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface.withOpacity(0.9))),
-                            const SizedBox(height: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryVariant,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.primaryGray, width: 1),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('Mood: ', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                                  Text(entry['mood'] as String, style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
-                                ],
                               ),
                             ),
-                          ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // Daily Summary Card with Section Header - Moved to Bottom
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.insights, color: AppColors.accent, size: 20),
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Text('Daily Summary', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
 
-            const SizedBox(height: 100), // Space for FAB
-          ],
-        ),
-      ),
+                  const SizedBox(height: 12),
+
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(child: _buildSummaryItem(Icons.local_fire_department, 'Calories', '420', 'kcal', AppColors.accent)),
+                          const SizedBox(width: 12),
+                          Expanded(child: _buildSummaryItem(Icons.directions_walk, 'Steps', '7,850', '', AppColors.completed)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(child: _buildSummaryItem(Icons.timer, 'Workout', '45', 'mins', const Color(0xFFFF9800))),
+                          const SizedBox(width: 12),
+                          Expanded(child: _buildSummaryItem(Icons.emoji_events, 'Mood', 'Great', '💪', const Color(0xFF9C27B0))),
+                        ],
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 16),
+
+                  const SizedBox(height: 100), // Space for FAB
+                ],
+              ),
+            ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'journal_fab',
         onPressed: _showAddEntryOptions,

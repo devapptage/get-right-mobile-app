@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
-import 'package:get_right/views/journal/journal_screen.dart';
+import 'package:get_right/views/journal/combined_journal_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
-import 'package:get_right/views/tracker/run_tracker_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
+import 'package:get_right/views/library/library_screen.dart';
 import 'package:get_right/widgets/common/app_drawer.dart';
 
 /// Home screen with bottom navigation - 5 tabs
@@ -22,10 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = const [
     DashboardScreen(), // Home
-    JournalScreen(), // Journal
     PlannerScreen(), // Planner
-    RunTrackerScreen(), // Run Tracker
+    CombinedJournalScreen(), // Journal (Center - Workout Journal + Runner Log)
     MarketplaceScreen(), // Marketplace
+    LibraryScreen(), // Library
   ];
 
   @override
@@ -56,10 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProfessionalBottomNav() {
     final navItems = [
       {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
-      {'icon': Icons.book_outlined, 'activeIcon': Icons.book_rounded, 'label': 'Journal'},
       {'icon': Icons.calendar_today_outlined, 'activeIcon': Icons.calendar_today_rounded, 'label': 'Planner'},
-      {'icon': Icons.directions_run_outlined, 'activeIcon': Icons.directions_run_rounded, 'label': 'Run'},
-      {'icon': Icons.store_outlined, 'activeIcon': Icons.store_rounded, 'label': 'Market Place'},
+      {'icon': Icons.fitness_center_outlined, 'activeIcon': Icons.fitness_center_rounded, 'label': 'Journal'},
+      {'icon': Icons.store_outlined, 'activeIcon': Icons.store_rounded, 'label': 'Market'},
+      {'icon': Icons.library_books_outlined, 'activeIcon': Icons.library_books_rounded, 'label': 'Library'},
     ];
 
     return Container(

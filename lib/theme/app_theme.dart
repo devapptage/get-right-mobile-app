@@ -5,12 +5,11 @@ import 'package:get_right/theme/text_styles.dart';
 
 /// Get Right App Theme Configuration
 ///
-/// This file contains the complete ThemeData setup for the Get Right app.
-/// It implements a clean, modern, and minimal design system with:
-/// - Flat UI elements
-/// - Ample white space
-/// - Strong visual contrast
-/// - Consistent spacing and typography
+/// Updated according to Design & Typography Guidelines (Section 3.0)
+/// - Steel Grey primary background
+/// - Green accent for buttons, icons, active states
+/// - Black for typography, shadows, outlines
+/// - Spacious layouts, subtle shadows, clear iconography
 
 class AppTheme {
   AppTheme._(); // Private constructor to prevent instantiation
@@ -23,34 +22,34 @@ class AppTheme {
 
       // Color Scheme
       colorScheme: const ColorScheme.light(
-        primary: AppColors.primary,
-        onPrimary: AppColors.onPrimary,
-        secondary: AppColors.secondary,
-        onSecondary: AppColors.onSecondary,
+        primary: AppColors.primary, // Steel Grey
+        onPrimary: AppColors.onPrimary, // White
+        secondary: AppColors.secondary, // Black (for typography)
+        onSecondary: AppColors.onSecondary, // White
         error: AppColors.error,
         onError: AppColors.onError,
-        surface: AppColors.surface,
-        onSurface: AppColors.onSurface,
-        outline: AppColors.gray,
-        outlineVariant: AppColors.lightGray,
+        surface: AppColors.surface, // White for cards
+        onSurface: AppColors.onSurface, // Black text
+        outline: AppColors.primaryGray, // Gray for outlines
+        outlineVariant: AppColors.primaryGrayLight,
       ),
 
-      // Scaffold Background - Black
-      scaffoldBackgroundColor: AppColors.background, // Black background
-      // App Bar Theme - Using Black background with White text
+      // Scaffold Background - Steel Grey
+      scaffoldBackgroundColor: AppColors.background, // Steel Grey background
+      // App Bar Theme - Steel Grey background with Black text
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.primary, // Black (primary)
-        foregroundColor: AppColors.onPrimary, // White text/icons
+        backgroundColor: AppColors.primary, // Steel Grey
+        foregroundColor: AppColors.onBackground, // Black text/icons
         elevation: 0,
         centerTitle: false,
-        systemOverlayStyle: SystemUiOverlayStyle.light, // Light icons for dark background
+        systemOverlayStyle: SystemUiOverlayStyle.dark, // Dark icons for light background
         titleTextStyle: AppTextStyles.titleLarge,
-        iconTheme: IconThemeData(color: AppColors.onPrimary, size: 24), // White icons
+        iconTheme: IconThemeData(color: AppColors.accent, size: 24), // Green icons
       ),
 
-      // Text Theme - White text on black backgrounds
+      // Text Theme - Black text on steel grey backgrounds
       textTheme: TextTheme(
-        headlineLarge: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground), // White
+        headlineLarge: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground),
         headlineMedium: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground),
         headlineSmall: AppTextStyles.headlineSmall.copyWith(color: AppColors.onBackground),
         titleLarge: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground),
@@ -65,45 +64,46 @@ class AppTheme {
       ),
 
       // Button Themes
-      // Primary buttons use Black (primary color)
+      // Primary buttons use Green (accent) for actions
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary, // Black
-          foregroundColor: AppColors.onPrimary, // White
+          backgroundColor: AppColors.accent, // Green
+          foregroundColor: AppColors.onAccent, // White
           textStyle: AppTextStyles.buttonLarge,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 0,
+          elevation: 2, // Subtle shadow
+          shadowColor: AppColors.secondary.withOpacity(0.2), // Black shadow
           minimumSize: const Size(120, 56),
         ),
       ),
 
-      // Outlined buttons use Gray (primary gray) or Green (secondary) for accents
+      // Outlined buttons use Black (secondary) for outlines
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary, // Black
-          textStyle: AppTextStyles.buttonLarge,
+          foregroundColor: AppColors.onBackground, // Black text
+          textStyle: AppTextStyles.buttonLarge.copyWith(color: AppColors.onBackground),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          side: const BorderSide(color: AppColors.primaryGray, width: 2),
+          side: const BorderSide(color: AppColors.secondary, width: 2), // Black outline
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           minimumSize: const Size(120, 56),
         ),
       ),
 
-      // Text buttons use Green (secondary) for actions
+      // Text buttons use Green (accent) for actions
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.secondary, // Green
-          textStyle: AppTextStyles.buttonMedium,
+          foregroundColor: AppColors.accent, // Green
+          textStyle: AppTextStyles.buttonMedium.copyWith(color: AppColors.accent),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
 
-      // Input Decoration Theme - Using Gray (primary gray) for backgrounds on black
+      // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceLight, // Gray background
+        fillColor: AppColors.surface, // White background
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -115,7 +115,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.secondary, width: 2), // Green focus
+          borderSide: const BorderSide(color: AppColors.accent, width: 2), // Green focus
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -125,147 +125,156 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurfaceLight), // Black text on gray
+        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
         hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark),
         errorStyle: AppTextStyles.labelSmall.copyWith(color: AppColors.error),
       ),
 
-      // Card Theme - Using Dark Gray/Black surface with gray borders
+      // Card Theme - White surface with subtle shadows
       cardTheme: CardThemeData(
-        color: AppColors.surface, // Dark gray/black surface
-        elevation: 0,
+        color: AppColors.surface, // White surface
+        elevation: 2, // Subtle shadow
+        shadowColor: AppColors.secondary.withOpacity(0.1), // Black shadow
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.primaryGray, width: 1),
+          side: BorderSide.none, // No border, using shadow instead
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
 
-      // Floating Action Button Theme - Using Green (secondary) for accent
+      // Floating Action Button Theme - Green (accent) for actions
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.secondary, // Green
-        foregroundColor: AppColors.onSecondary, // White
-        elevation: 4,
+        backgroundColor: AppColors.accent, // Green
+        foregroundColor: AppColors.onAccent, // White
+        elevation: 4, // Subtle shadow
         shape: CircleBorder(),
       ),
 
-      // Bottom Navigation Bar Theme - Black background, Green secondary for selected
+      // Bottom Navigation Bar Theme - Steel Grey background, Green for selected
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.primary, // Black background
-        selectedItemColor: AppColors.secondary, // Green (secondary) for selected
-        unselectedItemColor: AppColors.primaryGray, // Gray (primary) for unselected
+        backgroundColor: AppColors.primary, // Steel Grey background
+        selectedItemColor: AppColors.accent, // Green for selected
+        unselectedItemColor: AppColors.primaryGrayDark, // Gray for unselected
         selectedLabelStyle: AppTextStyles.labelMedium,
         unselectedLabelStyle: AppTextStyles.labelMedium,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 4, // Subtle shadow
         showSelectedLabels: true,
         showUnselectedLabels: true,
       ),
 
-      // Chip Theme - Gray (primary) for unselected, Green (secondary) for selected
+      // Chip Theme - Green (accent) for selected
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.primaryGray, // Gray (primary)
-        deleteIconColor: AppColors.onPrimaryGray, // Black
-        disabledColor: AppColors.primaryGrayDark,
-        selectedColor: AppColors.secondary, // Green (secondary) when selected
-        secondarySelectedColor: AppColors.secondary,
+        backgroundColor: AppColors.primaryGrayLight,
+        deleteIconColor: AppColors.onBackground,
+        disabledColor: AppColors.primaryGray,
+        selectedColor: AppColors.accent, // Green when selected
+        secondarySelectedColor: AppColors.accent,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        labelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.onPrimaryGray), // Black text on gray
-        secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.onSecondary), // White on green
+        labelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground),
+        secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.onAccent),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
 
-      // Dialog Theme - Dark surface
+      // Dialog Theme
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.surface, // Dark gray/black
+        backgroundColor: AppColors.surface, // White surface
         elevation: 8,
+        shadowColor: AppColors.secondary.withOpacity(0.2), // Black shadow
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titleTextStyle: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface), // White text
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface), // White text
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
       ),
 
       // Divider Theme
-      dividerTheme: const DividerThemeData(color: AppColors.gray, thickness: 1, space: 24),
+      dividerTheme: const DividerThemeData(color: AppColors.primaryGray, thickness: 1, space: 24),
 
-      // Icon Theme - White icons for dark backgrounds
-      iconTheme: const IconThemeData(color: AppColors.onBackground, size: 24), // White icons
-      // Switch Theme - Green (secondary) when selected, Gray (primary) when unselected
+      // Icon Theme - Green icons for navigation, actions, and toggles
+      iconTheme: const IconThemeData(
+        color: AppColors.accent, // Green icons
+        size: 24,
+      ),
+      // Switch Theme - Green (accent) when selected
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.onSecondary; // White
+            return AppColors.onAccent; // White
           }
           return AppColors.primaryGray; // Gray
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.secondary; // Green (secondary)
+            return AppColors.accent; // Green
           }
-          return AppColors.primaryGrayDark; // Gray (primary)
+          return AppColors.primaryGrayDark; // Gray
         }),
       ),
 
-      // Checkbox Theme - Green (secondary) when selected
+      // Checkbox Theme - Green (accent) when selected
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.secondary; // Green (secondary)
+            return AppColors.accent; // Green
           }
-          return AppColors.secondaryWhite; // White
+          return AppColors.surface; // White
         }),
-        checkColor: WidgetStateProperty.all(AppColors.onSecondary), // White check
+        checkColor: WidgetStateProperty.all(AppColors.onAccent), // White check
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
 
-      // Radio Theme - Green (secondary) when selected, Gray (primary) when unselected
+      // Radio Theme - Green (accent) when selected
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.secondary; // Green (secondary)
+            return AppColors.accent; // Green
           }
-          return AppColors.primaryGrayDark; // Gray (primary)
+          return AppColors.primaryGrayDark; // Gray
         }),
       ),
 
-      // Progress Indicator Theme - Green (secondary) for progress
+      // Progress Indicator Theme - Green (accent) for progress
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.secondary, // Green
-        linearTrackColor: AppColors.primaryGray, // Gray track
-        circularTrackColor: AppColors.primaryGray, // Gray track
+        color: AppColors.accent, // Green
+        linearTrackColor: AppColors.primaryGrayLight,
+        circularTrackColor: AppColors.primaryGrayLight,
       ),
 
-      // Snackbar Theme - Using Black (primary) background
+      // Snackbar Theme
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.primary, // Black
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.onPrimary), // White text
+        backgroundColor: AppColors.surfaceDark, // Dark surface
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurfaceDark),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 4,
       ),
 
-      // Tab Bar Theme - Green (secondary) for selected, Gray (primary) for unselected
+      // Tab Bar Theme - Green (accent) for selected
       tabBarTheme: TabBarThemeData(
-        labelColor: AppColors.secondary, // Green (secondary) for selected
-        unselectedLabelColor: AppColors.primaryGrayDark, // Gray (primary) for unselected
+        labelColor: AppColors.accent, // Green for selected
+        unselectedLabelColor: AppColors.primaryGrayDark, // Gray for unselected
         labelStyle: AppTextStyles.titleSmall,
         unselectedLabelStyle: AppTextStyles.titleSmall,
-        indicator: const UnderlineTabIndicator(borderSide: BorderSide(color: AppColors.secondary, width: 3)), // Green indicator
+        indicator: const UnderlineTabIndicator(
+          borderSide: BorderSide(color: AppColors.accent, width: 3), // Green indicator
+        ),
       ),
 
-      // Bottom Sheet Theme - Dark surface
+      // Bottom Sheet Theme
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.surface, // Dark gray/black
+        backgroundColor: AppColors.surface, // White surface
         elevation: 8,
+        shadowColor: AppColors.secondary, // Black shadow
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       ),
     );
   }
 
-  /// System UI Overlay Styles - Dark theme
+  /// System UI Overlay Styles - Light theme (dark icons for light background)
   static const SystemUiOverlayStyle lightSystemOverlay = SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light, // Light icons for dark background
-    statusBarBrightness: Brightness.dark,
-    systemNavigationBarColor: AppColors.primary, // Black navigation bar
-    systemNavigationBarIconBrightness: Brightness.light, // Light icons
+    statusBarIconBrightness: Brightness.dark, // Dark icons for light background
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: AppColors.primary, // Steel Grey navigation bar
+    systemNavigationBarIconBrightness: Brightness.dark, // Dark icons
   );
 }

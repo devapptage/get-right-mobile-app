@@ -16,13 +16,24 @@ import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/views/profile/edit_profile_screen.dart';
 import 'package:get_right/views/journal/journal_screen.dart';
+import 'package:get_right/views/journal/workout_journal_screen.dart';
+import 'package:get_right/views/journal/workout_timer_screen.dart';
 import 'package:get_right/views/journal/add_workout_screen.dart';
+import 'package:get_right/views/journal/add_exercise_screen.dart';
+import 'package:get_right/views/journal/exercise_selection_screen.dart';
+import 'package:get_right/views/journal/exercise_configuration_screen.dart';
+import 'package:get_right/views/journal/exercise_library_detail_screen.dart';
+import 'package:get_right/views/journal/add_notes_screen.dart';
+import 'package:get_right/views/journal/video_walkthrough_screen.dart';
+import 'package:get_right/views/journal/reorder_exercises_screen.dart';
 import 'package:get_right/views/journal/log_run_screen.dart';
 import 'package:get_right/views/journal/log_meal_screen.dart';
 import 'package:get_right/views/journal/write_note_screen.dart';
+import 'package:get_right/views/tracker/active_run_screen.dart';
 import 'package:get_right/views/tracker/tracker_screen.dart';
 import 'package:get_right/views/tracker/run_tracker_screen.dart';
-import 'package:get_right/views/tracker/active_run_screen.dart';
+import 'package:get_right/views/tracker/activity_type_selection_screen.dart';
+import 'package:get_right/views/tracker/route_planning_screen.dart';
 import 'package:get_right/views/tracker/run_summary_screen.dart';
 import 'package:get_right/views/tracker/run_history_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
@@ -47,6 +58,9 @@ import 'package:get_right/views/marketplace/program_terms_screen.dart';
 import 'package:get_right/views/marketplace/my_programs_screen.dart';
 import 'package:get_right/views/marketplace/bundle_detail_screen.dart';
 import 'package:get_right/views/marketplace/all_bundles_screen.dart';
+import 'package:get_right/views/library/library_screen.dart';
+import 'package:get_right/views/library/exercise_list_screen.dart';
+import 'package:get_right/views/library/exercise_detail_screen.dart';
 import 'package:get_right/views/trainer/all_programs_screen.dart';
 import 'package:get_right/views/favorites/favorites_screen.dart';
 import 'package:get_right/views/program_history/program_history_screen.dart';
@@ -87,7 +101,16 @@ class AppPages {
 
     // Journal Pages
     GetPage(name: AppRoutes.journal, page: () => const JournalScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.workoutJournal, page: () => const WorkoutJournalScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.workoutTimer, page: () => const WorkoutTimerScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.addWorkout, page: () => const AddWorkoutScreen(), transition: Transition.downToUp),
+    GetPage(name: AppRoutes.addExercise, page: () => const AddExerciseScreen(), transition: Transition.downToUp),
+    GetPage(name: AppRoutes.exerciseSelection, page: () => const ExerciseSelectionScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.exerciseConfiguration, page: () => const ExerciseConfigurationScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.exerciseLibraryDetail, page: () => const ExerciseLibraryDetailScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.addNotes, page: () => const AddNotesScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.videoWalkthrough, page: () => const VideoWalkthroughScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.reorderExercises, page: () => const ReorderExercisesScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.logRun, page: () => const LogRunScreen(), transition: Transition.downToUp),
     GetPage(name: AppRoutes.logMeal, page: () => const LogMealScreen(), transition: Transition.downToUp),
     GetPage(name: AppRoutes.writeNote, page: () => const WriteNoteScreen(), transition: Transition.downToUp),
@@ -99,6 +122,8 @@ class AppPages {
     GetPage(name: AppRoutes.runHistory, page: () => const RunHistoryScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.runDetail, page: () => const RunSummaryScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.progress, page: () => const ProgressScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.routePlanning, page: () => const RoutePlanningScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.activityTypeSelection, page: () => const ActivityTypeSelectionScreen(), transition: Transition.rightToLeft),
 
     // Planner Pages
     GetPage(name: AppRoutes.planner, page: () => const PlannerScreen(), transition: Transition.fade),
@@ -123,6 +148,11 @@ class AppPages {
     GetPage(name: AppRoutes.bundleDetail, page: () => const BundleDetailScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.allBundles, page: () => const AllBundlesScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.trainerAllPrograms, page: () => const AllProgramsScreen(), transition: Transition.rightToLeft),
+
+    // Library Pages
+    GetPage(name: AppRoutes.library, page: () => const LibraryScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.exerciseList, page: () => const ExerciseListScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.exerciseDetail, page: () => const ExerciseDetailScreen(), transition: Transition.rightToLeft),
 
     // Search Pages
     GetPage(name: AppRoutes.search, page: () => SearchScreen(), transition: Transition.rightToLeft),

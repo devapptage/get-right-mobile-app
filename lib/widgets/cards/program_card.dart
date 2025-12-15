@@ -60,7 +60,7 @@ class ProgramCard extends StatelessWidget {
                         radius: 12,
                         backgroundColor: AppColors.primaryGray, // Gray background
                         backgroundImage: program.trainerImage != null ? NetworkImage(program.trainerImage!) : null,
-                        child: program.trainerImage == null ? const Icon(Icons.person, size: 16, color: AppColors.onPrimaryGray) : null,
+                        child: program.trainerImage == null ? const Icon(Icons.person, size: 16, color: AppColors.primaryGray) : null,
                       ),
                       const SizedBox(width: 8),
                       Expanded(

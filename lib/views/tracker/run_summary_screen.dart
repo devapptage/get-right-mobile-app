@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Split;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:get_right/models/run_model.dart';
+import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -35,9 +36,38 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
         slivers: [
           _buildAppBar(context, run),
           SliverToBoxAdapter(
-            child: Column(children: [_buildMapSection(run), _buildStatsSection(run), _buildDetailedStats(run), _buildActionButtons(run), const SizedBox(height: 24)]),
+            child: Column(
+              children: [
+                _buildSuccessIcon(),
+                _buildMapSection(run),
+                _buildStatsSection(run),
+                _buildHeartRateSection(run),
+                _buildDetailedStats(run),
+                if (run.splits != null && run.splits!.isNotEmpty) _buildSplitsSection(run),
+                _buildNotesSection(run),
+                _buildActionButtons(run),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Build success icon
+  Widget _buildSuccessIcon() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: AppColors.completed.withOpacity(0.2),
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.completed, width: 3),
+        ),
+        child: const Icon(Icons.check_circle_rounded, color: AppColors.completed, size: 60),
       ),
     );
   }
@@ -194,6 +224,28 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
       ),
       child: Column(
         children: [
+          // Activity Type Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: _getActivityColor(run.activityType).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: _getActivityColor(run.activityType), width: 2),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(_getActivityIcon(run.activityType), color: _getActivityColor(run.activityType), size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  run.activityType.toUpperCase(),
+                  style: AppTextStyles.labelMedium.copyWith(color: _getActivityColor(run.activityType), fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
           // Distance - main stat
           Column(
             children: [
@@ -227,9 +279,9 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
             children: [
               _buildSecondaryStatItem(Icons.timer_rounded, 'Time', _formatDuration(run.duration)),
               Container(width: 1, height: 40, color: AppColors.primaryGray.withOpacity(0.3)),
-              _buildSecondaryStatItem(Icons.speed_rounded, 'Avg Pace', run.averagePace != null ? '${run.averagePace!.toStringAsFixed(0)}\'/km' : '--'),
+              _buildSecondaryStatItem(Icons.speed_rounded, 'Avg Pace', run.averagePace != null ? '${run.averagePace!.toStringAsFixed(1)}\'/km' : '--'),
               Container(width: 1, height: 40, color: AppColors.primaryGray.withOpacity(0.3)),
-              _buildSecondaryStatItem(Icons.terrain_rounded, 'Elevation', run.elevationGain != null ? '${run.elevationGain!.toStringAsFixed(0)}m' : '--'),
+              _buildSecondaryStatItem(Icons.local_fire_department_rounded, 'Calories', run.caloriesBurned != null ? '${run.caloriesBurned}' : '--'),
             ],
           ),
         ],
@@ -246,6 +298,62 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
           value,
           style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 4),
+        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+      ],
+    );
+  }
+
+  /// Build heart rate section
+  Widget _buildHeartRateSection(RunModel run) {
+    if (run.averageHeartRate == null && run.maxHeartRate == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.favorite_rounded, color: Colors.red, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Heart Rate',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildHRStatItem('Average', run.averageHeartRate != null ? '${run.averageHeartRate}' : '--'),
+              Container(width: 1, height: 40, color: AppColors.primaryGray.withOpacity(0.3)),
+              _buildHRStatItem('Maximum', run.maxHeartRate != null ? '${run.maxHeartRate}' : '--'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHRStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: AppTextStyles.headlineSmall.copyWith(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text('BPM', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
         const SizedBox(height: 4),
         Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
       ],
@@ -272,12 +380,15 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
             style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
+          _buildDetailRow('Activity Type', run.activityType),
           _buildDetailRow('Start Time', timeFormat.format(run.startTime)),
           _buildDetailRow('End Time', timeFormat.format(run.endTime)),
           _buildDetailRow('Duration', _formatDuration(run.duration)),
           _buildDetailRow('Distance', '${(run.distanceMeters / 1000).toStringAsFixed(2)} km'),
           if (run.averagePace != null) _buildDetailRow('Average Pace', '${run.averagePace!.toStringAsFixed(2)} min/km'),
+          if (run.maxPace != null) _buildDetailRow('Best Pace', '${run.maxPace!.toStringAsFixed(2)} min/km'),
           if (run.elevationGain != null) _buildDetailRow('Elevation Gain', '${run.elevationGain!.toStringAsFixed(0)} m'),
+          if (run.caloriesBurned != null) _buildDetailRow('Calories Burned', '${run.caloriesBurned} cal'),
           if (run.routePoints != null) _buildDetailRow('Route Points', '${run.routePoints!.length}'),
         ],
       ),
@@ -300,19 +411,150 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
     );
   }
 
+  /// Build splits section
+  Widget _buildSplitsSection(RunModel run) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.splitscreen_rounded, color: AppColors.accent, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Splits',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...run.splits!.map((split) => _buildSplitItem(split)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSplitItem(Split split) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.accent.withOpacity(0.2), width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            child: Center(
+              child: Text(
+                '${split.splitNumber}',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${(split.distanceMeters / 1000).toStringAsFixed(2)} km',
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text('Time: ${_formatDuration(split.duration)}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                    const SizedBox(width: 16),
+                    Text('Pace: ${split.pace.toStringAsFixed(1)}\'/km', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (split.averageHeartRate != null)
+            Row(
+              children: [
+                const Icon(Icons.favorite, color: Colors.red, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  '${split.averageHeartRate}',
+                  style: AppTextStyles.labelMedium.copyWith(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Build notes section
+  Widget _buildNotesSection(RunModel run) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.note_outlined, color: AppColors.accent, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Notes',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            run.notes ?? 'No notes added',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: run.notes != null ? AppColors.onSurface : AppColors.primaryGray,
+              fontStyle: run.notes == null ? FontStyle.italic : FontStyle.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Build action buttons
   Widget _buildActionButtons(RunModel run) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Save to Journal button
+          // Share Run button
           SizedBox(
             width: double.infinity,
             height: 56,
             child: ElevatedButton.icon(
               onPressed: () {
-                _saveToJournal(run);
+                // TODO: Implement share functionality
+                Get.snackbar(
+                  'Coming Soon',
+                  'Share run feature will be available soon',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: AppColors.accent,
+                  colorText: AppColors.white,
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accent,
@@ -321,8 +563,27 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
                 shadowColor: AppColors.accent.withOpacity(0.5),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              icon: const Icon(Icons.check_circle_rounded, size: 24),
-              label: Text('Save to Journal', style: AppTextStyles.buttonLarge),
+              icon: const Icon(Icons.share_rounded, size: 24),
+              label: Text('Share Run', style: AppTextStyles.buttonLarge),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // New Run button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Get.back();
+                Get.toNamed(AppRoutes.activityTypeSelection);
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.accent.withOpacity(0.5), width: 2),
+                foregroundColor: AppColors.accent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              icon: const Icon(Icons.play_arrow_rounded, size: 24),
+              label: Text('New Run', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.accent)),
             ),
           ),
           const SizedBox(height: 12),
@@ -335,11 +596,11 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
                 Get.back();
               },
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.accent.withOpacity(0.5), width: 2),
-                foregroundColor: AppColors.accent,
+                side: BorderSide(color: AppColors.primaryGray.withOpacity(0.5), width: 2),
+                foregroundColor: AppColors.onSurface,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: Text('Done', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.accent)),
+              child: Text('Done', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onSurface)),
             ),
           ),
         ],
@@ -391,6 +652,38 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
       Get.back();
     } else {
       Get.snackbar('Error', 'Failed to save run to journal', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.error, colorText: AppColors.white);
+    }
+  }
+
+  /// Get activity color
+  Color _getActivityColor(String activityType) {
+    switch (activityType.toLowerCase()) {
+      case 'walk':
+        return const Color(0xFF4CAF50);
+      case 'jog':
+        return const Color(0xFFFF9800);
+      case 'run':
+        return const Color(0xFFF44336);
+      case 'bike':
+        return const Color(0xFF2196F3);
+      default:
+        return AppColors.accent;
+    }
+  }
+
+  /// Get activity icon
+  IconData _getActivityIcon(String activityType) {
+    switch (activityType.toLowerCase()) {
+      case 'walk':
+        return Icons.directions_walk;
+      case 'jog':
+        return Icons.directions_walk_outlined;
+      case 'run':
+        return Icons.directions_run;
+      case 'bike':
+        return Icons.directions_bike;
+      default:
+        return Icons.directions_run;
     }
   }
 }

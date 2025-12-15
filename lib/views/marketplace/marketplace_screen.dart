@@ -18,6 +18,18 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   String _selectedGoal = 'All';
   bool _showCertifiedOnly = false;
 
+  // Motivational quotes for success modal
+  final List<String> _motivationalQuotes = [
+    "The only bad workout is the one that didn't happen.",
+    "Success is the sum of small efforts repeated day in and day out.",
+    "Your body can stand almost anything. It's your mind you have to convince.",
+    "The difference between try and triumph is a little umph.",
+    "Don't stop when you're tired. Stop when you're done.",
+    "Make yourself proud!",
+    "The pain you feel today will be the strength you feel tomorrow.",
+    "Push yourself because no one else is going to do it for you.",
+  ];
+
   // Mock bundle data
   final List<Map<String, dynamic>> _bundles = [
     {
@@ -936,6 +948,412 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     );
   }
 
+  void _showAddToCalendarModal(Map<String, dynamic> item, {bool isBundle = false}) {
+    DateTime selectedDate = DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.only(top: 24, left: 24, right: 24, bottom: MediaQuery.of(context).viewInsets.bottom + 24),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.calendar_today, color: AppColors.accent, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Text('Add to Calendar', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface)),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: AppColors.primaryGray),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Program/Bundle info
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryVariant,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        child: Icon(isBundle ? Icons.inventory_2 : Icons.fitness_center, color: AppColors.accent, size: 30),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item['title'],
+                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isBundle ? '${(item['programs'] as List).length} programs included' : item['duration'] ?? '',
+                              style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Date Selection
+                Text('Select Start Date', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryVariant,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.accent.withOpacity(0.5), width: 2),
+                  ),
+                  child: InkWell(
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.dark(
+                                primary: AppColors.accent,
+                                onPrimary: AppColors.onAccent,
+                                surface: AppColors.surface,
+                                onSurface: AppColors.onSurface,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        setModalState(() {
+                          selectedDate = picked;
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.calendar_month, color: AppColors.accent, size: 24),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Start Date', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                              const SizedBox(height: 4),
+                              Text('${selectedDate.day}/${selectedDate.month}/${selectedDate.year}', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, color: AppColors.accent),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Schedule info
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.info_outline, color: AppColors.accent, size: 20),
+                          const SizedBox(width: 8),
+                          Text('Schedule Information', style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoRow(Icons.play_circle_outline, 'Program starts on selected date'),
+                      _buildInfoRow(Icons.bedtime, 'Rest days included as per trainer'),
+                      _buildInfoRow(Icons.edit_calendar, 'You can edit individual days after import'),
+                      _buildInfoRow(Icons.schedule, 'Follows trainer recommended schedule'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 56,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColors.primaryGray, width: 2),
+                            foregroundColor: AppColors.onBackground,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text('Cancel', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: SizedBox(
+                        height: 56,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _addToCalendar(item, selectedDate, isBundle: isBundle);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.accent,
+                            foregroundColor: AppColors.onAccent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          icon: const Icon(Icons.check, size: 20),
+                          label: Text('Add to Calendar', style: AppTextStyles.buttonMedium),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primaryGray, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(text, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addToCalendar(Map<String, dynamic> item, DateTime startDate, {bool isBundle = false}) {
+    // Here you would integrate with your calendar storage/state management
+    // For now, we'll show a success modal
+
+    // TODO: Implement actual calendar integration
+    // This would involve:
+    // 1. Parsing the program duration (e.g., "12 weeks")
+    // 2. Creating daily workout entries in the calendar
+    // 3. Adding rest days as defined by the trainer
+    // 4. Storing in local storage or state management
+
+    _showSuccessModal(item, startDate, isBundle: isBundle);
+  }
+
+  void _showSuccessModal(Map<String, dynamic> item, DateTime startDate, {bool isBundle = false}) {
+    final randomQuote = (_motivationalQuotes..shuffle()).first;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(24)),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Success Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.2), shape: BoxShape.circle),
+                child: const Icon(Icons.check_circle, color: AppColors.completed, size: 50),
+              ),
+              const SizedBox(height: 24),
+
+              // Title
+              Text(
+                'Added to Calendar!',
+                style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onSurface),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+
+              // Start date info
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                child: Text('Starts: ${startDate.day}/${startDate.month}/${startDate.year}', style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)),
+              ),
+              const SizedBox(height: 16),
+
+              // Motivational Quote
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryVariant,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(Icons.format_quote, color: AppColors.accent, size: 24),
+                    const SizedBox(height: 8),
+                    Text(
+                      randomQuote,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Info boxes
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                      child: Column(
+                        children: [
+                          Icon(Icons.calendar_today, color: AppColors.accent, size: 20),
+                          const SizedBox(height: 4),
+                          Text(
+                            'View in\nPlanner',
+                            style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                      child: Column(
+                        children: [
+                          Icon(Icons.library_books, color: AppColors.completed, size: 20),
+                          const SizedBox(height: 4),
+                          Text(
+                            'View in\nPurchases',
+                            style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Action Buttons
+              Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // Navigate to planner (calendar tab - index 1)
+                        try {
+                          Get.find<dynamic>().changeTab(1);
+                        } catch (e) {
+                          // If controller not found, show message
+                          Get.snackbar(
+                            'Success',
+                            'Program added to calendar! View it in the Planner tab.',
+                            backgroundColor: AppColors.completed,
+                            colorText: AppColors.onError,
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.calendar_today, size: 20),
+                      label: Text('Go to Planner', style: AppTextStyles.buttonMedium),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primaryGray, width: 2),
+                        foregroundColor: AppColors.onBackground,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Continue Browsing', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showProgramDetail(Map<String, dynamic> program) {
     showModalBottomSheet(
       context: context,
@@ -1024,27 +1442,49 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.accent, width: 2),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
-                        Text('\$${program['price']}', style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent)),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Total Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+                            Text('\$${program['price']}', style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent)),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Get.toNamed(AppRoutes.programDetail, arguments: program);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.accent,
+                            foregroundColor: AppColors.onAccent,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          ),
+                          child: const Text('View Details'),
+                        ),
                       ],
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Get.toNamed(AppRoutes.programDetail, arguments: program);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.onAccent,
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _showAddToCalendarModal(program, isBundle: false);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.accent, width: 2),
+                          foregroundColor: AppColors.accent,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.calendar_today, size: 20),
+                        label: Text('Add to Calendar', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.accent)),
                       ),
-                      child: const Text('View Details'),
                     ),
                   ],
                 ),
@@ -1180,19 +1620,19 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     // Get primary trainer (first program's trainer)
     final primaryTrainer = programs.isNotEmpty ? programs[0]['trainer'] : 'Multiple Trainers';
 
-    return GestureDetector(
-      onTap: () {
-        Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
-      },
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.65,
-        margin: const EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Thumbnail Image
-            Stack(
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.65,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Thumbnail Image
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
+            },
+            child: Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
@@ -1226,76 +1666,104 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 ),
               ],
             ),
+          ),
 
-            // Content section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
+          // Content section
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.bundleDetail, arguments: bundle);
+                    },
+                    child: Text(
                       bundle['title'],
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 15),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                  ),
+                  const SizedBox(height: 4),
 
-                    // Instructor
-                    Text(
-                      primaryTrainer,
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  // Instructor
+                  Text(
+                    primaryTrainer,
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Rating
+                  Row(
+                    children: [
+                      Text(
+                        avgRating.toStringAsFixed(1),
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                      const SizedBox(width: 4),
+                      ...List.generate(5, (index) => Icon(index < avgRating.floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14)),
+                      const SizedBox(width: 4),
+                      Text('(${_formatNumber(totalRatings)})', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Price
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${programs.length} programs', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13)),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '\$${totalValue.toStringAsFixed(2)}',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough, fontSize: 13),
+                          ),
+                          const SizedBox(width: 8),
+
+                          Text(
+                            '\$${bundlePrice.toStringAsFixed(2)}',
+                            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  // Add to Calendar Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 36,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _showAddToCalendarModal(bundle, isBundle: true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: const Icon(Icons.calendar_today, size: 16),
+                      label: Text(
+                        'Add to Calendar',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    const SizedBox(height: 6),
-
-                    // Rating
-                    Row(
-                      children: [
-                        Text(
-                          avgRating.toStringAsFixed(1),
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
-                        ),
-                        const SizedBox(width: 4),
-                        ...List.generate(5, (index) => Icon(index < avgRating.floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14)),
-                        const SizedBox(width: 4),
-                        Text('(${_formatNumber(totalRatings)})', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Price
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('${programs.length} programs', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13)),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '\$${totalValue.toStringAsFixed(2)}',
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough, fontSize: 13),
-                            ),
-                            const SizedBox(width: 8),
-
-                            Text(
-                              '\$${bundlePrice.toStringAsFixed(2)}',
-                              style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1414,17 +1882,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   }
 
   Widget _buildProgramCard(Map<String, dynamic> program) {
-    return GestureDetector(
-      onTap: () => _showProgramDetail(program),
-      child: Container(
-        height: 285,
-        margin: const EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Thumbnail Image
-            Stack(
+    return Container(
+      height: 285,
+      margin: const EdgeInsets.only(right: 12),
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Thumbnail Image
+          GestureDetector(
+            onTap: () => _showProgramDetail(program),
+            child: Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
@@ -1456,80 +1924,106 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   ),
               ],
             ),
+          ),
 
-            // Content section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
+          // Content section
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  GestureDetector(
+                    onTap: () => _showProgramDetail(program),
+                    child: Text(
                       program['title'],
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 15),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                  ),
+                  const SizedBox(height: 4),
 
-                    // Instructor
-                    Text(
-                      program['trainer'],
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  // Instructor
+                  Text(
+                    program['trainer'],
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Rating
+                  Row(
+                    children: [
+                      Text(
+                        program['rating'].toStringAsFixed(1),
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                      const SizedBox(width: 4),
+                      ...List.generate(
+                        5,
+                        (index) => Icon(index < (program['rating'] as double).floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          '(${_formatNumber(program['students'] as int)})',
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  // Price and Duration
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
+                          const SizedBox(width: 4),
+                          Text(program['duration'], style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                        ],
+                      ),
+                      Text(
+                        '\$${program['price'].toStringAsFixed(2)}',
+                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Add to Calendar Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 36,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _showAddToCalendarModal(program, isBundle: false),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: const Icon(Icons.calendar_today, size: 16),
+                      label: Text(
+                        'Add to Calendar',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    const SizedBox(height: 6),
-
-                    // Rating
-                    Row(
-                      children: [
-                        Text(
-                          program['rating'].toStringAsFixed(1),
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
-                        ),
-                        const SizedBox(width: 4),
-                        ...List.generate(
-                          5,
-                          (index) => Icon(index < (program['rating'] as double).floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            '(${_formatNumber(program['students'] as int)})',
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const Spacer(),
-
-                    // Price and Duration
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
-                            const SizedBox(width: 4),
-                            Text(program['duration'], style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
-                          ],
-                        ),
-                        Text(
-                          '\$${program['price'].toStringAsFixed(2)}',
-                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
