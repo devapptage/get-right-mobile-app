@@ -7,6 +7,7 @@ import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
+import 'package:get_right/views/planner/planner_screen.dart';
 
 /// Professional App Drawer
 ///
@@ -97,8 +98,16 @@ class AppDrawer extends StatelessWidget {
                   activeIcon: Icons.calendar_today,
                   title: 'Planner',
                   onTap: () {
-                    navController.changeTab(2);
+                    Get.to(() => const PlannerScreen());
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.restaurant_menu_outlined,
+                  activeIcon: Icons.restaurant_menu,
+                  title: 'Calorie Tracker',
+                  onTap: () {
                     Get.back();
+                    Get.toNamed(AppRoutes.nutrition);
                   },
                 ),
                 _buildDrawerItem(

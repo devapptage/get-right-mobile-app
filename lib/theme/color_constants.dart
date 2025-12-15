@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Get Right Brand Color Palette
-///
-/// This file contains all brand colors as defined in the Get Right Brand Guide.
-/// Updated according to Design & Typography Guidelines (Section 3.0)
-///
-/// Color System:
-/// - Primary Background: Steel Grey - neutral foundation that reduces visual noise
-/// - Primary Accent: Green - used for buttons, icons, active states, progress indicators
-/// - Secondary Accent: Black - used for typography, shadows, and outlines
-
 class AppColors {
   AppColors._(); // Private constructor to prevent instantiation
 

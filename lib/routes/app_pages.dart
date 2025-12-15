@@ -61,6 +61,7 @@ import 'package:get_right/views/marketplace/all_bundles_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
 import 'package:get_right/views/library/exercise_list_screen.dart';
 import 'package:get_right/views/library/exercise_detail_screen.dart';
+import 'package:get_right/views/feed/feed_screen.dart';
 import 'package:get_right/views/trainer/all_programs_screen.dart';
 import 'package:get_right/views/favorites/favorites_screen.dart';
 import 'package:get_right/views/program_history/program_history_screen.dart';
@@ -69,6 +70,10 @@ import 'package:get_right/views/program_history/completed_program_detail_screen.
 import 'package:get_right/views/program_history/program_modification_request_screen.dart';
 import 'package:get_right/views/transaction_history/transaction_history_screen.dart';
 import 'package:get_right/views/transaction_history/transaction_detail_screen.dart';
+import 'package:get_right/views/nutrition/nutrition_screen.dart';
+import 'package:get_right/views/nutrition/recipe_detail_screen.dart';
+import 'package:get_right/views/nutrition/add_food_screen.dart';
+import 'package:get_right/models/meal_entry.dart';
 
 /// App Pages - GetX route configuration
 class AppPages {
@@ -154,6 +159,9 @@ class AppPages {
     GetPage(name: AppRoutes.exerciseList, page: () => const ExerciseListScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.exerciseDetail, page: () => const ExerciseDetailScreen(), transition: Transition.rightToLeft),
 
+    // Feed Pages
+    GetPage(name: AppRoutes.feed, page: () => const FeedScreen(), transition: Transition.fade),
+
     // Search Pages
     GetPage(name: AppRoutes.search, page: () => SearchScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.searchResults, page: () => const SearchResultsScreen(), transition: Transition.rightToLeft),
@@ -161,6 +169,10 @@ class AppPages {
     // Chat Pages
     GetPage(name: AppRoutes.chatList, page: () => const ChatListScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.chatRoom, page: () => const ChatRoomScreen(), transition: Transition.rightToLeft),
+
+    // Nutrition Pages
+    GetPage(name: AppRoutes.nutrition, page: () => const NutritionScreen(), transition: Transition.rightToLeft),
+    // Note: Recipe detail and add food are typically navigated to directly with Get.to() passing parameters
 
     // Settings Pages
     GetPage(name: AppRoutes.settings, page: () => const SettingsScreen(), transition: Transition.rightToLeft),

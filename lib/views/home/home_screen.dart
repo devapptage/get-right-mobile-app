@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/journal/combined_journal_screen.dart';
-import 'package:get_right/views/planner/planner_screen.dart';
+import 'package:get_right/views/feed/feed_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
 import 'package:get_right/widgets/common/app_drawer.dart';
@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = const [
     DashboardScreen(), // Home
-    PlannerScreen(), // Planner
+    FeedScreen(), // Community Feed
     CombinedJournalScreen(), // Journal (Center - Workout Journal + Runner Log)
     MarketplaceScreen(), // Marketplace
     LibraryScreen(), // Library
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProfessionalBottomNav() {
     final navItems = [
       {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
-      {'icon': Icons.calendar_today_outlined, 'activeIcon': Icons.calendar_today_rounded, 'label': 'Planner'},
+      {'icon': Icons.video_library_outlined, 'activeIcon': Icons.video_library_rounded, 'label': 'Feed'},
       {'icon': Icons.fitness_center_outlined, 'activeIcon': Icons.fitness_center_rounded, 'label': 'Journal'},
       {'icon': Icons.store_outlined, 'activeIcon': Icons.store_rounded, 'label': 'Market'},
       {'icon': Icons.library_books_outlined, 'activeIcon': Icons.library_books_rounded, 'label': 'Library'},

@@ -87,6 +87,11 @@ class AppRoutes {
   static const String exerciseList = '/exercise-list';
   static const String exerciseDetail = '/exercise-detail';
 
+  // Feed Routes
+  static const String feed = '/feed';
+  static const String createPost = '/create-post';
+  static const String postDetail = '/post-detail';
+
   // Search Routes
   static const String search = '/search';
   static const String searchResults = '/search-results';
@@ -94,6 +99,11 @@ class AppRoutes {
   // Chat Routes
   static const String chatList = '/chat-list';
   static const String chatRoom = '/chat-room';
+
+  // Nutrition Routes
+  static const String nutrition = '/nutrition';
+  static const String recipeDetail = '/recipe-detail';
+  static const String addFood = '/add-food';
 
   // Settings Routes
   static const String settings = '/settings';

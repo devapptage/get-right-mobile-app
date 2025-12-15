@@ -51,7 +51,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Map<String, dynamic> _getExerciseDetails(String exerciseName) {
     // Mock detailed information - in real app, this would come from database
     return {
-      'why': 'This exercise targets the ${exercise['muscleGroup']} muscles effectively. It helps build strength, improve muscle definition, and enhance overall functional fitness. Perfect for both beginners and advanced athletes looking to develop this muscle group.',
+      'why':
+          'This exercise targets the ${exercise['muscleGroup']} muscles effectively. It helps build strength, improve muscle definition, and enhance overall functional fitness. Perfect for both beginners and advanced athletes looking to develop this muscle group.',
       'recommendedSets': '3-4 sets',
       'recommendedReps': '8-12 reps',
       'restTime': '60-90 seconds',
@@ -86,17 +87,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.onPrimary),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          exercise['name'],
-          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary),
-        ),
+        title: Text(exercise['name'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(
-              isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: isFavorite ? AppColors.error : AppColors.onPrimary,
-            ),
+            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? AppColors.error : AppColors.onPrimary),
             onPressed: () {
               setState(() {
                 isFavorite = !isFavorite;
@@ -134,34 +129,17 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   // Placeholder for video
                   Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xFF9333EA),
-                          const Color(0xFFFBBF24),
-                        ],
-                      ),
+                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
                     ),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.play_circle_outline,
-                            size: 80,
-                            color: Colors.white.withOpacity(0.9),
-                          ),
+                          Icon(Icons.play_circle_outline, size: 80, color: Colors.white.withOpacity(0.9)),
                           const SizedBox(height: 12),
-                          Text(
-                            'Video Demonstration',
-                            style: AppTextStyles.titleMedium.copyWith(color: Colors.white),
-                          ),
+                          Text('Video Demonstration', style: AppTextStyles.titleMedium.copyWith(color: Colors.white)),
                           const SizedBox(height: 4),
-                          Text(
-                            'Tap to play',
-                            style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
-                          ),
+                          Text('Tap to play', style: AppTextStyles.bodySmall.copyWith(color: Colors.white70)),
                         ],
                       ),
                     ),
@@ -199,21 +177,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _buildInfoTag(
-                        Icons.fitness_center,
-                        exercise['equipment'],
-                        AppColors.accent,
-                      ),
-                      _buildInfoTag(
-                        Icons.category,
-                        exercise['muscleGroup'],
-                        AppColors.completed,
-                      ),
-                      _buildInfoTag(
-                        Icons.signal_cellular_alt,
-                        exercise['difficulty'],
-                        difficultyColor,
-                      ),
+                      _buildInfoTag(Icons.fitness_center, exercise['equipment'], AppColors.accent),
+                      _buildInfoTag(Icons.category, exercise['muscleGroup'], AppColors.completed),
+                      _buildInfoTag(Icons.signal_cellular_alt, exercise['difficulty'], difficultyColor),
                     ],
                   ),
 
@@ -231,17 +197,9 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                           children: [
                             Text(
                               exercise['difficulty'],
-                              style: AppTextStyles.titleSmall.copyWith(
-                                color: difficultyColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppTextStyles.titleSmall.copyWith(color: difficultyColor, fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              '${(difficultyValue * 100).toInt()}%',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.primaryGray,
-                              ),
-                            ),
+                            Text('${(difficultyValue * 100).toInt()}%', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -258,18 +216,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Beginner',
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.primaryGray,
-                              ),
-                            ),
-                            Text(
-                              'Advanced',
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.primaryGray,
-                              ),
-                            ),
+                            Text('Beginner', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                            Text('Advanced', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
                           ],
                         ),
                       ],
@@ -282,13 +230,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   _buildSection(
                     'Why?',
                     Icons.help_outline,
-                    child: Text(
-                      details['why'],
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.onBackground,
-                        height: 1.6,
-                      ),
-                    ),
+                    child: Text(details['why'], style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, height: 1.6)),
                   ),
 
                   const SizedBox(height: 24),
@@ -302,39 +244,19 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.accent.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.accent.withOpacity(0.3),
-                          width: 1,
-                        ),
+                        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1),
                       ),
                       child: Column(
                         children: [
                           Row(
                             children: [
-                              Expanded(
-                                child: _buildStatCard(
-                                  'Sets',
-                                  details['recommendedSets'],
-                                  Icons.format_list_numbered,
-                                ),
-                              ),
+                              Expanded(child: _buildStatCard('Sets', details['recommendedSets'], Icons.format_list_numbered)),
                               const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildStatCard(
-                                  'Reps',
-                                  details['recommendedReps'],
-                                  Icons.repeat_one,
-                                ),
-                              ),
+                              Expanded(child: _buildStatCard('Reps', details['recommendedReps'], Icons.repeat_one)),
                             ],
                           ),
                           const SizedBox(height: 12),
-                          _buildStatCard(
-                            'Rest Time',
-                            details['restTime'],
-                            Icons.timer,
-                            fullWidth: true,
-                          ),
+                          _buildStatCard('Rest Time', details['restTime'], Icons.timer, fullWidth: true),
                         ],
                       ),
                     ),
@@ -346,11 +268,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   _buildSection(
                     'Key Form Cues',
                     Icons.checklist,
-                    child: Column(
-                      children: (details['cues'] as List<String>)
-                          .map((cue) => _buildCueItem(cue))
-                          .toList(),
-                    ),
+                    child: Column(children: (details['cues'] as List).cast<String>().map((cue) => _buildCueItem(cue)).toList()),
                   ),
 
                   const SizedBox(height: 24),
@@ -362,35 +280,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Primary:',
-                          style: AppTextStyles.titleSmall.copyWith(
-                            color: AppColors.accent,
-                          ),
-                        ),
+                        Text('Primary:', style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)),
                         const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: (details['primaryMuscles'] as List<String>)
-                              .map((muscle) => _buildMuscleChip(muscle, true))
-                              .toList(),
-                        ),
+                        Wrap(spacing: 8, runSpacing: 8, children: (details['primaryMuscles'] as List).cast<String>().map((muscle) => _buildMuscleChip(muscle, true)).toList()),
                         const SizedBox(height: 16),
-                        Text(
-                          'Secondary:',
-                          style: AppTextStyles.titleSmall.copyWith(
-                            color: AppColors.primaryGray,
-                          ),
-                        ),
+                        Text('Secondary:', style: AppTextStyles.titleSmall.copyWith(color: AppColors.primaryGray)),
                         const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: (details['secondaryMuscles'] as List<String>)
-                              .map((muscle) => _buildMuscleChip(muscle, false))
-                              .toList(),
-                        ),
+                        Wrap(spacing: 8, runSpacing: 8, children: (details['secondaryMuscles'] as List).cast<String>().map((muscle) => _buildMuscleChip(muscle, false)).toList()),
                       ],
                     ),
                   ),
@@ -398,15 +294,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   const SizedBox(height: 24),
 
                   // Pro Tips
-                  _buildSection(
-                    'Pro Tips',
-                    Icons.lightbulb_outline,
-                    child: Column(
-                      children: (details['tips'] as List<String>)
-                          .map((tip) => _buildTipItem(tip))
-                          .toList(),
-                    ),
-                  ),
+                  _buildSection('Pro Tips', Icons.lightbulb_outline, child: Column(children: (details['tips'] as List).cast<String>().map((tip) => _buildTipItem(tip)).toList())),
 
                   const SizedBox(height: 32),
 
@@ -429,15 +317,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                         backgroundColor: AppColors.accent,
                         foregroundColor: AppColors.onAccent,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       icon: const Icon(Icons.add_circle_outline, size: 24),
-                      label: Text(
-                        'Add to Workout',
-                        style: AppTextStyles.buttonLarge,
-                      ),
+                      label: Text('Add to Workout', style: AppTextStyles.buttonLarge),
                     ),
                   ),
 
@@ -461,10 +344,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             const SizedBox(width: 8),
             Text(
               title,
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.onBackground,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -489,10 +369,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.labelMedium.copyWith(color: color, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -502,10 +379,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _buildStatCard(String label, String value, IconData icon, {bool fullWidth = false}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisAlignment: fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
         children: [
@@ -514,18 +388,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.primaryGray,
-                ),
-              ),
+              Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
               Text(
                 value,
-                style: AppTextStyles.titleSmall.copyWith(
-                  color: AppColors.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -544,20 +410,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             margin: const EdgeInsets.only(top: 4),
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
-              color: AppColors.accent,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              cue,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.onBackground,
-                height: 1.5,
-              ),
-            ),
+            child: Text(cue, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, height: 1.5)),
           ),
         ],
       ),
@@ -571,10 +428,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       decoration: BoxDecoration(
         color: AppColors.upcoming.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.upcoming.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.upcoming.withOpacity(0.3), width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -582,13 +436,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           Icon(Icons.tips_and_updates, color: AppColors.upcoming, size: 20),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              tip,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.onBackground,
-                height: 1.5,
-              ),
-            ),
+            child: Text(tip, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, height: 1.5)),
           ),
         ],
       ),
@@ -598,20 +446,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _buildMuscleChip(String muscle, bool isPrimary) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isPrimary
-            ? AppColors.accent.withOpacity(0.2)
-            : AppColors.primaryGray.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: isPrimary ? AppColors.accent.withOpacity(0.2) : AppColors.primaryGray.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
       child: Text(
         muscle,
-        style: AppTextStyles.labelMedium.copyWith(
-          color: isPrimary ? AppColors.accent : AppColors.primaryGray,
-          fontWeight: isPrimary ? FontWeight.bold : FontWeight.normal,
-        ),
+        style: AppTextStyles.labelMedium.copyWith(color: isPrimary ? AppColors.accent : AppColors.primaryGray, fontWeight: isPrimary ? FontWeight.bold : FontWeight.normal),
       ),
     );
   }
 }
-
