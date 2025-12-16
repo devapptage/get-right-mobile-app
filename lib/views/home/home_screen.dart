@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/journal/combined_journal_screen.dart';
 import 'package:get_right/views/feed/feed_screen.dart';
@@ -45,128 +44,167 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           key: _scaffoldKey,
           drawer: const AppDrawer(), // Professional app drawer
-          body: IndexedStack(index: _navController.currentIndex, children: _screens),
+          body: IndexedStack(
+            index: _navController.currentIndex,
+            children: _screens,
+          ),
           bottomNavigationBar: _buildProfessionalBottomNav(),
         ),
       ),
     );
   }
 
-  /// Professional custom bottom navigation bar
+  /// Modern 2024/2025 bottom navigation bar
   Widget _buildProfessionalBottomNav() {
     final navItems = [
-      {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
-      {'icon': Icons.video_library_outlined, 'activeIcon': Icons.video_library_rounded, 'label': 'Feed'},
-      {'icon': Icons.fitness_center_outlined, 'activeIcon': Icons.fitness_center_rounded, 'label': 'Journal'},
-      {'icon': Icons.store_outlined, 'activeIcon': Icons.store_rounded, 'label': 'Market'},
-      {'icon': Icons.library_books_outlined, 'activeIcon': Icons.library_books_rounded, 'label': 'Library'},
+      {
+        'icon': Icons.home_outlined,
+        'activeIcon': Icons.home_rounded,
+        'label': 'Home',
+      },
+      {
+        'icon': Icons.explore_outlined,
+        'activeIcon': Icons.explore_rounded,
+        'label': 'Feed',
+      },
+      {
+        'icon': Icons.add_circle_outline,
+        'activeIcon': Icons.add_circle,
+        'label': 'Journal',
+      },
+      {
+        'icon': Icons.storefront_outlined,
+        'activeIcon': Icons.storefront_rounded,
+        'label': 'Market',
+      },
+      {
+        'icon': Icons.menu_book_outlined,
+        'activeIcon': Icons.menu_book_rounded,
+        'label': 'Library',
+      },
     ];
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.primaryVariant, AppColors.primary]),
-        border: Border(top: BorderSide(color: AppColors.accent.withOpacity(0.1), width: 1)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 16, spreadRadius: 0, offset: const Offset(0, -4))],
+        color: const Color(0xFFF5F5F5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       child: SafeArea(
+        top: false,
         child: Container(
-          height: 75,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: Colors.white, width: 1)),
-          ),
+          height: 78,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(
-              navItems.length,
-              (index) => _buildNavItem(
+            children: List.generate(navItems.length, (index) {
+              final isCenter = index == 2;
+              return _buildNavItem(
                 icon: navItems[index]['icon'] as IconData,
                 activeIcon: navItems[index]['activeIcon'] as IconData,
                 label: navItems[index]['label'] as String,
                 index: index,
                 isSelected: _navController.currentIndex == index,
-              ),
-            ),
+                isCenter: isCenter,
+              );
+            }),
           ),
         ),
       ),
     );
   }
 
-  /// Individual navigation item with animation
-  Widget _buildNavItem({required IconData icon, required IconData activeIcon, required String label, required int index, required bool isSelected}) {
+  /// Modern navigation item
+  Widget _buildNavItem({
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required int index,
+    required bool isSelected,
+    bool isCenter = false,
+  }) {
+    const greenAccent = Color(0xFF29603C);
+    const blackPrimary = Color(0xFF000000);
+    const textSecondary = Color(0xFF404040);
+
     return Expanded(
       child: GestureDetector(
         onTap: () => _navController.changeTab(index),
         behavior: HitTestBehavior.opaque,
-        child: AnimatedScale(
-          scale: isSelected ? 1.0 : 0.95,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          child: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 3),
-                // Icon with animated container and glow effect
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Glow effect for selected item
-                    if (isSelected)
-                      Container(
-                        width: 45,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, spreadRadius: 0)],
-                        ),
-                      ),
-                    // Icon container
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOutCubic,
-                      width: 45,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.accent.withOpacity(0.2) : Colors.transparent,
-                        borderRadius: BorderRadius.circular(50),
-                        border: isSelected ? Border.all(color: const Color.fromARGB(255, 255, 255, 255), width: 1) : null,
-                      ),
-                      child: Center(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          transitionBuilder: (child, animation) {
-                            return ScaleTransition(scale: animation, child: child);
-                          },
-                          child: Icon(
-                            isSelected ? activeIcon : icon,
-                            key: ValueKey(isSelected),
-                            color: isSelected ? AppColors.white : AppColors.primaryGray,
-                            size: isSelected ? 23 : 23,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon container
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                width: isCenter ? 52 : (isSelected ? 44 : 38),
+                height: isCenter ? 52 : (isSelected ? 44 : 38),
+                decoration: BoxDecoration(
+                  color: isCenter
+                      ? greenAccent
+                      : isSelected
+                      ? greenAccent.withOpacity(0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(isCenter ? 26 : 22),
+                  boxShadow: isCenter
+                      ? [
+                          BoxShadow(
+                            color: greenAccent.withOpacity(0.3),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
+                        ]
+                      : null,
                 ),
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: Icon(
+                      isSelected ? activeIcon : icon,
+                      key: ValueKey('$index-$isSelected'),
+                      color: isCenter
+                          ? Colors.white
+                          : isSelected
+                          ? greenAccent
+                          : textSecondary,
+                      size: isCenter ? 26 : 22,
+                    ),
+                  ),
+                ),
+              ),
+              // Label (hidden for center item)
+              if (!isCenter) ...[
                 const SizedBox(height: 3),
-                // Label with enhanced animation
                 AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOutCubic,
                   style: TextStyle(
-                    fontSize: isSelected ? 11 : 10,
+                    fontSize: 10,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? AppColors.white : AppColors.primaryGray,
-                    letterSpacing: 0.5,
-                    height: 1.2,
+                    color: isSelected ? blackPrimary : textSecondary,
+                    letterSpacing: 0.2,
+                    height: 1.0,
                   ),
-                  child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
-            ),
+            ],
           ),
         ),
       ),
