@@ -43,31 +43,19 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
         ),
         title: Text(
           'Nutrition',
-          style: AppTextStyles.titleLarge.copyWith(
-            color: AppColors.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.lightGray,
-              borderRadius: BorderRadius.circular(25),
-            ),
+            decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(25)),
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
               ),
               labelColor: AppColors.onSurface,
               unselectedLabelColor: AppColors.mediumGray,
@@ -83,14 +71,7 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          NutritionTrackerTab(),
-          RecipesTab(),
-        ],
-      ),
+      body: TabBarView(controller: _tabController, children: const [NutritionTrackerTab(), RecipesTab()]),
     );
   }
-
 }

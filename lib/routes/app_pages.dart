@@ -71,9 +71,6 @@ import 'package:get_right/views/program_history/program_modification_request_scr
 import 'package:get_right/views/transaction_history/transaction_history_screen.dart';
 import 'package:get_right/views/transaction_history/transaction_detail_screen.dart';
 import 'package:get_right/views/nutrition/nutrition_screen.dart';
-import 'package:get_right/views/nutrition/recipe_detail_screen.dart';
-import 'package:get_right/views/nutrition/add_food_screen.dart';
-import 'package:get_right/models/meal_entry.dart';
 
 /// App Pages - GetX route configuration
 class AppPages {
