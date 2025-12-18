@@ -43,10 +43,7 @@ void main() async {
   // as it's less reliable than using AnnotatedRegion in the widget tree.
 
   // Set preferred orientations
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   // Initialize services
   await initServices();
@@ -83,11 +80,7 @@ class GetRightApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
 
             // Apply App Theme with Google Fonts fallback for Inter
-            theme: AppTheme.lightTheme.copyWith(
-              textTheme: GoogleFonts.interTextTheme(
-                AppTheme.lightTheme.textTheme,
-              ),
-            ),
+            theme: AppTheme.lightTheme.copyWith(textTheme: GoogleFonts.interTextTheme(AppTheme.lightTheme.textTheme)),
 
             // GetX Routing
             initialRoute: AppPages.initial,

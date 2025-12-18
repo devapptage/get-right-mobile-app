@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(32),
-                          gradient: LinearGradient(colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
+                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
                           border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
                           boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 30, spreadRadius: 5, offset: const Offset(0, 10))],
                         ),

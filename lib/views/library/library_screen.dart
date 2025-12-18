@@ -21,17 +21,17 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
 
   // Mock muscle groups data
   final List<Map<String, dynamic>> _muscleGroups = [
-    {'id': 'chest', 'name': 'Chest', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
-    {'id': 'back', 'name': 'Back', 'exerciseCount': 25, 'icon': Icons.accessibility_new, 'color': const Color(0xFFD32F2F)},
-    {'id': 'shoulders', 'name': 'Shoulders', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
-    {'id': 'quads', 'name': 'Quads', 'exerciseCount': 24, 'icon': Icons.directions_walk, 'color': const Color(0xFFD32F2F)},
-    {'id': 'hamstrings', 'name': 'Hamstrings', 'exerciseCount': 20, 'icon': Icons.directions_run, 'color': const Color(0xFFE53935)},
-    {'id': 'triceps', 'name': 'Triceps', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': const Color(0xFFD32F2F)},
-    {'id': 'biceps', 'name': 'Biceps', 'exerciseCount': 24, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
-    {'id': 'core', 'name': 'Core', 'exerciseCount': 30, 'icon': Icons.self_improvement, 'color': const Color(0xFFD32F2F)},
-    {'id': 'glutes', 'name': 'Glutes', 'exerciseCount': 18, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
-    {'id': 'calves', 'name': 'Calves', 'exerciseCount': 12, 'icon': Icons.directions_walk, 'color': const Color(0xFFD32F2F)},
-    {'id': 'forearms', 'name': 'Forearms', 'exerciseCount': 15, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
+    {'id': 'chest', 'name': 'Chest', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': AppColors.accent},
+    {'id': 'back', 'name': 'Back', 'exerciseCount': 25, 'icon': Icons.accessibility_new, 'color': AppColors.accent},
+    {'id': 'shoulders', 'name': 'Shoulders', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': AppColors.accent},
+    {'id': 'quads', 'name': 'Quads', 'exerciseCount': 24, 'icon': Icons.directions_walk, 'color': AppColors.accent},
+    {'id': 'hamstrings', 'name': 'Hamstrings', 'exerciseCount': 20, 'icon': Icons.directions_run, 'color': AppColors.accent},
+    {'id': 'triceps', 'name': 'Triceps', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': AppColors.accent},
+    {'id': 'biceps', 'name': 'Biceps', 'exerciseCount': 24, 'icon': Icons.fitness_center, 'color': AppColors.accent},
+    {'id': 'core', 'name': 'Core', 'exerciseCount': 30, 'icon': Icons.self_improvement, 'color': AppColors.accent},
+    {'id': 'glutes', 'name': 'Glutes', 'exerciseCount': 18, 'icon': Icons.fitness_center, 'color': AppColors.accent},
+    {'id': 'calves', 'name': 'Calves', 'exerciseCount': 12, 'icon': Icons.directions_walk, 'color': AppColors.accent},
+    {'id': 'forearms', 'name': 'Forearms', 'exerciseCount': 15, 'icon': Icons.fitness_center, 'color': AppColors.accent},
   ];
 
   List<Map<String, dynamic>> get _filteredMuscleGroups {
