@@ -77,43 +77,38 @@ class _DashboardScreenState extends State<DashboardScreen>
               ],
             ),
           ),
+
           child: Scaffold(
             backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.menu_rounded, color: _blackPrimary, size: 28),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(),
+              ),
+
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: _blackPrimary,
+                    size: 28,
+                  ),
+                  onPressed: () => Get.toNamed(AppRoutes.notifications),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                ),
+              ],
+              centerTitle: true,
+            ),
             body: SafeArea(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.menu_rounded,
-                              color: _blackPrimary,
-                              size: 28,
-                            ),
-                            onPressed: () => Scaffold.of(context).openDrawer(),
-                            padding: EdgeInsets.zero,
-                            constraints: BoxConstraints(),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.notifications_outlined,
-                              color: _blackPrimary,
-                              size: 28,
-                            ),
-                            onPressed: () =>
-                                Get.toNamed(AppRoutes.notifications),
-                            padding: EdgeInsets.zero,
-                            constraints: BoxConstraints(),
-                          ),
-                        ],
-                      ),
-                    ),
                     const SizedBox(height: 24),
 
                     // Greeting

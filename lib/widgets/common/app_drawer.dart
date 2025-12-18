@@ -49,50 +49,50 @@ class AppDrawer extends StatelessWidget {
               padding: EdgeInsets.zero,
               children: [
                 // Main Section
-                _buildSectionLabel('MAIN'),
-                _buildDrawerItem(
-                  icon: Icons.dashboard_outlined,
-                  activeIcon: Icons.dashboard,
-                  title: 'Dashboard',
-                  onTap: () {
-                    Get.back(); // Close drawer
-                    Get.offAllNamed(AppRoutes.home);
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person,
-                  title: 'Profile',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.profile);
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.settings_outlined,
-                  activeIcon: Icons.settings,
-                  title: 'Settings',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.settings);
-                  },
-                ),
+                // _buildSectionLabel('MAIN'),
+                // // _buildDrawerItem(
+                // //   icon: Icons.dashboard_outlined,
+                // //   activeIcon: Icons.dashboard,
+                // //   title: 'Dashboard',
+                // //   onTap: () {
+                // //     Get.back(); // Close drawer
+                // //     Get.offAllNamed(AppRoutes.home);
+                // //   },
+                // // ),
+                // _buildDrawerItem(
+                //   icon: Icons.person_outline,
+                //   activeIcon: Icons.person,
+                //   title: 'Profile',
+                //   onTap: () {
+                //     Get.back();
+                //     Get.toNamed(AppRoutes.profile);
+                //   },
+                // ),
+                // _buildDrawerItem(
+                //   icon: Icons.settings_outlined,
+                //   activeIcon: Icons.settings,
+                //   title: 'Settings',
+                //   onTap: () {
+                //     Get.back();
+                //     Get.toNamed(AppRoutes.settings);
+                //   },
+                // ),
 
-                const SizedBox(height: 16),
-                const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
+                // const SizedBox(height: 16),
+                // const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
                 const SizedBox(height: 16),
 
                 // Fitness Section
                 _buildSectionLabel('FITNESS'),
-                _buildDrawerItem(
-                  icon: Icons.book_outlined,
-                  activeIcon: Icons.book,
-                  title: 'Journal',
-                  onTap: () {
-                    navController.changeTab(1);
-                    Get.back();
-                  },
-                ),
+                // _buildDrawerItem(
+                //   icon: Icons.book_outlined,
+                //   activeIcon: Icons.book,
+                //   title: 'Journal',
+                //   onTap: () {
+                //     navController.changeTab(1);
+                //     Get.back();
+                //   },
+                // ),
                 _buildDrawerItem(
                   icon: Icons.calendar_today_outlined,
                   activeIcon: Icons.calendar_today,
@@ -110,15 +110,15 @@ class AppDrawer extends StatelessWidget {
                     Get.toNamed(AppRoutes.nutrition);
                   },
                 ),
-                _buildDrawerItem(
-                  icon: Icons.directions_run_outlined,
-                  activeIcon: Icons.directions_run,
-                  title: 'Run Tracker',
-                  onTap: () {
-                    navController.changeTab(3);
-                    Get.back();
-                  },
-                ),
+                // _buildDrawerItem(
+                //   icon: Icons.directions_run_outlined,
+                //   activeIcon: Icons.directions_run,
+                //   title: 'Run Tracker',
+                //   onTap: () {
+                //     navController.changeTab(3);
+                //     Get.back();
+                //   },
+                // ),
                 _buildDrawerItem(
                   icon: Icons.trending_up,
                   activeIcon: Icons.trending_up,
@@ -129,16 +129,15 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
-                _buildDrawerItem(
-                  icon: Icons.track_changes_outlined,
-                  activeIcon: Icons.track_changes,
-                  title: 'Marketplace',
-                  onTap: () {
-                    navController.changeTab(4);
-                    Get.back();
-                  },
-                ),
-
+                // _buildDrawerItem(
+                //   icon: Icons.track_changes_outlined,
+                //   activeIcon: Icons.track_changes,
+                //   title: 'Marketplace',
+                //   onTap: () {
+                //     navController.changeTab(4);
+                //     Get.back();
+                //   },
+                // ),
                 const SizedBox(height: 16),
                 const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
                 const SizedBox(height: 16),
@@ -199,6 +198,15 @@ class AppDrawer extends StatelessWidget {
                 // Help & Support Section
                 _buildSectionLabel('HELP & SUPPORT'),
                 _buildDrawerItem(
+                  icon: Icons.settings_outlined,
+                  activeIcon: Icons.settings,
+                  title: 'Settings',
+                  onTap: () {
+                    Get.back();
+                    Get.toNamed(AppRoutes.settings);
+                  },
+                ),
+                _buildDrawerItem(
                   icon: Icons.help_outline,
                   activeIcon: Icons.help,
                   title: 'Help & Feedback',
@@ -244,7 +252,7 @@ class AppDrawer extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       decoration: BoxDecoration(
-        color: AppColors.primaryVariant,
+        color: const Color.fromARGB(108, 192, 192, 192),
         border: Border(bottom: BorderSide(color: AppColors.primaryGray.withOpacity(0.3), width: 1)),
       ),
       child: Column(
@@ -282,7 +290,7 @@ class AppDrawer extends StatelessWidget {
           // User Email
           Text(
             userEmail,
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
+            style: AppTextStyles.bodySmall.copyWith(color: const Color.fromARGB(255, 55, 56, 58)),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -326,7 +334,7 @@ class AppDrawer extends StatelessWidget {
   /// Drawer Item
   Widget _buildDrawerItem({required IconData icon, required IconData activeIcon, required String title, required VoidCallback onTap}) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primaryGray, size: 24),
+      leading: Icon(icon, color: AppColors.accent, size: 24),
       title: Text(
         title,
         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w500),

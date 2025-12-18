@@ -118,30 +118,27 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     };
 
     final exercises = exercisesByGroup[groupId] ?? [];
-    return List.generate(
-      count,
-      (index) {
-        if (index < exercises.length) {
-          return {
-            'id': '${groupId}_$index',
-            'name': exercises[index]['name']!,
-            'equipment': exercises[index]['equipment']!,
-            'difficulty': exercises[index]['difficulty']!,
-            'muscleGroup': muscleGroup['name'],
-            'isFavorite': false,
-          };
-        } else {
-          return {
-            'id': '${groupId}_$index',
-            'name': 'Exercise ${index + 1}',
-            'equipment': 'Various',
-            'difficulty': 'Beginner',
-            'muscleGroup': muscleGroup['name'],
-            'isFavorite': false,
-          };
-        }
-      },
-    );
+    return List.generate(count, (index) {
+      if (index < exercises.length) {
+        return {
+          'id': '${groupId}_$index',
+          'name': exercises[index]['name']!,
+          'equipment': exercises[index]['equipment']!,
+          'difficulty': exercises[index]['difficulty']!,
+          'muscleGroup': muscleGroup['name'],
+          'isFavorite': false,
+        };
+      } else {
+        return {
+          'id': '${groupId}_$index',
+          'name': 'Exercise ${index + 1}',
+          'equipment': 'Various',
+          'difficulty': 'Beginner',
+          'muscleGroup': muscleGroup['name'],
+          'isFavorite': false,
+        };
+      }
+    });
   }
 
   List<Map<String, dynamic>> get _filteredExercises {
@@ -182,10 +179,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.onPrimary),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          muscleGroup['name'],
-          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary),
-        ),
+        title: Text(muscleGroup['name'], style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -201,7 +195,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           // Search Bar
           Container(
             padding: const EdgeInsets.all(16),
-            color: AppColors.surface,
+            color: Colors.transparent,
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
@@ -209,14 +203,14 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                   _searchQuery = value;
                 });
               },
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+              style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
               decoration: InputDecoration(
-                hintText: 'Search exercises in ${muscleGroup['name']}',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryGray),
+                hintText: 'Search exercises',
+                hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: AppColors.primaryGray),
+                        icon: const Icon(Icons.clear, color: Color(0xFF404040)),
                         onPressed: () {
                           setState(() {
                             _searchController.clear();
@@ -226,11 +220,8 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: AppColors.primaryVariant,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
+                fillColor: const Color(0xFFF5F5F5),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
@@ -238,14 +229,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
           // Exercise count
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              children: [
-                Text(
-                  '${filteredExercises.length} exercises',
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
-                ),
-              ],
+              children: [Text('${filteredExercises.length} exercises', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray))],
             ),
           ),
 
@@ -258,10 +244,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                       children: [
                         Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
                         const SizedBox(height: 16),
-                        Text(
-                          'No exercises found',
-                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray),
-                        ),
+                        Text('No exercises found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
                       ],
                     ),
                   )
@@ -286,35 +269,19 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         leading: Container(
           width: 50,
           height: 50,
-          decoration: BoxDecoration(
-            color: muscleGroup['color'].withOpacity(0.2),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            Icons.play_circle_outline,
-            color: muscleGroup['color'],
-            size: 28,
-          ),
+          decoration: BoxDecoration(color: muscleGroup['color'].withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+          child: Icon(Icons.play_circle_outline, color: muscleGroup['color'], size: 28),
         ),
         title: Text(
           exercise['name'],
-          style: AppTextStyles.titleSmall.copyWith(
-            color: AppColors.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8),
@@ -322,32 +289,16 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGray.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  exercise['equipment'],
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.onSurface,
-                    fontSize: 11,
-                  ),
-                ),
+                decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+                child: Text(exercise['equipment'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface, fontSize: 11)),
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: difficultyColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
-                ),
+                decoration: BoxDecoration(color: difficultyColor.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
                 child: Text(
                   exercise['difficulty'],
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: difficultyColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.labelSmall.copyWith(color: difficultyColor, fontSize: 11, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -355,13 +306,9 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
         ),
         trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
         onTap: () {
-          Get.toNamed(
-            AppRoutes.exerciseDetail,
-            arguments: exercise,
-          );
+          Get.toNamed(AppRoutes.exerciseDetail, arguments: exercise);
         },
       ),
     );
   }
 }
-

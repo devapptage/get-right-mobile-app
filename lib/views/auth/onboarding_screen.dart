@@ -14,8 +14,7 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>
-    with TickerProviderStateMixin {
+class _OnboardingScreenState extends State<OnboardingScreen> with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -33,34 +32,30 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       emoji: '💪',
-      title: 'Track Every\nRep',
+      title: 'Track Every Rep',
       subtitle: 'Your Fitness Journey',
-      description:
-          'Log workouts, track progress, and watch yourself grow stronger every single day.',
+      description: 'Log workouts, track progress, and watch yourself grow stronger every single day.',
       gradient: [Color(0xFF29603C), Color(0xFF1a3d26)],
     ),
     OnboardingPage(
       emoji: '📅',
-      title: 'Plan Your\nGoals',
+      title: 'Plan Your Goals',
       subtitle: 'Smart Planning',
-      description:
-          'Custom programs designed for your goals. Follow expert plans or create your own.',
+      description: 'Custom programs designed for your goals. Follow expert plans or create your own.',
       gradient: [Color(0xFF29603C), Color(0xFF1a3d26)],
     ),
     OnboardingPage(
       emoji: '🏃',
-      title: 'Run \u0026\nConquer',
+      title: 'Run & Conquer',
       subtitle: 'GPS Tracking',
-      description:
-          'Track outdoor runs with real-time pace, distance, and elevation data.',
+      description: 'Track outdoor runs with real-time pace, distance, and elevation data.',
       gradient: [Color(0xFF29603C), Color(0xFF1a3d26)],
     ),
     OnboardingPage(
       emoji: '🎯',
-      title: 'Get\nRight',
+      title: 'Get Right',
       subtitle: 'Start Today',
-      description:
-          'Join thousands achieving their fitness goals. Your transformation starts now.',
+      description: 'Join thousands achieving their fitness goals. Your transformation starts now.',
       gradient: [Color(0xFF29603C), Color(0xFF1a3d26)],
     ),
   ];
@@ -68,22 +63,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _scaleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
+    _fadeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _scaleController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.easeOutBack),
-    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(parent: _scaleController, curve: Curves.easeOutBack));
 
     _fadeController.forward();
     _scaleController.forward();
@@ -101,10 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOutCubic,
-      );
+      _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOutCubic);
     } else {
       _completeOnboarding();
     }
@@ -135,14 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           AnimatedContainer(
             duration: const Duration(milliseconds: 600),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  _bgGrey,
-                  Color.lerp(_bgGrey, _pages[_currentPage].gradient[0], 0.1)!,
-                ],
-              ),
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_bgGrey, Color.lerp(_bgGrey, _pages[_currentPage].gradient[0], 0.1)!]),
             ),
           ),
 
@@ -154,27 +128,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Get Right',
-                        style: TextStyle(
-                          color: _blackPrimary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
                       if (_currentPage < _pages.length - 1)
                         TextButton(
                           onPressed: _completeOnboarding,
                           child: Text(
                             'Skip',
-                            style: TextStyle(
-                              color: _blackPrimary.withOpacity(0.6),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: TextStyle(color: _blackPrimary.withOpacity(0.6), fontSize: 15, fontWeight: FontWeight.w600),
                           ),
                         ),
                     ],
@@ -221,48 +182,25 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     width: 180,
                     height: 180,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: page.gradient,
-                      ),
+                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: page.gradient),
                       borderRadius: BorderRadius.circular(60),
-                      boxShadow: [
-                        BoxShadow(
-                          color: page.gradient[0].withOpacity(0.4),
-                          blurRadius: 40,
-                          offset: const Offset(0, 20),
-                        ),
-                      ],
+                      boxShadow: [BoxShadow(color: page.gradient[0].withOpacity(0.4), blurRadius: 40, offset: const Offset(0, 20))],
                     ),
-                    child: Center(
-                      child: Text(page.emoji, style: TextStyle(fontSize: 80)),
-                    ),
+                    child: Center(child: Text(page.emoji, style: TextStyle(fontSize: 80))),
                   ),
                   const SizedBox(height: 64),
 
                   // Subtitle
                   Text(
                     page.subtitle,
-                    style: TextStyle(
-                      color: _greenAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                    ),
+                    style: TextStyle(color: _greenAccent, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 2),
                   ),
                   const SizedBox(height: 16),
 
                   // Title
                   Text(
                     page.title,
-                    style: TextStyle(
-                      color: _blackPrimary,
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      height: 1.0,
-                      letterSpacing: -1.5,
-                    ),
+                    style: TextStyle(color: _blackPrimary, fontSize: 40, fontWeight: FontWeight.w900, height: 1.0, letterSpacing: -1.5),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -272,12 +210,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       page.description,
-                      style: TextStyle(
-                        color: _blackPrimary.withOpacity(0.6),
-                        fontSize: 16,
-                        height: 1.6,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(color: _blackPrimary.withOpacity(0.6), fontSize: 16, height: 1.6, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -297,13 +230,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           // Page indicators
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              _pages.length,
-              (index) => _buildPageIndicator(index),
-            ),
-          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(_pages.length, (index) => _buildPageIndicator(index))),
           const SizedBox(height: 40),
 
           // CTA Button
@@ -315,35 +242,18 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: _pages[_currentPage].gradient),
                 borderRadius: BorderRadius.circular(32),
-                boxShadow: [
-                  BoxShadow(
-                    color: _pages[_currentPage].gradient[0].withOpacity(0.4),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: _pages[_currentPage].gradient[0].withOpacity(0.4), blurRadius: 24, offset: const Offset(0, 12))],
               ),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _currentPage == _pages.length - 1
-                          ? 'Get Started'
-                          : 'Continue',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
+                      _currentPage == _pages.length - 1 ? 'Get Started' : 'Continue',
+                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                     ),
                     const SizedBox(width: 12),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                    Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 24),
                   ],
                 ),
               ),
@@ -362,10 +272,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       margin: const EdgeInsets.symmetric(horizontal: 4),
       width: isActive ? 32 : 8,
       height: 8,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        color: isActive ? _greenAccent : _blackPrimary.withOpacity(0.2),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: isActive ? _greenAccent : _blackPrimary.withOpacity(0.2)),
     );
   }
 }
@@ -377,11 +284,5 @@ class OnboardingPage {
   final String description;
   final List<Color> gradient;
 
-  OnboardingPage({
-    required this.emoji,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.gradient,
-  });
+  OnboardingPage({required this.emoji, required this.title, required this.subtitle, required this.description, required this.gradient});
 }

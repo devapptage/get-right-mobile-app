@@ -137,50 +137,60 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-        title: Text('Community Feed', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: AppColors.onPrimary),
-            onPressed: () {
-              // TODO: Implement search
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: AppColors.onPrimary),
-            onPressed: () {
-              // TODO: Show notifications
-            },
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.accent,
-          labelColor: AppColors.accent,
-          unselectedLabelColor: AppColors.primaryGray,
-          labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: AppTextStyles.titleSmall,
-          tabs: const [
-            Tab(text: 'For You'),
-            Tab(text: 'Following'),
-            Tab(text: 'Explore'),
-          ],
-        ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)]),
       ),
-      body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage()]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreatePostOptions,
-        backgroundColor: AppColors.accent,
-        child: const Icon(Icons.add, color: AppColors.onAccent, size: 32),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.menu, color: Color(0xFF000000)),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+          title: Text(
+            'Community Feed',
+            style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Color(0xFF000000)),
+              onPressed: () {
+                // TODO: Implement search
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications_outlined, color: Color(0xFF000000)),
+              onPressed: () {
+                // TODO: Show notifications
+              },
+            ),
+          ],
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: AppColors.accent,
+            labelColor: AppColors.accent,
+            unselectedLabelColor: const Color(0xFF404040),
+            labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold),
+            unselectedLabelStyle: AppTextStyles.titleSmall,
+            tabs: const [
+              Tab(text: 'For You'),
+              Tab(text: 'Following'),
+              Tab(text: 'Explore'),
+            ],
+          ),
+        ),
+        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage()]),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showCreatePostOptions,
+          backgroundColor: AppColors.accent,
+          child: const Icon(Icons.add, color: Colors.white, size: 32),
+        ),
       ),
     );
   }
@@ -299,13 +309,32 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    width: 140,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
-                    ),
-                    child: Center(child: Icon(Icons.play_circle_filled, color: Colors.white.withOpacity(0.9), size: 50)),
+                  child: Stack(
+                    children: [
+                      Image.network(
+                        post['thumbnail'],
+                        width: 140,
+                        height: 150,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 140,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 140,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: Center(child: Icon(Icons.play_circle_filled, color: Colors.white.withOpacity(0.9), size: 50)),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(
@@ -336,8 +365,9 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.primaryGray.withOpacity(0.2), width: 1)),
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,13 +410,32 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             onTap: () => _showPostDetail(post),
             child: Stack(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 400,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
-                  ),
-                  child: Center(child: Icon(Icons.play_circle_filled, size: 80, color: Colors.white.withOpacity(0.9))),
+                Stack(
+                  children: [
+                    Image.network(
+                      post['thumbnail'],
+                      width: double.infinity,
+                      height: 400,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: double.infinity,
+                        height: 400,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 400,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.5)]),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Center(child: Icon(Icons.play_circle_filled, size: 80, color: Colors.white.withOpacity(0.9))),
+                    ),
+                  ],
                 ),
                 Positioned(
                   bottom: 16,
@@ -431,35 +480,41 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                _buildInteractionButton(
-                  icon: post['isLiked'] ? Icons.favorite : Icons.favorite_border,
-                  label: _formatCount(post['likes']),
-                  color: post['isLiked'] ? AppColors.error : AppColors.primaryGray,
-                  onTap: () {
-                    setState(() {
-                      post['isLiked'] = !post['isLiked'];
-                      post['likes'] += post['isLiked'] ? 1 : -1;
-                    });
-                  },
+                Expanded(
+                  child: Row(
+                    children: [
+                      _buildInteractionButton(
+                        icon: post['isLiked'] ? Icons.favorite : Icons.favorite_border,
+                        label: _formatCount(post['likes']),
+                        color: post['isLiked'] ? AppColors.error : AppColors.primaryGray,
+                        onTap: () {
+                          setState(() {
+                            post['isLiked'] = !post['isLiked'];
+                            post['likes'] += post['isLiked'] ? 1 : -1;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      _buildInteractionButton(icon: Icons.comment_outlined, label: _formatCount(post['comments']), color: AppColors.primaryGray, onTap: () => _showComments(post)),
+                      const SizedBox(width: 16),
+                      _buildInteractionButton(
+                        icon: post['isSaved'] ? Icons.bookmark : Icons.bookmark_border,
+                        label: _formatCount(post['saves']),
+                        color: post['isSaved'] ? AppColors.completed : AppColors.primaryGray,
+                        onTap: () {
+                          setState(() {
+                            post['isSaved'] = !post['isSaved'];
+                            post['saves'] += post['isSaved'] ? 1 : -1;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      _buildInteractionButton(icon: Icons.share_outlined, label: _formatCount(post['shares']), color: AppColors.primaryGray, onTap: () => _showShareOptions(post)),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 24),
-                _buildInteractionButton(icon: Icons.comment_outlined, label: _formatCount(post['comments']), color: AppColors.primaryGray, onTap: () => _showComments(post)),
-                const SizedBox(width: 24),
-                _buildInteractionButton(
-                  icon: post['isSaved'] ? Icons.bookmark : Icons.bookmark_border,
-                  label: _formatCount(post['saves']),
-                  color: post['isSaved'] ? AppColors.completed : AppColors.primaryGray,
-                  onTap: () {
-                    setState(() {
-                      post['isSaved'] = !post['isSaved'];
-                      post['saves'] += post['isSaved'] ? 1 : -1;
-                    });
-                  },
-                ),
-                const SizedBox(width: 24),
-                _buildInteractionButton(icon: Icons.share_outlined, label: _formatCount(post['shares']), color: AppColors.primaryGray, onTap: () => _showShareOptions(post)),
-                const Spacer(),
-                if (post['isTrainer'])
+                if (post['isTrainer']) ...[
+                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
                       // TODO: Navigate to trainer profile with hire option
@@ -467,11 +522,13 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.accent,
                       foregroundColor: AppColors.onAccent,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       minimumSize: Size.zero,
+                      textStyle: AppTextStyles.labelSmall.copyWith(fontSize: 12),
                     ),
                     child: const Text('Hire Me'),
                   ),
+                ],
               ],
             ),
           ),

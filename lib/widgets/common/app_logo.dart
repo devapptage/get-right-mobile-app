@@ -27,7 +27,7 @@ class AppLogo extends StatelessWidget {
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
           // Fallback to icon if image not found
-          return Icon(Icons.fitness_center, size: size * 0.10, color: backgroundColor == AppColors.primary ? AppColors.onPrimary : AppColors.onSecondary);
+          return Icon(Icons.fitness_center, size: size * 0.10, color: backgroundColor == AppColors.accent ? AppColors.onPrimary : AppColors.onSecondary);
         },
       ),
     );

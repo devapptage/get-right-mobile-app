@@ -81,14 +81,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
-                          gradient: LinearGradient(colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
+                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
                           border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
                           boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
                         ),
                         child: const AppLogo(size: 100, borderRadius: 16),
                       ),
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 25),
 
                     // Welcome text with modern typography
                     Text(
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
                     // Password field
                     PasswordTextField(controller: _passwordController),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
 
                     // Remember Me and Forgot Password row
                     Row(
@@ -124,29 +124,26 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         InkWell(
                           onTap: () => setState(() => _rememberMe = !_rememberMe),
                           borderRadius: BorderRadius.circular(8),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: _rememberMe ? AppColors.accent : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(color: _rememberMe ? AppColors.accent : AppColors.primaryGray.withOpacity(0.5), width: 2),
-                                  ),
-                                  child: _rememberMe ? const Icon(Icons.check_rounded, size: 14, color: AppColors.onAccent) : null,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: _rememberMe ? AppColors.accent : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: _rememberMe ? AppColors.accent : AppColors.primaryGray.withOpacity(0.5), width: 2),
                                 ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Remember Me',
-                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w500),
-                                ),
-                              ],
-                            ),
+                                child: _rememberMe ? const Icon(Icons.check_rounded, size: 14, color: AppColors.onAccent) : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Remember Me',
+                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                            ],
                           ),
                         ),
 
@@ -161,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 10),
 
                     // Login button
                     GetBuilder<AuthController>(
@@ -169,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         return CustomButton(text: 'Login', onPressed: _login, isLoading: controller.isLoading);
                       },
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
 
                     // Divider with "OR"
                     Row(
@@ -195,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
 
                     // Social login buttons
                     Row(
@@ -231,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                       ],
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 20),
 
                     // Sign up link
                     Center(

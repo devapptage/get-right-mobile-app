@@ -101,15 +101,15 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                     // Logo
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
 
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
+                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
                           border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
                           boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
                         ),
-                        child: const AppLogo(size: 60, borderRadius: 14),
+                        child: const AppLogo(size: 80, borderRadius: 14),
                       ),
                     ),
                     const SizedBox(height: 20),

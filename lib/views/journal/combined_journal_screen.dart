@@ -14,7 +14,8 @@ class CombinedJournalScreen extends StatefulWidget {
   State<CombinedJournalScreen> createState() => _CombinedJournalScreenState();
 }
 
-class _CombinedJournalScreenState extends State<CombinedJournalScreen> with SingleTickerProviderStateMixin {
+class _CombinedJournalScreenState extends State<CombinedJournalScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -34,64 +35,99 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: AppColors.accent),
-          onPressed: () {
-            Get.find<HomeNavigationController>().openDrawer();
-          },
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)],
         ),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: () => _tabController.animateTo(0),
-              child: Column(
-                children: [
-                  Text(
-                    'Workout Journal',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: _tabController.index == 0 ? AppColors.accent : AppColors.black,
-                      fontWeight: _tabController.index == 0 ? FontWeight.bold : FontWeight.normal,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.menu_rounded, color: Colors.black, size: 28),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(),
+          ),
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => _tabController.animateTo(0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Workout Journal',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: _tabController.index == 0
+                            ? AppColors.accent
+                            : const Color(0xFF000000),
+                        fontWeight: _tabController.index == 0
+                            ? FontWeight.w900
+                            : FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  if (_tabController.index == 0) Container(height: 2, width: 120, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
-                ],
+                    if (_tabController.index == 0)
+                      Container(
+                        height: 3,
+                        width: 120,
+                        margin: const EdgeInsets.only(top: 2),
+                        color: AppColors.accent,
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 24),
-            GestureDetector(
-              onTap: () => _tabController.animateTo(1),
-              child: Column(
-                children: [
-                  Text(
-                    'Runner Log',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: _tabController.index == 1 ? AppColors.accent : AppColors.black,
-                      fontWeight: _tabController.index == 1 ? FontWeight.bold : FontWeight.normal,
+              const SizedBox(width: 24),
+              GestureDetector(
+                onTap: () => _tabController.animateTo(1),
+                child: Column(
+                  children: [
+                    Text(
+                      'Runner Log',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: _tabController.index == 1
+                            ? AppColors.accent
+                            : const Color(0xFF000000),
+                        fontWeight: _tabController.index == 1
+                            ? FontWeight.w900
+                            : FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  if (_tabController.index == 1) Container(height: 2, width: 90, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
-                ],
+                    if (_tabController.index == 1)
+                      Container(
+                        height: 3,
+                        width: 90,
+                        margin: const EdgeInsets.only(top: 2),
+                        color: AppColors.accent,
+                      ),
+                  ],
+                ),
               ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.calendar_month, color: Color(0xFF000000)),
+              onPressed: () {
+                Get.toNamed('/planner');
+              },
             ),
           ],
+          centerTitle: true,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month, color: AppColors.accent),
-            onPressed: () {
-              Get.toNamed('/planner');
-            },
-          ),
-        ],
-        centerTitle: true,
+        body: TabBarView(
+          controller: _tabController,
+          children: const [
+            WorkoutJournalScreen(isEmbedded: true),
+            RunTrackerScreen(),
+          ],
+        ),
       ),
-      body: TabBarView(controller: _tabController, children: const [WorkoutJournalScreen(isEmbedded: true), RunTrackerScreen()]),
     );
   }
 }

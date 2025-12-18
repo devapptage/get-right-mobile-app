@@ -729,7 +729,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             color: AppColors.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          padding: EdgeInsets.only(top: 24, left: 24, right: 24, bottom: MediaQuery.of(context).viewInsets.bottom + 24),
+          padding: EdgeInsets.only(top: 50, left: 24, right: 24, bottom: MediaQuery.of(context).viewInsets.bottom + 24),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -762,6 +762,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 _buildFilterSectionHeader('Category', Icons.category_outlined),
                 SizedBox(height: 12),
                 Container(
+                  width: double.infinity,
+
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.primaryVariant,
@@ -780,7 +782,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: isSelected ? AppColors.accent : AppColors.surface,
                             borderRadius: BorderRadius.circular(8),
@@ -804,6 +806,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 _buildFilterSectionHeader('Fitness Goal', Icons.flag_outlined),
                 const SizedBox(height: 12),
                 Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.primaryVariant,
@@ -822,7 +825,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: isSelected ? AppColors.accent : AppColors.surface,
                             borderRadius: BorderRadius.circular(8),
@@ -866,7 +869,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Certified Trainers Only', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                            Text('Show only verified professionals', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                            Text('Show only verified professionals', style: AppTextStyles.labelSmall.copyWith(color: const Color.fromARGB(255, 47, 48, 49))),
                           ],
                         ),
                       ),
@@ -918,6 +921,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
                             backgroundColor: AppColors.accent,
                             foregroundColor: AppColors.onAccent,
                             elevation: 0,
@@ -1500,109 +1504,123 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   Widget build(BuildContext context) {
     final filteredPrograms = _filteredPrograms;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-        title: Text('Market Place', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: AppColors.onPrimary),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)]),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.menu, color: Color(0xFF000000)),
             onPressed: () {
-              // TODO: Implement search
+              Scaffold.of(context).openDrawer();
             },
           ),
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.filter_list, color: AppColors.onPrimary),
-                onPressed: _showFilterModal,
-              ),
-              if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                  ),
+          title: Text(
+            'Market Place',
+            style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Color(0xFF000000)),
+              onPressed: () {
+                // TODO: Implement search
+              },
+            ),
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.filter_list, color: Color(0xFF000000)),
+                  onPressed: _showFilterModal,
                 ),
+                if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Bundle Programs Section
+              Text(
+                'Bundle Programs',
+                style: AppTextStyles.titleMedium.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 320.h,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  itemCount: 4, // Show 3 bundles + See More card
+                  itemBuilder: (context, index) {
+                    if (index < 3) {
+                      return _buildBundleCard(_bundles[index]);
+                    } else {
+                      return _buildSeeMoreCard();
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Active filters indicator
+              if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly) ...[
+                Row(
+                  children: [
+                    Text('Active Filters: ', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                    if (_selectedCategory != 'All')
+                      Chip(label: Text(_selectedCategory), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _selectedCategory = 'All')),
+                    if (_selectedGoal != 'All')
+                      Chip(label: Text(_selectedGoal), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _selectedGoal = 'All')),
+                    if (_showCertifiedOnly)
+                      Chip(label: const Text('Certified'), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _showCertifiedOnly = false)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              // Programs by Category
+              filteredPrograms.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(40),
+                        child: Column(
+                          children: [
+                            Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
+                            const SizedBox(height: 16),
+                            Text('No programs found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => setState(() {
+                                _selectedCategory = 'All';
+                                _selectedGoal = 'All';
+                                _showCertifiedOnly = false;
+                              }),
+                              child: const Text('Clear Filters'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : _buildProgramsByCategory(filteredPrograms),
             ],
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Bundle Programs Section
-            Text('Bundle Programs', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 280.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                itemCount: 4, // Show 3 bundles + See More card
-                itemBuilder: (context, index) {
-                  if (index < 3) {
-                    return _buildBundleCard(_bundles[index]);
-                  } else {
-                    return _buildSeeMoreCard();
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Active filters indicator
-            if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly) ...[
-              Row(
-                children: [
-                  Text('Active Filters: ', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
-                  if (_selectedCategory != 'All')
-                    Chip(label: Text(_selectedCategory), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _selectedCategory = 'All')),
-                  if (_selectedGoal != 'All')
-                    Chip(label: Text(_selectedGoal), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _selectedGoal = 'All')),
-                  if (_showCertifiedOnly)
-                    Chip(label: const Text('Certified'), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _showCertifiedOnly = false)),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Programs by Category
-            filteredPrograms.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(40),
-                      child: Column(
-                        children: [
-                          Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
-                          const SizedBox(height: 16),
-                          Text('No programs found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
-                          const SizedBox(height: 8),
-                          TextButton(
-                            onPressed: () => setState(() {
-                              _selectedCategory = 'All';
-                              _selectedGoal = 'All';
-                              _showCertifiedOnly = false;
-                            }),
-                            child: const Text('Clear Filters'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : _buildProgramsByCategory(filteredPrograms),
-          ],
         ),
       ),
     );
@@ -1671,7 +1689,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           // Content section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1712,7 +1730,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
                   // Price
                   Row(
@@ -1864,7 +1882,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 275.h,
+              height: 310.h,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -1883,7 +1901,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
   Widget _buildProgramCard(Map<String, dynamic> program) {
     return Container(
-      height: 285,
+      height: 320,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
       child: Column(
@@ -1929,7 +1947,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           // Content section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1977,7 +1995,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     ],
                   ),
 
-                  const Spacer(),
+                  const SizedBox(height: 6),
 
                   // Price and Duration
                   Row(
@@ -1997,7 +2015,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const Spacer(),
 
                   // Add to Calendar Button
                   SizedBox(

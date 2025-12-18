@@ -12,89 +12,26 @@ class LibraryScreen extends StatefulWidget {
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen> {
+class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
+  bool _isSearchBarVisible = true;
+  double _lastScrollOffset = 0.0;
 
   // Mock muscle groups data
   final List<Map<String, dynamic>> _muscleGroups = [
-    {
-      'id': 'chest',
-      'name': 'Chest',
-      'exerciseCount': 25,
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFFE53935),
-    },
-    {
-      'id': 'back',
-      'name': 'Back',
-      'exerciseCount': 25,
-      'icon': Icons.accessibility_new,
-      'color': const Color(0xFFD32F2F),
-    },
-    {
-      'id': 'shoulders',
-      'name': 'Shoulders',
-      'exerciseCount': 25,
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFFE53935),
-    },
-    {
-      'id': 'quads',
-      'name': 'Quads',
-      'exerciseCount': 24,
-      'icon': Icons.directions_walk,
-      'color': const Color(0xFFD32F2F),
-    },
-    {
-      'id': 'hamstrings',
-      'name': 'Hamstrings',
-      'exerciseCount': 20,
-      'icon': Icons.directions_run,
-      'color': const Color(0xFFE53935),
-    },
-    {
-      'id': 'triceps',
-      'name': 'Triceps',
-      'exerciseCount': 25,
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFFD32F2F),
-    },
-    {
-      'id': 'biceps',
-      'name': 'Biceps',
-      'exerciseCount': 24,
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFFE53935),
-    },
-    {
-      'id': 'core',
-      'name': 'Core',
-      'exerciseCount': 30,
-      'icon': Icons.self_improvement,
-      'color': const Color(0xFFD32F2F),
-    },
-    {
-      'id': 'glutes',
-      'name': 'Glutes',
-      'exerciseCount': 18,
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFFE53935),
-    },
-    {
-      'id': 'calves',
-      'name': 'Calves',
-      'exerciseCount': 12,
-      'icon': Icons.directions_walk,
-      'color': const Color(0xFFD32F2F),
-    },
-    {
-      'id': 'forearms',
-      'name': 'Forearms',
-      'exerciseCount': 15,
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFFE53935),
-    },
+    {'id': 'chest', 'name': 'Chest', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
+    {'id': 'back', 'name': 'Back', 'exerciseCount': 25, 'icon': Icons.accessibility_new, 'color': const Color(0xFFD32F2F)},
+    {'id': 'shoulders', 'name': 'Shoulders', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
+    {'id': 'quads', 'name': 'Quads', 'exerciseCount': 24, 'icon': Icons.directions_walk, 'color': const Color(0xFFD32F2F)},
+    {'id': 'hamstrings', 'name': 'Hamstrings', 'exerciseCount': 20, 'icon': Icons.directions_run, 'color': const Color(0xFFE53935)},
+    {'id': 'triceps', 'name': 'Triceps', 'exerciseCount': 25, 'icon': Icons.fitness_center, 'color': const Color(0xFFD32F2F)},
+    {'id': 'biceps', 'name': 'Biceps', 'exerciseCount': 24, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
+    {'id': 'core', 'name': 'Core', 'exerciseCount': 30, 'icon': Icons.self_improvement, 'color': const Color(0xFFD32F2F)},
+    {'id': 'glutes', 'name': 'Glutes', 'exerciseCount': 18, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
+    {'id': 'calves', 'name': 'Calves', 'exerciseCount': 12, 'icon': Icons.directions_walk, 'color': const Color(0xFFD32F2F)},
+    {'id': 'forearms', 'name': 'Forearms', 'exerciseCount': 15, 'icon': Icons.fitness_center, 'color': const Color(0xFFE53935)},
   ];
 
   List<Map<String, dynamic>> get _filteredMuscleGroups {
@@ -107,162 +44,173 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final currentScrollOffset = _scrollController.offset;
+    final scrollDelta = currentScrollOffset - _lastScrollOffset;
+
+    // Only toggle if scrolled more than 10 pixels to avoid jitter
+    if (scrollDelta.abs() > 10) {
+      if (scrollDelta > 0 && _isSearchBarVisible && currentScrollOffset > 50) {
+        // Scrolling down - hide search bar
+        setState(() {
+          _isSearchBarVisible = false;
+        });
+      } else if (scrollDelta < 0 && !_isSearchBarVisible) {
+        // Scrolling up - show search bar
+        setState(() {
+          _isSearchBarVisible = true;
+        });
+      }
+      _lastScrollOffset = currentScrollOffset;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredGroups = _filteredMuscleGroups;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: AppColors.onPrimary),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-        title: Text('Library', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border, color: AppColors.onPrimary),
-            onPressed: () {
-              // TODO: Show favorite exercises
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: AppColors.onPrimary),
-            onPressed: () {
-              // TODO: Show options menu
-            },
-          ),
-        ],
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)]),
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: AppColors.surface,
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
-              decoration: InputDecoration(
-                hintText: 'Search exercises',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryGray),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: AppColors.primaryGray),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppColors.primaryVariant,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.menu, color: Color(0xFF000000)),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+          title: Text(
+            'Library',
+            style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+          ),
+          centerTitle: true,
+          // actions: [
+          //   IconButton(
+          //     icon: const Icon(Icons.more_vert, color: Color(0xFF000000)),
+          //     onPressed: () {
+          //       // TODO: Show options menu
+          //     },
+          //   ),
+          // ],
+        ),
+        body: Column(
+          children: [
+            // Search Bar with animation
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              height: _isSearchBarVisible ? 80 : 0,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: _isSearchBarVisible ? 1.0 : 0.0,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.transparent,
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
+                    decoration: InputDecoration(
+                      hintText: 'Search exercises',
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
+                      prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, color: Color(0xFF404040)),
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
-          ),
 
-          // Muscle Groups List
-          Expanded(
-            child: filteredGroups.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No muscle groups found',
-                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray),
-                        ),
-                      ],
+            // Muscle Groups List
+            Expanded(
+              child: filteredGroups.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
+                          const SizedBox(height: 16),
+                          Text('No muscle groups found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      itemCount: filteredGroups.length,
+                      itemBuilder: (context, index) {
+                        return _buildMuscleGroupCard(filteredGroups[index]);
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: filteredGroups.length,
-                    itemBuilder: (context, index) {
-                      return _buildMuscleGroupCard(filteredGroups[index]);
-                    },
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildMuscleGroupCard(Map<String, dynamic> muscleGroup) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 6))],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         leading: Container(
           width: 56,
           height: 56,
-          decoration: BoxDecoration(
-            color: muscleGroup['color'].withOpacity(0.2),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: muscleGroup['color'],
-              width: 2,
-            ),
-          ),
-          child: Icon(
-            muscleGroup['icon'],
-            color: muscleGroup['color'],
-            size: 28,
-          ),
+          decoration: BoxDecoration(color: muscleGroup['color'].withOpacity(0.15), shape: BoxShape.circle),
+          child: Icon(muscleGroup['icon'], color: muscleGroup['color'], size: 28),
         ),
         title: Text(
           muscleGroup['name'],
-          style: AppTextStyles.titleMedium.copyWith(
-            color: AppColors.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.titleMedium.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
         ),
-        subtitle: Text(
-          '${muscleGroup['exerciseCount']} exercises',
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
-        ),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
+        subtitle: Text('${muscleGroup['exerciseCount']} exercises', style: AppTextStyles.bodySmall.copyWith(color: const Color(0xFF404040))),
+        trailing: const Icon(Icons.chevron_right, color: Color(0xFF404040)),
         onTap: () {
-          Get.toNamed(
-            AppRoutes.exerciseList,
-            arguments: muscleGroup,
-          );
+          Get.toNamed(AppRoutes.exerciseList, arguments: muscleGroup);
         },
       ),
     );
   }
 }
-
