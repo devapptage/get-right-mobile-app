@@ -14,8 +14,11 @@ class ExerciseListScreen extends StatefulWidget {
 
 class _ExerciseListScreenState extends State<ExerciseListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
   late Map<String, dynamic> muscleGroup;
+  bool _isSearchBarVisible = true;
+  double _lastScrollOffset = 0;
 
   // Mock exercises data based on muscle group
   List<Map<String, dynamic>> _exercises = [];
@@ -25,6 +28,31 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     super.initState();
     muscleGroup = Get.arguments as Map<String, dynamic>;
     _loadExercises();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final currentScrollOffset = _scrollController.offset;
+
+    // Only hide/show if scrolled enough (threshold to avoid jittery behavior)
+    if ((currentScrollOffset - _lastScrollOffset).abs() > 10) {
+      if (currentScrollOffset > _lastScrollOffset && currentScrollOffset > 50) {
+        // Scrolling down
+        if (_isSearchBarVisible) {
+          setState(() {
+            _isSearchBarVisible = false;
+          });
+        }
+      } else if (currentScrollOffset < _lastScrollOffset) {
+        // Scrolling up
+        if (!_isSearchBarVisible) {
+          setState(() {
+            _isSearchBarVisible = true;
+          });
+        }
+      }
+      _lastScrollOffset = currentScrollOffset;
+    }
   }
 
   void _loadExercises() {
@@ -166,6 +194,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -176,7 +205,11 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onPrimary),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(muscleGroup['name'], style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
@@ -192,46 +225,54 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
       ),
       body: Column(
         children: [
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.transparent,
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
-              decoration: InputDecoration(
-                hintText: 'Search exercises',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: Color(0xFF404040)),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          // Search Bar with animation
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            height: _isSearchBarVisible ? 80 : 0,
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.transparent,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
+                  decoration: InputDecoration(
+                    hintText: 'Search exercises',
+                    hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Color(0xFF404040)),
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: const Color(0xFFF5F5F5),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
               ),
             ),
           ),
 
           // Exercise count
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
             child: Row(
-              children: [Text('${filteredExercises.length} exercises', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray))],
+              children: [Text('${filteredExercises.length} exercises', style: AppTextStyles.bodyMedium.copyWith(color: const Color.fromARGB(255, 59, 61, 65)))],
             ),
           ),
 
@@ -249,6 +290,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
                     ),
                   )
                 : ListView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.only(bottom: 16),
                     itemCount: filteredExercises.length,
                     itemBuilder: (context, index) {

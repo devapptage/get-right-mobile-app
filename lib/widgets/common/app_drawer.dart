@@ -163,15 +163,15 @@ class AppDrawer extends StatelessWidget {
                     Get.to(() => const ChatListScreen());
                   },
                 ),
-                _buildDrawerItem(
-                  icon: Icons.people_outline,
-                  activeIcon: Icons.people,
-                  title: 'Trainers',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.marketplace);
-                  },
-                ),
+                // _buildDrawerItem(
+                //   icon: Icons.people_outline,
+                //   activeIcon: Icons.people,
+                //   title: 'Trainers',
+                //   onTap: () {
+                //     Get.back();
+                //     Get.toNamed(AppRoutes.marketplace);
+                //   },
+                // ),
                 _buildDrawerItem(
                   icon: Icons.history_outlined,
                   activeIcon: Icons.history,

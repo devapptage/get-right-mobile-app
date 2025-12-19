@@ -38,7 +38,11 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -48,7 +52,6 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(25)),
             child: TabBar(
               controller: _tabController,

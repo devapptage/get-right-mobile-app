@@ -240,11 +240,11 @@ class _ProgramHistoryScreenState extends State<ProgramHistoryScreen> with Single
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.accent.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+              border: Border.all(color: AppColors.accent.withOpacity(0.1), width: 1),
             ),
-            child: const Icon(Icons.arrow_back_rounded, size: 20),
+            child: const Icon(Icons.arrow_back_ios_new, size: 20),
           ),
           onPressed: () {
             if (Navigator.of(context).canPop()) {

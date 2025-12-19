@@ -171,7 +171,7 @@ class TransactionHistoryScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '\$${transaction.amount.toStringAsFixed(2)}',
-                    style: AppTextStyles.titleLarge.copyWith(color: isRefund ? AppColors.completed : AppColors.accent, fontWeight: FontWeight.bold),
+                    style: AppTextStyles.titleLarge.copyWith(color: isRefund ? AppColors.accent : AppColors.accent, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

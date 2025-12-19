@@ -1300,7 +1300,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
 
               // Action Buttons
               Column(
@@ -1561,12 +1561,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 'Bundle Programs',
                 style: AppTextStyles.titleMedium.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               SizedBox(
                 height: 320.h,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 4.w),
                   itemCount: 4, // Show 3 bundles + See More card
                   itemBuilder: (context, index) {
                     if (index < 3) {
@@ -1577,7 +1577,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
 
               // Active filters indicator
               if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly) ...[
@@ -1592,20 +1592,20 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       Chip(label: const Text('Certified'), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _showCertifiedOnly = false)),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
               ],
 
               // Programs by Category
               filteredPrograms.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(40),
+                        padding: EdgeInsets.all(40.w),
                         child: Column(
                           children: [
                             Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             Text('No programs found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8.h),
                             TextButton(
                               onPressed: () => setState(() {
                                 _selectedCategory = 'All';
@@ -1661,7 +1661,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       width: double.infinity,
-                      height: 100,
+                      height: 100.h,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                       ),
@@ -1674,11 +1674,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   top: 8,
                   right: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: const Color(0xFFF3D060), borderRadius: BorderRadius.circular(4)),
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(color: const Color(0xFFF3D060), borderRadius: BorderRadius.circular(4.r)),
                     child: Text(
                       'Bestseller',
-                      style: AppTextStyles.labelSmall.copyWith(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
+                      style: AppTextStyles.labelSmall.copyWith(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10.sp),
                     ),
                   ),
                 ),
@@ -1689,7 +1689,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           // Content section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(10.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1710,7 +1710,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   // Instructor
                   Text(
                     primaryTrainer,
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12.sp),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1721,56 +1721,62 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     children: [
                       Text(
                         avgRating.toStringAsFixed(1),
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13.sp),
                       ),
                       const SizedBox(width: 4),
                       ...List.generate(5, (index) => Icon(index < avgRating.floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14)),
                       const SizedBox(width: 4),
-                      Text('(${_formatNumber(totalRatings)})', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                      Text(
+                        '(${_formatNumber(totalRatings)})',
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11.sp),
+                      ),
                     ],
                   ),
 
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6.h),
 
                   // Price
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${programs.length} programs', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13)),
+                      Text(
+                        '${programs.length} programs',
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13.sp),
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             '\$${totalValue.toStringAsFixed(2)}',
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough, fontSize: 13),
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough, fontSize: 13.sp),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8.w),
 
                           Text(
                             '\$${bundlePrice.toStringAsFixed(2)}',
-                            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16.sp),
                           ),
                         ],
                       ),
                     ],
                   ),
 
-                  const Spacer(),
+                  Spacer(),
 
                   // Add to Calendar Button
                   SizedBox(
                     width: double.infinity,
-                    height: 36,
+                    height: 36.h,
                     child: ElevatedButton.icon(
                       onPressed: () => _showAddToCalendarModal(bundle, isBundle: true),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
                         foregroundColor: AppColors.onAccent,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                      icon: const Icon(Icons.calendar_today, size: 16),
+                      icon: Icon(Icons.calendar_today, size: 16.sp),
                       label: Text(
                         'Add to Calendar',
                         style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
@@ -1799,16 +1805,16 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
               child: const Icon(Icons.grid_view_rounded, size: 30, color: AppColors.accent),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               'See More',
               style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text('${_bundles.length - 3}+ more bundles', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
           ],
         ),
@@ -1871,28 +1877,28 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
                   child: Text(
                     '${categoryPrograms.length}',
-                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 12.sp),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             SizedBox(
-              height: 310.h,
+              height: 300.h,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: EdgeInsets.symmetric(horizontal: 4.w),
                 itemCount: categoryPrograms.length,
                 itemBuilder: (context, index) {
                   return SizedBox(width: MediaQuery.of(context).size.width * 0.5, child: _buildProgramCard(categoryPrograms[index]));
                 },
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
           ],
         );
       }).toList(),
@@ -1901,8 +1907,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
   Widget _buildProgramCard(Map<String, dynamic> program) {
     return Container(
-      height: 320,
-      margin: const EdgeInsets.only(right: 12),
+      margin: EdgeInsets.only(right: 12.w),
       decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(8)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1913,11 +1918,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             child: Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(8.r)),
                   child: Image.network(
                     program['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
                     width: double.infinity,
-                    height: 130,
+                    height: 130.h,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       width: double.infinity,
@@ -1935,7 +1940,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: EdgeInsets.all(4.w),
                       decoration: BoxDecoration(color: AppColors.completed, shape: BoxShape.circle),
                       child: const Icon(Icons.verified, color: Colors.white, size: 14),
                     ),
@@ -1947,7 +1952,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           // Content section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(10.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1961,41 +1966,41 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
 
                   // Instructor
                   Text(
                     program['trainer'],
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12),
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12.sp),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6.h),
 
                   // Rating
                   Row(
                     children: [
                       Text(
                         program['rating'].toStringAsFixed(1),
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 13.sp),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4.w),
                       ...List.generate(
                         5,
                         (index) => Icon(index < (program['rating'] as double).floor() ? Icons.star : Icons.star_border, color: const Color(0xFFE59819), size: 14),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4.w),
                       Expanded(
                         child: Text(
                           '(${_formatNumber(program['students'] as int)})',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11),
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11.sp),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6.h),
 
                   // Price and Duration
                   Row(
@@ -2003,14 +2008,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.schedule, size: 12, color: AppColors.primaryGray),
-                          const SizedBox(width: 4),
-                          Text(program['duration'], style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
+                          Icon(Icons.schedule, size: 12.sp, color: AppColors.primaryGray),
+                          SizedBox(width: 4.w),
+                          Text(
+                            program['duration'],
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11.sp),
+                          ),
                         ],
                       ),
                       Text(
                         '\$${program['price'].toStringAsFixed(2)}',
-                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 16.sp),
                       ),
                     ],
                   ),
@@ -2020,17 +2028,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   // Add to Calendar Button
                   SizedBox(
                     width: double.infinity,
-                    height: 36,
+                    height: 36.h,
                     child: ElevatedButton.icon(
                       onPressed: () => _showAddToCalendarModal(program, isBundle: false),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
                         foregroundColor: AppColors.onAccent,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                      icon: const Icon(Icons.calendar_today, size: 16),
+                      icon: Icon(Icons.calendar_today, size: 16.sp),
                       label: Text(
                         'Add to Calendar',
                         style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
@@ -2049,17 +2057,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   Widget _buildInfoChip(IconData icon, String label) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
         decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: AppColors.accent),
-            const SizedBox(width: 6),
+            Icon(icon, size: 16.sp, color: AppColors.accent),
+            SizedBox(width: 6.w),
             Flexible(
               child: Text(
                 label,
-                style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface),
+                style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface, fontSize: 12.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -2071,13 +2079,16 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
   Widget _buildDetailItem(IconData icon, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.accent, size: 20),
-          const SizedBox(width: 12),
+          Icon(icon, color: AppColors.accent, size: 20.sp),
+          SizedBox(width: 12.w),
           Expanded(
-            child: Text(text, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+            child: Text(
+              text,
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontSize: 12.sp),
+            ),
           ),
         ],
       ),

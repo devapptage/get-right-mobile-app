@@ -33,6 +33,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
+          onPressed: () => Get.back(),
+        ),
         title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         actions: [
@@ -41,17 +49,34 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             onPressed: () => Get.toNamed(AppRoutes.settings),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.accent,
-          labelColor: AppColors.accent,
-          unselectedLabelColor: AppColors.primaryGray,
-          labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: AppTextStyles.titleSmall,
-          tabs: const [
-            Tab(text: 'Public'),
-            Tab(text: 'Personal'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(68),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: AppColors.onAccent,
+                unselectedLabelColor: AppColors.onSurface.withOpacity(0.6),
+                labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
+                unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w500),
+                tabs: const [
+                  Tab(text: 'Public'),
+                  Tab(text: 'Personal'),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
       body: TabBarView(controller: _tabController, children: [_buildPublicProfile(), _buildPersonalProfile()]),
@@ -73,12 +98,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.completed, width: 3),
+                    border: Border.all(color: AppColors.accent, width: 3),
                   ),
                   child: CircleAvatar(
                     radius: 45,
                     backgroundColor: AppColors.surface,
-                    child: Icon(Icons.person, size: 50, color: AppColors.completed),
+                    child: Icon(Icons.person, size: 50, color: AppColors.accent),
                   ),
                 ),
                 const SizedBox(width: 30),
@@ -166,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                     ),
                     Container(
-                      decoration: BoxDecoration(color: AppColors.completed, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
                       child: IconButton(
                         icon: const Icon(Icons.add, color: Colors.white, size: 20),
                         onPressed: () {
@@ -365,13 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   color: AppColors.upcoming,
                   onTap: () => Get.toNamed(AppRoutes.myPrograms),
                 ),
-                _buildMenuCard(
-                  icon: Icons.chat_outlined,
-                  title: 'Messages',
-                  subtitle: 'Chat with trainers',
-                  color: AppColors.completed,
-                  onTap: () => Get.toNamed(AppRoutes.chatList),
-                ),
+                _buildMenuCard(icon: Icons.chat_outlined, title: 'Messages', subtitle: 'Chat with trainers', color: AppColors.accent, onTap: () => Get.toNamed(AppRoutes.chatList)),
                 const SizedBox(height: 24),
                 Text('Settings', style: AppTextStyles.titleSmall.copyWith(color: AppColors.primaryGray)),
                 const SizedBox(height: 12),
@@ -431,7 +450,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           const SizedBox(height: 8),
           Text(
             value,
-            style: AppTextStyles.headlineSmall.copyWith(color: AppColors.completed, fontWeight: FontWeight.bold),
+            style: AppTextStyles.headlineSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(date, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),

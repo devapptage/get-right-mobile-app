@@ -24,7 +24,10 @@ class _AddNotesScreenState extends State<AddNotesScreen> {
   }
 
   @override
-  void dispose() { _notesController.dispose(); super.dispose(); }
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
 
   void _onSave() => Get.back(result: {'notes': _notesController.text});
 
@@ -32,13 +35,54 @@ class _AddNotesScreenState extends State<AddNotesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: AppColors.primary, elevation: 0, leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent, size: 20), onPressed: () => Get.back()), title: Text('Notes', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)), centerTitle: true, actions: [TextButton(onPressed: _onSave, child: Text('Save', style: AppTextStyles.labelMedium.copyWith(color: Colors.blue)))]),
-      body: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Exercise: $_exerciseName', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground)),
-        const SizedBox(height: 16),
-        Expanded(child: Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)), child: TextField(controller: _notesController, maxLines: null, expands: true, textAlignVertical: TextAlignVertical.top, decoration: InputDecoration(hintText: 'Add your notes here...', hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark), border: InputBorder.none), style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)))),
-      ])),
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
+          onPressed: () => Get.back(),
+        ),
+        title: Text('Notes', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: _onSave,
+            child: Text('Save', style: AppTextStyles.labelMedium.copyWith(color: Colors.blue)),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Exercise: $_exerciseName', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground)),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+                child: TextField(
+                  controller: _notesController,
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  decoration: InputDecoration(
+                    hintText: 'Add your notes here...',
+                    hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark),
+                    border: InputBorder.none,
+                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
-

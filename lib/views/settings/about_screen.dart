@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/widgets/common/app_logo.dart';
 
 /// About Screen - App information for Alpha
 class AboutScreen extends StatelessWidget {
@@ -13,7 +14,11 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('About', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onPrimary),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
           onPressed: () => Get.back(),
         ),
       ),
@@ -22,15 +27,19 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 32),
+            const SizedBox(height: 15),
 
             // App Logo
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(24)),
-              child: Center(
-                child: Text('GR', style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onAccent, fontSize: 48)),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
+                  border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
+                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
+                ),
+                child: const AppLogo(size: 100, borderRadius: 16),
               ),
             ),
 

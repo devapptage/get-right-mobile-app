@@ -84,7 +84,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onPrimary),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(exercise['name'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary)),
@@ -265,11 +269,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   const SizedBox(height: 24),
 
                   // Form Cues
-                  _buildSection(
-                    'Key Form Cues',
-                    Icons.checklist,
-                    child: Column(children: (details['cues'] as List).cast<String>().map((cue) => _buildCueItem(cue)).toList()),
-                  ),
+                  _buildSection('Key Form Cues', Icons.checklist, child: Column(children: (details['cues'] as List).cast<String>().map((cue) => _buildCueItem(cue)).toList())),
 
                   const SizedBox(height: 24),
 
