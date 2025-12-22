@@ -23,13 +23,12 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
   bool _isPaused = false;
   bool _isLocked = false;
   Timer? _timer;
-  
+
   // Tracking data
   int _seconds = 0;
   double _distanceMeters = 0;
   double _currentPace = 0;
   double _averagePace = 0;
-  int _heartRate = 0;
   int _calories = 0;
   List<LatLng> _routePoints = [];
   LatLng? _currentLocation;
@@ -65,7 +64,6 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
           _distanceMeters += 2.5; // ~150m/min = 9km/h
           _currentPace = _distanceMeters > 0 ? (_seconds / 60) / (_distanceMeters / 1000) : 0;
           _averagePace = _distanceMeters > 0 ? (_seconds / 60) / (_distanceMeters / 1000) : 0;
-          _heartRate = 140 + (DateTime.now().second % 20);
           _calories = (_seconds / 60 * 8).round(); // ~8 cal/min for running
         });
       }
@@ -82,7 +80,7 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
 
   void _endActivity() {
     _timer?.cancel();
-    
+
     // Create run activity model
     final activity = RunActivityModel(
       id: 'run_${DateTime.now().millisecondsSinceEpoch}',
@@ -93,8 +91,6 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
       distanceMeters: _distanceMeters,
       averagePace: _averagePace,
       maxPace: _currentPace,
-      averageHeartRate: _heartRate.toDouble(),
-      maxHeartRate: (_heartRate + 10).toDouble(),
       caloriesBurned: _calories,
       routePoints: _routePoints,
       startedAt: DateTime.now().subtract(Duration(seconds: _seconds)),
@@ -165,15 +161,7 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       mapToolbarEnabled: false,
-      polylines: {
-        if (_routePoints.isNotEmpty)
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: _routePoints,
-            color: AppColors.accent,
-            width: 4,
-          ),
-      },
+      polylines: {if (_routePoints.isNotEmpty) Polyline(polylineId: const PolylineId('route'), points: _routePoints, color: AppColors.accent, width: 4)},
     );
   }
 
@@ -189,13 +177,7 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
           decoration: BoxDecoration(
             color: AppColors.surface.withOpacity(0.95),
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.secondary.withOpacity(0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: AppColors.secondary.withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 4))],
           ),
           child: Column(
             children: [
@@ -205,20 +187,14 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
                     child: Row(
                       children: [
                         Icon(_getActivityIcon(), color: AppColors.accent, size: 16),
                         const SizedBox(width: 6),
                         Text(
                           _activityType,
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -236,19 +212,11 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildMetricItem(
-                      label: 'Time',
-                      value: _formatTime(_seconds),
-                      icon: Icons.timer_outlined,
-                    ),
+                    child: _buildMetricItem(label: 'Time', value: _formatTime(_seconds), icon: Icons.timer_outlined),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildMetricItem(
-                      label: 'Distance',
-                      value: '${_formatDistance(_distanceMeters)} km',
-                      icon: Icons.straighten,
-                    ),
+                    child: _buildMetricItem(label: 'Distance', value: '${_formatDistance(_distanceMeters)} km', icon: Icons.straighten),
                   ),
                 ],
               ),
@@ -258,19 +226,11 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildMetricItem(
-                      label: 'Current Pace',
-                      value: '${_formatPace(_currentPace)}/km',
-                      icon: Icons.speed,
-                    ),
+                    child: _buildMetricItem(label: 'Current Pace', value: '${_formatPace(_currentPace)}/km', icon: Icons.speed),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildMetricItem(
-                      label: 'Avg Pace',
-                      value: '${_formatPace(_averagePace)}/km',
-                      icon: Icons.show_chart,
-                    ),
+                    child: _buildMetricItem(label: 'Avg Pace', value: '${_formatPace(_averagePace)}/km', icon: Icons.show_chart),
                   ),
                 ],
               ),
@@ -280,22 +240,10 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildMetricItem(
-                      label: 'Heart Rate',
-                      value: '$_heartRate BPM',
-                      icon: Icons.favorite,
-                      iconColor: Colors.red,
-                    ),
+                    child: _buildMetricItem(label: 'Calories', value: '$_calories cal', icon: Icons.local_fire_department, iconColor: Colors.orange),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildMetricItem(
-                      label: 'Calories',
-                      value: '$_calories cal',
-                      icon: Icons.local_fire_department,
-                      iconColor: Colors.orange,
-                    ),
-                  ),
+                  const Expanded(child: SizedBox()),
                 ],
               ),
             ],
@@ -305,18 +253,10 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
     );
   }
 
-  Widget _buildMetricItem({
-    required String label,
-    required String value,
-    required IconData icon,
-    Color? iconColor,
-  }) {
+  Widget _buildMetricItem({required String label, required String value, required IconData icon, Color? iconColor}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.primaryGrayLight.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -326,20 +266,14 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
               const SizedBox(width: 4),
               Text(
                 label,
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.primaryGrayDark,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.w600),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: AppTextStyles.titleMedium.copyWith(
-              color: AppColors.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -358,24 +292,13 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
           decoration: BoxDecoration(
             color: AppColors.surface.withOpacity(0.95),
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.secondary.withOpacity(0.15),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: AppColors.secondary.withOpacity(0.15), blurRadius: 20, offset: const Offset(0, -4))],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               // Lock Button
-              _buildControlButton(
-                icon: Icons.lock_outline,
-                label: 'Lock',
-                color: AppColors.primaryGrayDark,
-                onTap: _toggleLock,
-              ),
+              _buildControlButton(icon: Icons.lock_outline, label: 'Lock', color: AppColors.primaryGrayDark, onTap: _toggleLock),
 
               // Pause/Resume Button
               _buildControlButton(
@@ -387,12 +310,7 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
               ),
 
               // End Button
-              _buildControlButton(
-                icon: Icons.stop,
-                label: 'End',
-                color: Colors.red,
-                onTap: _showEndConfirmation,
-              ),
+              _buildControlButton(icon: Icons.stop, label: 'End', color: Colors.red, onTap: _showEndConfirmation),
             ],
           ),
         ),
@@ -400,13 +318,7 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
     );
   }
 
-  Widget _buildControlButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-    bool isLarge = false,
-  }) {
+  Widget _buildControlButton({required IconData icon, required String label, required Color color, required VoidCallback onTap, bool isLarge = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -418,27 +330,14 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: isLarge ? 36 : 28,
-            ),
+            child: Icon(icon, color: Colors.white, size: isLarge ? 36 : 28),
           ),
           const SizedBox(height: 8),
           Text(
             label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -460,35 +359,17 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accent.withOpacity(0.3),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 20, spreadRadius: 5)],
                 ),
-                child: const Icon(
-                  Icons.lock,
-                  size: 48,
-                  color: AppColors.accent,
-                ),
+                child: const Icon(Icons.lock, size: 48, color: AppColors.accent),
               ),
               const SizedBox(height: 24),
               Text(
                 'Screen Locked',
-                style: AppTextStyles.titleLarge.copyWith(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text(
-                'Tap to unlock',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.primaryGrayLight,
-                ),
-              ),
+              Text('Tap to unlock', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayLight)),
             ],
           ),
         ),
@@ -502,32 +383,20 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-          ),
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.stop_circle_outlined,
-                size: 64,
-                color: Colors.red,
-              ),
+              const Icon(Icons.stop_circle_outlined, size: 64, color: Colors.red),
               const SizedBox(height: 16),
               Text(
                 'End Activity?',
-                style: AppTextStyles.titleLarge.copyWith(
-                  color: AppColors.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
                 'Your progress will be saved',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.primaryGrayDark,
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -538,17 +407,10 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
                       onPressed: () => Get.back(),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primaryGray, width: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text(
-                        'Cancel',
-                        style: AppTextStyles.buttonMedium.copyWith(
-                          color: AppColors.onBackground,
-                        ),
-                      ),
+                      child: Text('Cancel', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -561,15 +423,10 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text(
-                        'End Run',
-                        style: AppTextStyles.buttonMedium,
-                      ),
+                      child: Text('End Run', style: AppTextStyles.buttonMedium),
                     ),
                   ),
                 ],
@@ -594,4 +451,3 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
     }
   }
 }
-

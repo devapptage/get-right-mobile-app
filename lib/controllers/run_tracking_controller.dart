@@ -23,15 +23,11 @@ class RunTrackingController extends GetxController {
   final Rx<Duration> elapsedTime = Duration.zero.obs;
   final RxString runStatus = 'Ready'.obs;
   final RxString activityType = 'Run'.obs;
-  final RxInt currentHeartRate = 0.obs;
-  final RxInt averageHeartRate = 0.obs;
-  final RxInt maxHeartRate = 0.obs;
   final RxInt caloriesBurned = 0.obs;
 
   // Private state
   StreamSubscription<Position>? _positionSubscription;
   Timer? _timer;
-  Timer? _heartRateTimer;
   DateTime? _startTime;
   DateTime? _pauseTime;
   Duration _pausedDuration = Duration.zero;
@@ -90,8 +86,6 @@ class RunTrackingController extends GetxController {
     distanceMeters.value = 0.0;
     elevationGain.value = 0.0;
     maxPace.value = 0.0;
-    averageHeartRate.value = 0;
-    maxHeartRate.value = 0;
     caloriesBurned.value = 0;
     elapsedTime.value = Duration.zero;
     _pausedDuration = Duration.zero;
@@ -118,9 +112,6 @@ class RunTrackingController extends GetxController {
 
     // Start timer
     _startTimer();
-
-    // Start heart rate simulation (in real app, this would connect to watch/sensor)
-    _startHeartRateSimulation();
 
     return true;
   }
@@ -174,49 +165,6 @@ class RunTrackingController extends GetxController {
     });
   }
 
-  /// Start heart rate simulation (In real app, this would connect to smartwatch)
-  void _startHeartRateSimulation() {
-    _heartRateTimer?.cancel();
-    _heartRateTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (!isPaused.value && isTracking.value) {
-        // Simulate heart rate based on activity type and pace
-        int baseHR = 70;
-        int activityBonus = 0;
-
-        switch (activityType.value.toLowerCase()) {
-          case 'walk':
-            activityBonus = 30;
-            break;
-          case 'jog':
-            activityBonus = 50;
-            break;
-          case 'run':
-            activityBonus = 70;
-            break;
-          case 'bike':
-            activityBonus = 60;
-            break;
-        }
-
-        // Add random variation
-        final randomVariation = (-5 + (timer.tick % 11));
-        currentHeartRate.value = baseHR + activityBonus + randomVariation;
-
-        // Update max heart rate
-        if (currentHeartRate.value > maxHeartRate.value) {
-          maxHeartRate.value = currentHeartRate.value;
-        }
-
-        // Update average heart rate
-        if (averageHeartRate.value == 0) {
-          averageHeartRate.value = currentHeartRate.value;
-        } else {
-          averageHeartRate.value = ((averageHeartRate.value + currentHeartRate.value) / 2).round();
-        }
-      }
-    });
-  }
-
   /// Calculate calories burned based on activity type, distance, and duration
   void _updateCaloriesBurned() {
     // Simplified calorie calculation (In real app, would use user weight, age, etc.)
@@ -250,7 +198,6 @@ class RunTrackingController extends GetxController {
     isPaused.value = true;
     runStatus.value = 'Paused';
     _pauseTime = DateTime.now();
-    _heartRateTimer?.cancel();
   }
 
   /// Resume tracking
@@ -264,9 +211,6 @@ class RunTrackingController extends GetxController {
       _pausedDuration += DateTime.now().difference(_pauseTime!);
       _pauseTime = null;
     }
-
-    // Resume heart rate tracking
-    _startHeartRateSimulation();
   }
 
   /// Stop tracking and save run
@@ -274,7 +218,6 @@ class RunTrackingController extends GetxController {
     if (!isTracking.value) return null;
 
     _timer?.cancel();
-    _heartRateTimer?.cancel();
     _positionSubscription?.cancel();
 
     final endTime = DateTime.now();
@@ -302,8 +245,6 @@ class RunTrackingController extends GetxController {
       averagePace: averagePace.value,
       maxPace: maxPace.value > 0 ? maxPace.value : null,
       maxSpeed: null,
-      averageHeartRate: averageHeartRate.value > 0 ? averageHeartRate.value : null,
-      maxHeartRate: maxHeartRate.value > 0 ? maxHeartRate.value : null,
       caloriesBurned: caloriesBurned.value > 0 ? caloriesBurned.value : null,
       createdAt: DateTime.now(),
     );
@@ -341,7 +282,6 @@ class RunTrackingController extends GetxController {
   /// Cancel tracking without saving
   void cancelTracking() {
     _timer?.cancel();
-    _heartRateTimer?.cancel();
     _positionSubscription?.cancel();
 
     isTracking.value = false;
@@ -352,9 +292,6 @@ class RunTrackingController extends GetxController {
     distanceMeters.value = 0.0;
     elevationGain.value = 0.0;
     maxPace.value = 0.0;
-    currentHeartRate.value = 0;
-    averageHeartRate.value = 0;
-    maxHeartRate.value = 0;
     caloriesBurned.value = 0;
     elapsedTime.value = Duration.zero;
   }

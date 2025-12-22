@@ -25,7 +25,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   bool _isPaused = false;
   Timer? _timer;
   int _seconds = 0;
-  int _heartRate = 128;
   int _calories = 0;
   DateTime? _startTime;
 
@@ -67,7 +66,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
         setState(() {
           _seconds++;
           _calories = (_seconds / 60 * 5).round();
-          _heartRate = 120 + (DateTime.now().second % 20);
         });
       }
     });
@@ -85,17 +83,10 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
     _timer?.cancel();
 
     // Calculate average heart rate
-    final avgHeartRate = _heartRate;
 
     // Update workout model with completion data
     if (_workout != null && _startTime != null) {
-      _workout = _workout!.copyWith(
-        startedAt: _startTime,
-        completedAt: DateTime.now(),
-        durationSeconds: _seconds,
-        caloriesBurned: _calories,
-        averageHeartRate: avgHeartRate.toDouble(),
-      );
+      _workout = _workout!.copyWith(startedAt: _startTime, completedAt: DateTime.now(), durationSeconds: _seconds, caloriesBurned: _calories);
     }
 
     setState(() {
@@ -105,7 +96,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
 
     // Show full-screen celebration view
     Get.to(
-      () => WorkoutCelebrationScreen(duration: _formatTime(_seconds), calories: _calories, avgHeartRate: avgHeartRate, workoutName: _getWorkoutName()),
+      () => WorkoutCelebrationScreen(duration: _formatTime(_seconds), calories: _calories, workoutName: _getWorkoutName()),
       transition: Transition.zoom,
       duration: const Duration(milliseconds: 500),
     )?.then((_) {
@@ -113,7 +104,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
       setState(() {
         _seconds = 0;
         _calories = 0;
-        _heartRate = 128;
         _startTime = null;
       });
     });
@@ -358,17 +348,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                       const SizedBox(width: 4),
                       Text(
                         _formatTime(_seconds),
-                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Container(width: 1, height: 20, color: AppColors.primaryGrayLight),
-                  Row(
-                    children: [
-                      Icon(Icons.favorite, color: Colors.red, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$_heartRate',
                         style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                       ),
                     ],

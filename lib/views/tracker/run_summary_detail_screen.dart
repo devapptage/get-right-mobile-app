@@ -206,22 +206,7 @@ class _RunSummaryDetailScreenState extends State<RunSummaryDetailScreen> {
 
           const SizedBox(height: 12),
 
-          // Row 3: Avg HR, Max HR
-          Row(
-            children: [
-              Expanded(
-                child: _buildMetricCard(icon: Icons.favorite, value: '${_activity!.averageHeartRate?.toInt() ?? '--'} BPM', label: 'Avg Heart Rate', iconColor: Colors.red),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildMetricCard(icon: Icons.favorite_border, value: '${_activity!.maxHeartRate?.toInt() ?? '--'} BPM', label: 'Max Heart Rate', iconColor: Colors.red),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Row 4: Calories
+          // Row 3: Calories
           _buildMetricCard(icon: Icons.local_fire_department, value: '${_activity!.caloriesBurned ?? 0} cal', label: 'Calories Burned', iconColor: Colors.orange),
 
           const SizedBox(height: 24),
@@ -319,13 +304,6 @@ class _RunSummaryDetailScreenState extends State<RunSummaryDetailScreen> {
                           style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'HR',
-                          style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.bold),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -358,13 +336,6 @@ class _RunSummaryDetailScreenState extends State<RunSummaryDetailScreen> {
                           child: Text(
                             split.formattedPace,
                             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            split.averageHeartRate != null ? '${split.averageHeartRate!.toInt()}' : '--',
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
                           ),
                         ),
                       ],

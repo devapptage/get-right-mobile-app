@@ -41,7 +41,6 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
                 _buildSuccessIcon(),
                 _buildMapSection(run),
                 _buildStatsSection(run),
-                _buildHeartRateSection(run),
                 _buildDetailedStats(run),
                 if (run.splits != null && run.splits!.isNotEmpty) _buildSplitsSection(run),
                 _buildNotesSection(run),
@@ -304,62 +303,6 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
     );
   }
 
-  /// Build heart rate section
-  Widget _buildHeartRateSection(RunModel run) {
-    if (run.averageHeartRate == null && run.maxHeartRate == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.favorite_rounded, color: Colors.red, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Heart Rate',
-                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildHRStatItem('Average', run.averageHeartRate != null ? '${run.averageHeartRate}' : '--'),
-              Container(width: 1, height: 40, color: AppColors.primaryGray.withOpacity(0.3)),
-              _buildHRStatItem('Maximum', run.maxHeartRate != null ? '${run.maxHeartRate}' : '--'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHRStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: AppTextStyles.headlineSmall.copyWith(color: Colors.red, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text('BPM', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-        const SizedBox(height: 4),
-        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 11)),
-      ],
-    );
-  }
-
   /// Build detailed stats section
   Widget _buildDetailedStats(RunModel run) {
     final timeFormat = DateFormat('h:mm a');
@@ -483,17 +426,6 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
               ],
             ),
           ),
-          if (split.averageHeartRate != null)
-            Row(
-              children: [
-                const Icon(Icons.favorite, color: Colors.red, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  '${split.averageHeartRate}',
-                  style: AppTextStyles.labelMedium.copyWith(color: Colors.red, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
         ],
       ),
     );

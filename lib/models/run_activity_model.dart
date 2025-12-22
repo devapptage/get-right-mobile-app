@@ -11,8 +11,6 @@ class RunActivityModel {
   final double distanceMeters;
   final double averagePace; // minutes per km
   final double maxPace;
-  final double? averageHeartRate;
-  final double? maxHeartRate;
   final int? caloriesBurned;
   final List<LatLng> routePoints;
   final List<RunSplit> splits;
@@ -31,8 +29,6 @@ class RunActivityModel {
     required this.distanceMeters,
     required this.averagePace,
     required this.maxPace,
-    this.averageHeartRate,
-    this.maxHeartRate,
     this.caloriesBurned,
     required this.routePoints,
     this.splits = const [],
@@ -53,8 +49,6 @@ class RunActivityModel {
       distanceMeters: (json['distanceMeters'] ?? 0.0).toDouble(),
       averagePace: (json['averagePace'] ?? 0.0).toDouble(),
       maxPace: (json['maxPace'] ?? 0.0).toDouble(),
-      averageHeartRate: json['averageHeartRate']?.toDouble(),
-      maxHeartRate: json['maxHeartRate']?.toDouble(),
       caloriesBurned: json['caloriesBurned'],
       routePoints: (json['routePoints'] as List<dynamic>?)
               ?.map((p) => LatLng(p['lat'] as double, p['lng'] as double))
@@ -82,8 +76,6 @@ class RunActivityModel {
       'distanceMeters': distanceMeters,
       'averagePace': averagePace,
       'maxPace': maxPace,
-      'averageHeartRate': averageHeartRate,
-      'maxHeartRate': maxHeartRate,
       'caloriesBurned': caloriesBurned,
       'routePoints': routePoints.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList(),
       'splits': splits.map((s) => s.toJson()).toList(),
@@ -104,8 +96,6 @@ class RunActivityModel {
     double? distanceMeters,
     double? averagePace,
     double? maxPace,
-    double? averageHeartRate,
-    double? maxHeartRate,
     int? caloriesBurned,
     List<LatLng>? routePoints,
     List<RunSplit>? splits,
@@ -124,8 +114,6 @@ class RunActivityModel {
       distanceMeters: distanceMeters ?? this.distanceMeters,
       averagePace: averagePace ?? this.averagePace,
       maxPace: maxPace ?? this.maxPace,
-      averageHeartRate: averageHeartRate ?? this.averageHeartRate,
-      maxHeartRate: maxHeartRate ?? this.maxHeartRate,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       routePoints: routePoints ?? this.routePoints,
       splits: splits ?? this.splits,
@@ -169,14 +157,12 @@ class RunSplit {
   final double distance; // in meters
   final int timeSeconds;
   final double pace; // minutes per km
-  final double? averageHeartRate;
 
   RunSplit({
     required this.splitNumber,
     required this.distance,
     required this.timeSeconds,
     required this.pace,
-    this.averageHeartRate,
   });
 
   factory RunSplit.fromJson(Map<String, dynamic> json) {
@@ -185,7 +171,6 @@ class RunSplit {
       distance: (json['distance'] ?? 0.0).toDouble(),
       timeSeconds: json['timeSeconds'] ?? 0,
       pace: (json['pace'] ?? 0.0).toDouble(),
-      averageHeartRate: json['averageHeartRate']?.toDouble(),
     );
   }
 
@@ -195,7 +180,6 @@ class RunSplit {
       'distance': distance,
       'timeSeconds': timeSeconds,
       'pace': pace,
-      'averageHeartRate': averageHeartRate,
     };
   }
 

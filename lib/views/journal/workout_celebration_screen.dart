@@ -9,14 +9,12 @@ import 'package:get_right/theme/text_styles.dart';
 class WorkoutCelebrationScreen extends StatefulWidget {
   final String duration;
   final int calories;
-  final int avgHeartRate;
   final String workoutName;
 
   const WorkoutCelebrationScreen({
     super.key,
     required this.duration,
     required this.calories,
-    required this.avgHeartRate,
     required this.workoutName,
   });
 
@@ -271,9 +269,9 @@ class _WorkoutCelebrationScreenState extends State<WorkoutCelebrationScreen> wit
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildStatCard(Icons.favorite, '${widget.avgHeartRate}', 'Avg BPM')),
-            const SizedBox(width: 16),
             Expanded(child: _buildStatCard(Icons.fitness_center, widget.workoutName, 'Exercises')),
+            const SizedBox(width: 16),
+            const Expanded(child: SizedBox()),
           ],
         ),
       ],

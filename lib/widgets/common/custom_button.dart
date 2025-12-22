@@ -66,7 +66,7 @@ class _CustomButtonState extends State<CustomButton> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final actualBackgroundColor = widget.backgroundColor ?? (widget.isPrimary ? AppColors.accent : AppColors.surface);
+    final actualBackgroundColor = widget.backgroundColor ?? (widget.isPrimary ? AppColors.accent : AppColors.accent);
     final isGrayButton = actualBackgroundColor == AppColors.secondary;
     final isGreenButton = actualBackgroundColor == AppColors.accent;
     final actualTextColor =
@@ -90,24 +90,17 @@ class _CustomButtonState extends State<CustomButton> with SingleTickerProviderSt
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             gradient: widget.onPressed == null || widget.isLoading
-                ? null
+                ? isGreenButton
+                      ? LinearGradient(colors: [AppColors.accent, AppColors.accent], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                      : null
                 : isGreenButton
                 ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
                 : null,
             color: widget.onPressed == null || widget.isLoading
-                ? AppColors.primaryGray.withOpacity(0.3)
+                ? AppColors.accent
                 : isGreenButton
                 ? null
                 : actualBackgroundColor,
-            boxShadow: _isPressed || widget.isLoading
-                ? []
-                : isGreenButton
-                ? [
-                    BoxShadow(color: AppColors.accent.withOpacity(0.4), blurRadius: 16, spreadRadius: 0, offset: const Offset(0, 6)),
-                    BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 8, spreadRadius: -2, offset: const Offset(0, 2)),
-                  ]
-                : [BoxShadow(color: AppColors.black.withOpacity(0.15), blurRadius: 12, spreadRadius: 0, offset: const Offset(0, 4))],
-            border: !isGreenButton && !isGrayButton ? Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5) : null,
           ),
           child: Material(
             color: Colors.transparent,

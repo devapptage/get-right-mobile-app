@@ -12,8 +12,6 @@ class RunModel {
   final double? averagePace;
   final double? maxPace;
   final double? maxSpeed;
-  final int? averageHeartRate;
-  final int? maxHeartRate;
   final int? caloriesBurned;
   final String? notes;
   final List<Split>? splits;
@@ -32,8 +30,6 @@ class RunModel {
     this.averagePace,
     this.maxPace,
     this.maxSpeed,
-    this.averageHeartRate,
-    this.maxHeartRate,
     this.caloriesBurned,
     this.notes,
     this.splits,
@@ -58,8 +54,6 @@ class RunModel {
       averagePace: json['averagePace']?.toDouble(),
       maxPace: json['maxPace']?.toDouble(),
       maxSpeed: json['maxSpeed']?.toDouble(),
-      averageHeartRate: json['averageHeartRate']?.toInt(),
-      maxHeartRate: json['maxHeartRate']?.toInt(),
       caloriesBurned: json['caloriesBurned']?.toInt(),
       notes: json['notes'],
       splits: json['splits'] != null ? (json['splits'] as List).map((split) => Split.fromJson(split)).toList() : null,
@@ -82,8 +76,6 @@ class RunModel {
       'averagePace': averagePace,
       'maxPace': maxPace,
       'maxSpeed': maxSpeed,
-      'averageHeartRate': averageHeartRate,
-      'maxHeartRate': maxHeartRate,
       'caloriesBurned': caloriesBurned,
       'notes': notes,
       'splits': splits?.map((split) => split.toJson()).toList(),
@@ -121,9 +113,8 @@ class Split {
   final double distanceMeters;
   final Duration duration;
   final double pace; // min/km
-  final int? averageHeartRate;
 
-  Split({required this.splitNumber, required this.distanceMeters, required this.duration, required this.pace, this.averageHeartRate});
+  Split({required this.splitNumber, required this.distanceMeters, required this.duration, required this.pace});
 
   factory Split.fromJson(Map<String, dynamic> json) {
     return Split(
@@ -131,11 +122,10 @@ class Split {
       distanceMeters: json['distanceMeters']?.toDouble() ?? 0.0,
       duration: Duration(seconds: json['durationSeconds'] ?? 0),
       pace: json['pace']?.toDouble() ?? 0.0,
-      averageHeartRate: json['averageHeartRate']?.toInt(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'splitNumber': splitNumber, 'distanceMeters': distanceMeters, 'durationSeconds': duration.inSeconds, 'pace': pace, 'averageHeartRate': averageHeartRate};
+    return {'splitNumber': splitNumber, 'distanceMeters': distanceMeters, 'durationSeconds': duration.inSeconds, 'pace': pace};
   }
 }

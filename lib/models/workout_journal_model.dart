@@ -14,7 +14,6 @@ class WorkoutJournalModel {
   final DateTime? completedAt;
   final int? durationSeconds; // Total workout duration
   final int? caloriesBurned; // From smartwatch
-  final double? averageHeartRate; // From smartwatch
   final String? notes; // Daily workout notes
 
   WorkoutJournalModel({
@@ -29,7 +28,6 @@ class WorkoutJournalModel {
     this.completedAt,
     this.durationSeconds,
     this.caloriesBurned,
-    this.averageHeartRate,
     this.notes,
   });
 
@@ -38,21 +36,14 @@ class WorkoutJournalModel {
       id: json['id'] ?? '',
       userId: json['userId'] ?? '',
       date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
-      warmupExercises: (json['warmupExercises'] as List<dynamic>?)
-              ?.map((ex) => WorkoutExerciseModel.fromJson(ex as Map<String, dynamic>))
-              .toList() ??
-          [],
-      workoutExercises: (json['workoutExercises'] as List<dynamic>?)
-              ?.map((ex) => WorkoutExerciseModel.fromJson(ex as Map<String, dynamic>))
-              .toList() ??
-          [],
+      warmupExercises: (json['warmupExercises'] as List<dynamic>?)?.map((ex) => WorkoutExerciseModel.fromJson(ex as Map<String, dynamic>)).toList() ?? [],
+      workoutExercises: (json['workoutExercises'] as List<dynamic>?)?.map((ex) => WorkoutExerciseModel.fromJson(ex as Map<String, dynamic>)).toList() ?? [],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
       startedAt: json['startedAt'] != null ? DateTime.parse(json['startedAt']) : null,
       completedAt: json['completedAt'] != null ? DateTime.parse(json['completedAt']) : null,
       durationSeconds: json['durationSeconds']?.toInt(),
       caloriesBurned: json['caloriesBurned']?.toInt(),
-      averageHeartRate: json['averageHeartRate']?.toDouble(),
       notes: json['notes'],
     );
   }
@@ -70,7 +61,6 @@ class WorkoutJournalModel {
       'completedAt': completedAt?.toIso8601String(),
       'durationSeconds': durationSeconds,
       'caloriesBurned': caloriesBurned,
-      'averageHeartRate': averageHeartRate,
       'notes': notes,
     };
   }
@@ -87,7 +77,6 @@ class WorkoutJournalModel {
     DateTime? completedAt,
     int? durationSeconds,
     int? caloriesBurned,
-    double? averageHeartRate,
     String? notes,
   }) {
     return WorkoutJournalModel(
@@ -102,7 +91,6 @@ class WorkoutJournalModel {
       completedAt: completedAt ?? this.completedAt,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
-      averageHeartRate: averageHeartRate ?? this.averageHeartRate,
       notes: notes ?? this.notes,
     );
   }
@@ -125,10 +113,7 @@ class WorkoutJournalModel {
       if (exercise.isSuperset && exercise.supersetId != null) {
         if (!processedSupersets.contains(exercise.supersetId)) {
           // Find the other exercise in the superset
-          final otherExercise = allExercises.firstWhere(
-            (ex) => ex.isSuperset && ex.supersetId == exercise.supersetId && ex.id != exercise.id,
-            orElse: () => exercise,
-          );
+          final otherExercise = allExercises.firstWhere((ex) => ex.isSuperset && ex.supersetId == exercise.supersetId && ex.id != exercise.id, orElse: () => exercise);
           grouped.add({
             'type': 'superset',
             'exercises': [exercise, otherExercise],
@@ -137,14 +122,10 @@ class WorkoutJournalModel {
           processedSupersets.add(exercise.supersetId!);
         }
       } else if (!exercise.isSuperset) {
-        grouped.add({
-          'type': 'exercise',
-          'exercise': exercise,
-        });
+        grouped.add({'type': 'exercise', 'exercise': exercise});
       }
     }
 
     return grouped;
   }
 }
-

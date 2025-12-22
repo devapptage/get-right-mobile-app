@@ -33,10 +33,11 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.background,
         elevation: 0,
+        centerTitle: false,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
@@ -50,31 +51,92 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
           style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
+          preferredSize: const Size.fromHeight(70),
           child: Container(
-            decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(25)),
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+            ),
             child: TabBar(
               controller: _tabController,
-              indicator: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
-              ),
-              labelColor: AppColors.onSurface,
-              unselectedLabelColor: AppColors.mediumGray,
-              labelStyle: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-              unselectedLabelStyle: AppTextStyles.bodyMedium,
-              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorSize: TabBarIndicatorSize.label,
+              indicatorWeight: 0,
+              indicator: const BoxDecoration(),
+              labelPadding: EdgeInsets.zero,
               dividerColor: Colors.transparent,
-              tabs: const [
-                Tab(text: 'Tracker'),
-                Tab(text: 'Recipes'),
+              tabs: [
+                _CustomTab(icon: Icons.restaurant_menu, label: 'Tracker', controller: _tabController, index: 0),
+                _CustomTab(icon: Icons.menu_book, label: 'Recipes', controller: _tabController, index: 1),
               ],
             ),
           ),
         ),
       ),
       body: TabBarView(controller: _tabController, children: const [NutritionTrackerTab(), RecipesTab()]),
+    );
+  }
+}
+
+class _CustomTab extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final TabController controller;
+  final int index;
+
+  const _CustomTab({required this.icon, required this.label, required this.controller, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        final isActive = controller.index == index;
+        // Calculate animation value based on offset
+        // This makes the animation smooth as you drag between tabs
+        final double offset = controller.offset;
+        final double value = (offset + controller.index) - index;
+        final double animationValue = 1.0 - value.abs().clamp(0.0, 1.0);
+
+        // Use either the direct index comparison or the calculated animation value
+        // The animation value is non-zero when transitioning towards or away from this tab
+        final bool isSelected = isActive || animationValue > 0.5;
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: isSelected ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
+              color: isSelected ? null : Colors.transparent,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: isSelected ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))] : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: isSelected ? Colors.white : AppColors.mediumGray, size: 20),
+                // Only show text when selected or transitioning to selected
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeInOut,
+                  child: SizedBox(width: isSelected ? 8 : 8),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeInOut,
+                  child: Text(
+                    label,
+                    style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? Colors.white : AppColors.mediumGray, fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
