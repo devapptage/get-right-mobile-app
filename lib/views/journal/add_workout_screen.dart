@@ -390,12 +390,19 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.primaryGray, width: 1),
                 ),
-                child: CustomTextField(
+                child: TextFormField(
                   controller: _notesController,
-                  labelText: 'Additional Notes',
-                  hintText: 'How did it feel? Any observations?',
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.done,
                   maxLines: 4,
-                  prefixIcon: const Icon(Icons.notes),
+                  onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 15, fontWeight: FontWeight.w500),
+                  decoration: const InputDecoration(
+                    labelText: 'Additional Notes',
+                    hintText: 'How did it feel? Any observations?',
+                    prefixIcon: Icon(Icons.notes),
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),

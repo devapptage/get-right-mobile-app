@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
-import 'package:get_right/theme/text_styles.dart';
 import 'dart:math' as math;
 
 /// Modern 2024/2025 Fitness Dashboard
@@ -14,9 +13,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
-  static const Color _bgGrey = Color(0xFFD6D6D6);
+class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin {
   static const Color _greenAccent = Color(0xFF29603C);
   static const Color _blackPrimary = Color(0xFF000000);
   static const Color _cardWhite = Color(0xFFF5F5F5);
@@ -29,20 +26,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    );
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 15));
 
-    _topAlignmentAnimation = Tween<Alignment>(
-      begin: Alignment.topLeft,
-      end: Alignment.topRight,
-    ).animate(_controller);
+    _topAlignmentAnimation = Tween<Alignment>(begin: Alignment.topLeft, end: Alignment.topRight).animate(_controller);
 
-    _bottomAlignmentAnimation = Tween<Alignment>(
-      begin: Alignment.bottomRight,
-      end: Alignment.bottomLeft,
-    ).animate(_controller);
+    _bottomAlignmentAnimation = Tween<Alignment>(begin: Alignment.bottomRight, end: Alignment.bottomLeft).animate(_controller);
 
     _controller.repeat(reverse: true);
   }
@@ -70,11 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             gradient: LinearGradient(
               begin: _topAlignmentAnimation.value,
               end: _bottomAlignmentAnimation.value,
-              colors: const [
-                Color(0xFFD6D6D6),
-                Color(0xFFE8E8E8),
-                Color(0xFFC0C0C0),
-              ],
+              colors: const [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)],
             ),
           ),
 
@@ -92,11 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
               actions: [
                 IconButton(
-                  icon: Icon(
-                    Icons.notifications_outlined,
-                    color: _blackPrimary,
-                    size: 28,
-                  ),
+                  icon: Icon(Icons.notifications_outlined, color: _blackPrimary, size: 28),
                   onPressed: () => Get.toNamed(AppRoutes.notifications),
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
@@ -119,22 +99,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                         children: [
                           Text(
                             'Good $greeting',
-                            style: TextStyle(
-                              color: _textSecondary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyle(color: _textSecondary, fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Let\'s Get Right',
-                            style: TextStyle(
-                              color: _blackPrimary,
-                              fontSize: 40,
-                              fontWeight: FontWeight.w900,
-                              height: 1.0,
-                              letterSpacing: -0.5,
-                            ),
+                            style: TextStyle(color: _blackPrimary, fontSize: 40, fontWeight: FontWeight.w900, height: 1.0, letterSpacing: -0.5),
                           ),
                         ],
                       ),
@@ -150,12 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       padding: const EdgeInsets.only(left: 24),
                       child: Text(
                         'QUICK START',
-                        style: TextStyle(
-                          color: _textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.5,
-                        ),
+                        style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -163,10 +128,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     const SizedBox(height: 40),
 
                     // Stats Grid
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: _buildStatsGrid(),
-                    ),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: _buildStatsGrid()),
                     const SizedBox(height: 40),
 
                     // Today's Plan
@@ -174,20 +136,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                       padding: const EdgeInsets.only(left: 24),
                       child: Text(
                         'TODAY\'S PLAN',
-                        style: TextStyle(
-                          color: _textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.5,
-                        ),
+                        style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: _buildTodaysPlan(),
-                    ),
-                    const SizedBox(height: 40),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: _buildTodaysPlan()),
+                    const SizedBox(height: 20),
 
                     // Recent Activity
                     Padding(
@@ -197,35 +151,19 @@ class _DashboardScreenState extends State<DashboardScreen>
                         children: [
                           Text(
                             'RECENT',
-                            style: TextStyle(
-                              color: _textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.5,
-                            ),
+                            style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5),
                           ),
                           TextButton(
-                            onPressed: () =>
-                                Get.find<HomeNavigationController>().changeTab(
-                                  2,
-                                ),
+                            onPressed: () => Get.find<HomeNavigationController>().changeTab(2),
                             child: Text(
                               'See All',
-                              style: TextStyle(
-                                color: _greenAccent,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: TextStyle(color: _greenAccent, fontSize: 14, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: _buildRecentActivity(),
-                    ),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: _buildRecentActivity()),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -250,48 +188,21 @@ class _DashboardScreenState extends State<DashboardScreen>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFFAFAFA),
-                  Color(0xFFEEEEEE),
-                  Color(0xFFE5E5E5),
-                ],
+                colors: [Color(0xFFFAFAFA), Color(0xFFEEEEEE), Color(0xFFE5E5E5)],
                 stops: [0.0, 0.5, 1.0],
               ),
               borderRadius: BorderRadius.circular(36),
               boxShadow: [
                 // Deep outer shadow for elevation
-                BoxShadow(
-                  color: _blackPrimary.withOpacity(0.15),
-                  blurRadius: 40,
-                  offset: const Offset(0, 20),
-                  spreadRadius: -8,
-                ),
+                BoxShadow(color: _blackPrimary.withOpacity(0.15), blurRadius: 40, offset: const Offset(0, 20), spreadRadius: -8),
                 // Mid shadow for depth
-                BoxShadow(
-                  color: _blackPrimary.withOpacity(0.1),
-                  blurRadius: 24,
-                  offset: const Offset(0, 12),
-                  spreadRadius: -4,
-                ),
+                BoxShadow(color: _blackPrimary.withOpacity(0.1), blurRadius: 24, offset: const Offset(0, 12), spreadRadius: -4),
                 // Soft ambient shadow
-                BoxShadow(
-                  color: _blackPrimary.withOpacity(0.05),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
+                BoxShadow(color: _blackPrimary.withOpacity(0.05), blurRadius: 12, offset: const Offset(0, 6)),
                 // Top highlight for 3D pop
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.9),
-                  blurRadius: 2,
-                  offset: const Offset(0, -2),
-                  spreadRadius: 0,
-                ),
+                BoxShadow(color: Colors.white.withOpacity(0.9), blurRadius: 2, offset: const Offset(0, -2), spreadRadius: 0),
                 // Side highlight
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.5),
-                  blurRadius: 4,
-                  offset: const Offset(-2, 0),
-                ),
+                BoxShadow(color: Colors.white.withOpacity(0.5), blurRadius: 4, offset: const Offset(-2, 0)),
               ],
             ),
             child: ClipRRect(
@@ -309,11 +220,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.white.withOpacity(0.6),
-                            Colors.white.withOpacity(0.2),
-                            Colors.transparent,
-                          ],
+                          colors: [Colors.white.withOpacity(0.6), Colors.white.withOpacity(0.2), Colors.transparent],
                         ),
                       ),
                     ),
@@ -322,14 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.8,
-                          colors: [
-                            Colors.white.withOpacity(0.3),
-                            Colors.transparent,
-                          ],
-                        ),
+                        gradient: RadialGradient(center: Alignment.center, radius: 0.8, colors: [Colors.white.withOpacity(0.3), Colors.transparent]),
                       ),
                     ),
                   ),
@@ -347,38 +247,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                             children: [
                               // Premium badge with neumorphism
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 8,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      _greenAccent.withOpacity(0.12),
-                                      _greenAccent.withOpacity(0.08),
-                                    ],
-                                  ),
+                                  gradient: LinearGradient(colors: [_greenAccent.withOpacity(0.12), _greenAccent.withOpacity(0.08)]),
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: _greenAccent.withOpacity(0.25),
-                                    width: 1.5,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: _greenAccent.withOpacity(0.15),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
+                                  border: Border.all(color: _greenAccent.withOpacity(0.25), width: 1.5),
+                                  boxShadow: [BoxShadow(color: _greenAccent.withOpacity(0.15), blurRadius: 8, offset: const Offset(0, 2))],
                                 ),
                                 child: Text(
                                   'WEEKLY GOAL',
-                                  style: TextStyle(
-                                    color: _greenAccent,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.5,
-                                  ),
+                                  style: TextStyle(color: _greenAccent, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5),
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -395,26 +273,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                       height: 0.85,
                                       letterSpacing: -4,
                                       shadows: [
-                                        Shadow(
-                                          color: _greenAccent.withOpacity(0.2),
-                                          offset: const Offset(0, 6),
-                                          blurRadius: 12,
-                                        ),
-                                        Shadow(
-                                          color: _blackPrimary.withOpacity(
-                                            0.08,
-                                          ),
-                                          offset: const Offset(0, 3),
-                                          blurRadius: 6,
-                                        ),
+                                        Shadow(color: _greenAccent.withOpacity(0.2), offset: const Offset(0, 6), blurRadius: 12),
+                                        Shadow(color: _blackPrimary.withOpacity(0.08), offset: const Offset(0, 3), blurRadius: 6),
                                       ],
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 18,
-                                      left: 6,
-                                    ),
+                                    padding: const EdgeInsets.only(bottom: 18, left: 6),
                                     child: Text(
                                       '%',
                                       style: TextStyle(
@@ -422,15 +287,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         fontSize: 34,
                                         fontWeight: FontWeight.w900,
                                         height: 1.0,
-                                        shadows: [
-                                          Shadow(
-                                            color: _greenAccent.withOpacity(
-                                              0.3,
-                                            ),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 4,
-                                          ),
-                                        ],
+                                        shadows: [Shadow(color: _greenAccent.withOpacity(0.3), offset: const Offset(0, 2), blurRadius: 4)],
                                       ),
                                     ),
                                   ),
@@ -445,32 +302,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     width: 6,
                                     height: 6,
                                     decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          _greenAccent,
-                                          _greenAccent.withOpacity(0.7),
-                                        ],
-                                      ),
+                                      gradient: LinearGradient(colors: [_greenAccent, _greenAccent.withOpacity(0.7)]),
                                       shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: _greenAccent.withOpacity(0.4),
-                                          blurRadius: 4,
-                                          spreadRadius: 1,
-                                        ),
-                                      ],
+                                      boxShadow: [BoxShadow(color: _greenAccent.withOpacity(0.4), blurRadius: 4, spreadRadius: 1)],
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
                                       '3 of 4 workouts',
-                                      style: TextStyle(
-                                        color: _textSecondary,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.2,
-                                      ),
+                                      style: TextStyle(color: _textSecondary, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.2),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -493,22 +334,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 height: 130,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: _greenAccent.withOpacity(0.25),
-                                      blurRadius: 32,
-                                      spreadRadius: 8,
-                                    ),
-                                  ],
+                                  boxShadow: [BoxShadow(color: _greenAccent.withOpacity(0.25), blurRadius: 32, spreadRadius: 8)],
                                 ),
                               ),
                               // Progress ring
                               CustomPaint(
                                 size: const Size(130, 130),
-                                painter: _UltraPremium3DRingPainter(
-                                  progress: 0.75,
-                                  color: _greenAccent,
-                                ),
+                                painter: _UltraPremium3DRingPainter(progress: 0.75, color: _greenAccent),
                               ),
                               // Center neumorphic circle
                               Container(
@@ -516,28 +348,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 height: 86,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xFFFFFFFF),
-                                      Color(0xFFF5F5F5),
-                                      Color(0xFFEEEEEE),
-                                    ],
-                                  ),
+                                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFFFFFF), Color(0xFFF5F5F5), Color(0xFFEEEEEE)]),
                                   boxShadow: [
                                     // Outer shadow
-                                    BoxShadow(
-                                      color: _blackPrimary.withOpacity(0.12),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 6),
-                                    ),
+                                    BoxShadow(color: _blackPrimary.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, 6)),
                                     // Inner highlight
-                                    BoxShadow(
-                                      color: Colors.white,
-                                      blurRadius: 4,
-                                      offset: const Offset(-2, -2),
-                                    ),
+                                    BoxShadow(color: Colors.white, blurRadius: 4, offset: const Offset(-2, -2)),
                                   ],
                                 ),
                                 child: Center(
@@ -547,38 +363,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              _greenAccent,
-                                              _greenAccent.withOpacity(0.8),
-                                            ],
-                                          ),
+                                          gradient: LinearGradient(colors: [_greenAccent, _greenAccent.withOpacity(0.8)]),
                                           shape: BoxShape.circle,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: _greenAccent.withOpacity(
-                                                0.3,
-                                              ),
-                                              blurRadius: 8,
-                                              spreadRadius: 2,
-                                            ),
-                                          ],
+                                          boxShadow: [BoxShadow(color: _greenAccent.withOpacity(0.3), blurRadius: 8, spreadRadius: 2)],
                                         ),
-                                        child: Icon(
-                                          Icons.trending_up_rounded,
-                                          color: Colors.white,
-                                          size: 24,
-                                        ),
+                                        child: Icon(Icons.trending_up_rounded, color: Colors.white, size: 24),
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
                                         '3/4',
-                                        style: TextStyle(
-                                          color: _blackPrimary,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 0.5,
-                                        ),
+                                        style: TextStyle(color: _blackPrimary, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                                       ),
                                     ],
                                   ),
@@ -606,37 +400,17 @@ class _DashboardScreenState extends State<DashboardScreen>
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
-          _buildQuickStartCard(
-            'Start\nWorkout',
-            Icons.play_circle_filled,
-            _greenAccent,
-            () => Get.toNamed(AppRoutes.addWorkout),
-          ),
+          _buildQuickStartCard('Start\nWorkout', Icons.play_circle_filled, _greenAccent, () => Get.toNamed(AppRoutes.addWorkout)),
           const SizedBox(width: 16),
-          _buildQuickStartCard(
-            'Track\nRun',
-            Icons.directions_run_rounded,
-            _blackPrimary,
-            () => Get.toNamed(AppRoutes.runTracking),
-          ),
+          _buildQuickStartCard('Track\nRun', Icons.directions_run_rounded, _blackPrimary, () => Get.find<HomeNavigationController>().changeTab(2)),
           const SizedBox(width: 16),
-          _buildQuickStartCard(
-            'View\nPlanner',
-            Icons.calendar_today_rounded,
-            _blackPrimary,
-            () => Get.find<HomeNavigationController>().changeTab(2),
-          ),
+          _buildQuickStartCard('View\nPlanner', Icons.calendar_today_rounded, _blackPrimary, () => Get.toNamed(AppRoutes.planner)),
         ],
       ),
     );
   }
 
-  Widget _buildQuickStartCard(
-    String label,
-    IconData icon,
-    Color accentColor,
-    VoidCallback onTap,
-  ) {
+  Widget _buildQuickStartCard(String label, IconData icon, Color accentColor, VoidCallback onTap) {
     final bool isPrimary = accentColor == _greenAccent;
 
     return GestureDetector(
@@ -648,13 +422,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           color: isPrimary ? _greenAccent : _cardWhite,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
-            BoxShadow(
-              color: isPrimary
-                  ? _greenAccent.withOpacity(0.3)
-                  : _blackPrimary.withOpacity(0.06),
-              blurRadius: isPrimary ? 20 : 16,
-              offset: Offset(0, isPrimary ? 8 : 6),
-            ),
+            BoxShadow(color: isPrimary ? _greenAccent.withOpacity(0.3) : _blackPrimary.withOpacity(0.06), blurRadius: isPrimary ? 20 : 16, offset: Offset(0, isPrimary ? 8 : 6)),
           ],
         ),
         child: Column(
@@ -664,12 +432,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             Icon(icon, color: isPrimary ? Colors.white : accentColor, size: 36),
             Text(
               label,
-              style: TextStyle(
-                color: isPrimary ? Colors.white : _blackPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-              ),
+              style: TextStyle(color: isPrimary ? Colors.white : _blackPrimary, fontSize: 18, fontWeight: FontWeight.w900, height: 1.1),
             ),
           ],
         ),
@@ -680,13 +443,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget _buildStatsGrid() {
     return Row(
       children: [
-        Expanded(
-          child: _buildStatCard(
-            '15',
-            'Day Streak',
-            Icons.local_fire_department_rounded,
-          ),
-        ),
+        Expanded(child: _buildStatCard('15', 'Day Streak', Icons.local_fire_department_rounded)),
         const SizedBox(width: 16),
         Expanded(child: _buildStatCard('2.4k', 'Calories', Icons.bolt_rounded)),
       ],
@@ -699,13 +456,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       decoration: BoxDecoration(
         color: _cardWhite,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: _blackPrimary.withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: _blackPrimary.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -714,22 +465,12 @@ class _DashboardScreenState extends State<DashboardScreen>
           const SizedBox(height: 16),
           Text(
             value,
-            style: TextStyle(
-              color: _blackPrimary,
-              fontSize: 36,
-              fontWeight: FontWeight.w900,
-              height: 1.0,
-              letterSpacing: -1,
-            ),
+            style: TextStyle(color: _blackPrimary, fontSize: 36, fontWeight: FontWeight.w900, height: 1.0, letterSpacing: -1),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              color: _textSecondary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: _textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -742,13 +483,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       decoration: BoxDecoration(
         color: _cardWhite,
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: _blackPrimary.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: _blackPrimary.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -757,15 +492,8 @@ class _DashboardScreenState extends State<DashboardScreen>
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: _greenAccent.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.fitness_center_rounded,
-                  color: _greenAccent,
-                  size: 24,
-                ),
+                decoration: BoxDecoration(color: _greenAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                child: Icon(Icons.fitness_center_rounded, color: _greenAccent, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -774,21 +502,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                   children: [
                     Text(
                       'Upper Body Strength',
-                      style: TextStyle(
-                        color: _blackPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        height: 1.2,
-                      ),
+                      style: TextStyle(color: _blackPrimary, fontSize: 18, fontWeight: FontWeight.w900, height: 1.2),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '45 min • 9:00 AM',
-                      style: TextStyle(
-                        color: _textSecondary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(color: _textSecondary, fontSize: 14, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -796,26 +515,26 @@ class _DashboardScreenState extends State<DashboardScreen>
             ],
           ),
           const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: _greenAccent,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
               borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Start Workout',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+              onTap: () => Get.toNamed(AppRoutes.workoutJournal),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(color: _greenAccent, borderRadius: BorderRadius.circular(16)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Start Workout',
+                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -824,13 +543,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildRecentActivity() {
-    return Column(
-      children: [
-        _buildActivityItem('Cardio Session', '5:00 PM', false),
-        const SizedBox(height: 12),
-        _buildActivityItem('Morning Run', 'Yesterday', true),
-      ],
-    );
+    return Column(children: [_buildActivityItem('Cardio Session', '5:00 PM', false), const SizedBox(height: 12), _buildActivityItem('Morning Run', 'Yesterday', true)]);
   }
 
   Widget _buildActivityItem(String title, String time, bool completed) {
@@ -839,30 +552,15 @@ class _DashboardScreenState extends State<DashboardScreen>
       decoration: BoxDecoration(
         color: _cardWhite,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: _blackPrimary.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: _blackPrimary.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))],
       ),
       child: Row(
         children: [
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
-              color: completed
-                  ? _greenAccent.withOpacity(0.15)
-                  : _blackPrimary.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              completed ? Icons.check_circle_rounded : Icons.schedule_rounded,
-              color: completed ? _greenAccent : _textSecondary,
-              size: 24,
-            ),
+            decoration: BoxDecoration(color: completed ? _greenAccent.withOpacity(0.15) : _blackPrimary.withOpacity(0.05), borderRadius: BorderRadius.circular(14)),
+            child: Icon(completed ? Icons.check_circle_rounded : Icons.schedule_rounded, color: completed ? _greenAccent : _textSecondary, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -871,20 +569,12 @@ class _DashboardScreenState extends State<DashboardScreen>
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    color: _blackPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(color: _blackPrimary, fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   time,
-                  style: TextStyle(
-                    color: _textSecondary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(color: _textSecondary, fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -892,17 +582,10 @@ class _DashboardScreenState extends State<DashboardScreen>
           if (completed)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: _greenAccent.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
+              decoration: BoxDecoration(color: _greenAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
               child: Text(
                 'Done',
-                style: TextStyle(
-                  color: _greenAccent,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(color: _greenAccent, fontSize: 12, fontWeight: FontWeight.w700),
               ),
             ),
         ],
@@ -975,13 +658,7 @@ class _UltraPremium3DRingPainter extends CustomPainter {
       progressPaint.color = Color.lerp(color.withOpacity(0.7), color, colorT)!;
       progressPaint.strokeWidth = strokeWidth;
 
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        angle,
-        nextAngle - angle,
-        false,
-        progressPaint,
-      );
+      canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angle, nextAngle - angle, false, progressPaint);
     }
 
     // Outer glow shadow for progress (stronger at top)
@@ -992,13 +669,7 @@ class _UltraPremium3DRingPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16);
 
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      2 * math.pi * progress,
-      false,
-      outerGlowPaint,
-    );
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -math.pi / 2, 2 * math.pi * progress, false, outerGlowPaint);
 
     // Top highlight for glossy curved 3D effect
     final highlightPaint = Paint()
@@ -1007,13 +678,7 @@ class _UltraPremium3DRingPainter extends CustomPainter {
       ..strokeWidth = 5
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius + baseStrokeWidth / 2 - 2),
-      -math.pi / 2,
-      2 * math.pi * progress * 0.35,
-      false,
-      highlightPaint,
-    );
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius + baseStrokeWidth / 2 - 2), -math.pi / 2, 2 * math.pi * progress * 0.35, false, highlightPaint);
 
     // Bottom shadow for 3D depth
     final bottomShadowPaint = Paint()
@@ -1022,13 +687,7 @@ class _UltraPremium3DRingPainter extends CustomPainter {
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius - baseStrokeWidth / 2 + 1),
-      math.pi / 4,
-      2 * math.pi * progress * 0.6,
-      false,
-      bottomShadowPaint,
-    );
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius - baseStrokeWidth / 2 + 1), math.pi / 4, 2 * math.pi * progress * 0.6, false, bottomShadowPaint);
 
     // Inner highlight on the left side for curve
     final innerHighlightPaint = Paint()
@@ -1037,20 +696,13 @@ class _UltraPremium3DRingPainter extends CustomPainter {
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius - baseStrokeWidth / 2 + 3),
-      -math.pi / 2,
-      2 * math.pi * progress * 0.25,
-      false,
-      innerHighlightPaint,
-    );
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius - baseStrokeWidth / 2 + 3), -math.pi / 2, 2 * math.pi * progress * 0.25, false, innerHighlightPaint);
 
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_UltraPremium3DRingPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.color != color;
+  bool shouldRepaint(_UltraPremium3DRingPainter oldDelegate) => oldDelegate.progress != progress || oldDelegate.color != color;
 }
 
 class HomeNavigationController extends GetxController {
