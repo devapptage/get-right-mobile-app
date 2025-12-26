@@ -25,12 +25,7 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
 
   void _startActivity() {
     if (_selectedActivity == null) {
-      Get.snackbar(
-        'Select Activity',
-        'Please choose an activity type',
-        backgroundColor: AppColors.error,
-        colorText: AppColors.onError,
-      );
+      Get.snackbar('Select Activity', 'Please choose an activity type', backgroundColor: AppColors.error, colorText: AppColors.onError);
       return;
     }
 
@@ -49,10 +44,7 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
           icon: const Icon(Icons.arrow_back, color: AppColors.onBackground),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          'Select Activity Type',
-          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground),
-        ),
+        title: Text('Select Activity Type', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
         centerTitle: true,
       ),
       body: Column(
@@ -65,18 +57,10 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
                 children: [
                   Text(
                     'What are you doing today?',
-                    style: AppTextStyles.headlineSmall.copyWith(
-                      color: AppColors.onBackground,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Choose your activity to get accurate tracking',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.primaryGrayDark,
-                    ),
-                  ),
+                  Text('Choose your activity to get accurate tracking', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
                   const SizedBox(height: 32),
 
                   // Activity Type Cards
@@ -115,15 +99,15 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
                 child: ElevatedButton.icon(
                   onPressed: _selectedActivity != null ? _startActivity : null,
                   icon: const Icon(Icons.play_arrow, size: 28),
-                  label: Text(
-                    'Start Activity',
-                    style: AppTextStyles.buttonLarge,
-                  ),
+                  label: Text('Start Activity', style: AppTextStyles.buttonLarge.copyWith(color: startActivity ? AppColors.onPrimary : AppColors.onAccent)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     foregroundColor: AppColors.onAccent,
                     disabledBackgroundColor: AppColors.primaryGrayLight,
+                    disabledForegroundColor: AppColors.onPrimary,
+
                     shape: RoundedRectangleBorder(
+                      side: BorderSide(color: AppColors.accent.withOpacity(0.5), width: 2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 2,
@@ -153,25 +137,10 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.1) : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? color : AppColors.primaryGray.withOpacity(0.3),
-            width: isSelected ? 2 : 1,
-          ),
+          border: Border.all(color: isSelected ? color : AppColors.primaryGray.withOpacity(0.3), width: isSelected ? 2 : 1),
           boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: AppColors.secondary.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+              ? [BoxShadow(color: color.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 4))]
+              : [BoxShadow(color: AppColors.secondary.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
         ),
         child: Row(
           children: [
@@ -195,18 +164,10 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
                 children: [
                   Text(
                     type,
-                    style: AppTextStyles.titleLarge.copyWith(
-                      color: isSelected ? color : AppColors.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.titleLarge.copyWith(color: isSelected ? color : AppColors.onSurface, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.primaryGrayDark,
-                    ),
-                  ),
+                  Text(description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark)),
                 ],
               ),
             ),
@@ -216,15 +177,8 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                child: const Icon(Icons.check, color: Colors.white, size: 20),
               )
             else
               Container(
@@ -232,10 +186,7 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
                 height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primaryGray,
-                    width: 2,
-                  ),
+                  border: Border.all(color: AppColors.primaryGray, width: 2),
                 ),
               ),
           ],
@@ -244,4 +195,3 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
     );
   }
 }
-

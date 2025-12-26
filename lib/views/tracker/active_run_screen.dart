@@ -265,9 +265,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
                   child: _buildStatCard('Calories', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value} cal' : '--', Icons.local_fire_department_rounded),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard('Elevation', _controller.formatElevation(_controller.elevationGain.value), Icons.terrain_rounded),
-                ),
+                Expanded(child: _buildStatCard('Elevation', _controller.formatElevation(_controller.elevationGain.value), Icons.terrain_rounded)),
               ],
             ),
           ],
@@ -322,7 +320,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Stop button
-              _buildControlButton(icon: Icons.stop_rounded, label: 'Stop', color: AppColors.error, onPressed: _showStopDialog),
+              _buildControlButton(icon: Icons.stop_rounded, label: 'End', color: AppColors.error, onPressed: _showStopDialog),
               const SizedBox(width: 20),
               // Pause/Resume button
               _buildControlButton(

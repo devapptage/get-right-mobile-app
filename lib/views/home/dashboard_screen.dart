@@ -154,7 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                             style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.5),
                           ),
                           TextButton(
-                            onPressed: () => Get.find<HomeNavigationController>().changeTab(2),
+                            onPressed: () => Get.find<HomeNavigationController>().changeTab(2, journalTab: 0),
                             child: Text(
                               'See All',
                               style: TextStyle(color: _greenAccent, fontSize: 14, fontWeight: FontWeight.w600),
@@ -400,9 +400,9 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
-          _buildQuickStartCard('Start\nWorkout', Icons.play_circle_filled, _greenAccent, () => Get.find<HomeNavigationController>().changeTab(2)),
+          _buildQuickStartCard('Start\nWorkout', Icons.play_circle_filled, _greenAccent, () => Get.find<HomeNavigationController>().changeTab(2, journalTab: 0)),
           const SizedBox(width: 16),
-          _buildQuickStartCard('Track\nRun', Icons.directions_run_rounded, _blackPrimary, () => Get.find<HomeNavigationController>().changeTab(2)),
+          _buildQuickStartCard('Track\nRun', Icons.directions_run_rounded, _blackPrimary, () => Get.find<HomeNavigationController>().changeTab(2, journalTab: 1)),
           const SizedBox(width: 16),
           _buildQuickStartCard('View\nPlanner', Icons.calendar_today_rounded, _blackPrimary, () => Get.toNamed(AppRoutes.planner)),
         ],
@@ -519,7 +519,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () => Get.toNamed(AppRoutes.workoutJournal),
+              onTap: () => Get.find<HomeNavigationController>().changeTab(2, journalTab: 0),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(color: _greenAccent, borderRadius: BorderRadius.circular(16)),
@@ -707,11 +707,15 @@ class _UltraPremium3DRingPainter extends CustomPainter {
 
 class HomeNavigationController extends GetxController {
   final _currentIndex = 0.obs;
+  final journalTabIndex = 0.obs; // 0 = Workout Journal, 1 = Runner Log
   GlobalKey<ScaffoldState>? scaffoldKey;
 
   int get currentIndex => _currentIndex.value;
 
-  void changeTab(int index) {
+  void changeTab(int index, {int? journalTab}) {
+    if (journalTab != null) {
+      journalTabIndex.value = journalTab.clamp(0, 1);
+    }
     _currentIndex.value = index;
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Split;
+import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -525,7 +526,8 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
             height: 56,
             child: OutlinedButton(
               onPressed: () {
-                Get.back();
+                Get.close(3);
+                Get.find<HomeNavigationController>().changeTab(2, journalTab: 1);
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: AppColors.primaryGray.withOpacity(0.5), width: 2),

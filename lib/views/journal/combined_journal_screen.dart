@@ -17,18 +17,40 @@ class CombinedJournalScreen extends StatefulWidget {
 class _CombinedJournalScreenState extends State<CombinedJournalScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late final HomeNavigationController _navController;
+  late final Worker _journalTabWorker;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _navController = Get.find<HomeNavigationController>();
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: _navController.journalTabIndex.value.clamp(0, 1),
+    );
     _tabController.addListener(() {
-      setState(() {}); // Update UI when tab changes
+      // Keep controller in sync (and update UI)
+      final idx = _tabController.index.clamp(0, 1);
+      if (_navController.journalTabIndex.value != idx) {
+        _navController.journalTabIndex.value = idx;
+      }
+      setState(() {});
+    });
+
+    // If something (e.g. dashboard quick actions) requests a specific tab, jump there.
+    _journalTabWorker = ever<int>(_navController.journalTabIndex, (idx) {
+      if (!mounted) return;
+      final target = idx.clamp(0, 1);
+      if (_tabController.index != target) {
+        _tabController.animateTo(target);
+      }
     });
   }
 
   @override
   void dispose() {
+    _journalTabWorker.dispose();
     _tabController.dispose();
     super.dispose();
   }
