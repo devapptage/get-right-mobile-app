@@ -160,22 +160,24 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
         child: Column(
           children: [
             // Actions bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                      child: const Icon(Icons.add, color: AppColors.onAccent, size: 20),
+            _workout == null || _workout!.isEmpty
+                ? const SizedBox.shrink()
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                            child: const Icon(Icons.add, color: AppColors.onAccent, size: 20),
+                          ),
+                          onPressed: _onAddExercise,
+                        ),
+                      ],
                     ),
-                    onPressed: _onAddExercise,
                   ),
-                ],
-              ),
-            ),
             Expanded(
               child: _isLoading
                   ? Center(child: CircularProgressIndicator(color: AppColors.accent))

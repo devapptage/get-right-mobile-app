@@ -1,13 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_right/constants/app_constants.dart';
 import 'package:get_right/models/workout_model.dart';
+import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/utils/validators.dart';
 import 'package:get_right/widgets/common/custom_button.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 /// Add workout screen - Redesigned to match app theme
@@ -25,6 +30,9 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   final _repsController = TextEditingController();
   final _weightController = TextEditingController();
   final _notesController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+
+  String? _progressPhotoPath;
   final List<String> _selectedTags = [];
   DateTime _selectedDate = DateTime.now();
   bool _isLoading = false;
@@ -96,6 +104,117 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   }
 
   Future<void> _saveWorkout() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) {
+      Get.snackbar(
+        'Missing info',
+        'Please fill in all required fields (Exercise Name, Sets, Reps).',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+
+    final sets = int.tryParse(_setsController.text.trim());
+    final reps = int.tryParse(_repsController.text.trim());
+    if (sets == null || reps == null) {
+      Get.snackbar(
+        'Invalid number',
+        'Sets and Reps must be whole numbers.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+
+    if (_storageService == null) {
+      await _initializeStorage();
+    }
+
+    if (_storageService == null) {
+      Get.snackbar(
+        'Error',
+        'Failed to initialize storage. Please try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final userId = _storageService!.getUserId() ?? 'anonymous';
+      final workout = WorkoutModel(
+        id: _isEditMode && _editWorkoutId != null ? _editWorkoutId! : DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: userId,
+        exerciseName: _exerciseController.text.trim(),
+        sets: sets,
+        reps: reps,
+        weight: _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
+        notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+        tags: _selectedTags.isNotEmpty ? _selectedTags : null,
+        progressPhotos: _progressPhotoPath != null ? [_progressPhotoPath!] : null,
+        date: _selectedDate,
+        createdAt: DateTime.now(),
+      );
+
+      bool success;
+      if (_isEditMode) {
+        success = await _storageService!.updateWorkout(workout);
+      } else {
+        success = await _storageService!.addWorkout(workout);
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (success) {
+        // Always leave this screen on success (some entry points don't await the route result).
+        if (Navigator.of(context).canPop()) {
+          Get.back(result: true);
+        } else {
+          Get.offAllNamed(AppRoutes.home);
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          'Failed to save workout. Please try again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      Get.snackbar(
+        'Error',
+        'An error occurred: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+    }
+  }
+
+  /*
+  // Previous implementation (kept commented for reference)
+  Future<void> _saveWorkout() async {
     if (_formKey.currentState!.validate()) {
       if (_storageService == null) {
         await _initializeStorage();
@@ -128,6 +247,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
           weight: _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
           notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
           tags: _selectedTags.isNotEmpty ? _selectedTags : null,
+          progressPhotos: _progressPhotoPath != null ? [_progressPhotoPath!] : null,
           date: _selectedDate,
           createdAt: DateTime.now(),
         );
@@ -178,8 +298,11 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
       }
     }
   }
+  */
 
   void _showPhotoOptions() {
+    // Prevent the Notes field (or any other field) from re-opening the keyboard.
+    FocusManager.instance.primaryFocus?.unfocus();
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(24),
@@ -200,9 +323,12 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                 child: const Icon(Icons.camera_alt, color: AppColors.accent),
               ),
               title: Text('Take Photo', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              onTap: () {
+              onTap: () async {
+                FocusManager.instance.primaryFocus?.unfocus();
                 Get.back();
-                // TODO: Implement camera
+                // Small delay to allow the bottom sheet to close cleanly.
+                await Future.delayed(const Duration(milliseconds: 150));
+                await _pickProgressPhoto(ImageSource.camera);
               },
             ),
             ListTile(
@@ -213,15 +339,38 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                 child: const Icon(Icons.photo_library, color: AppColors.completed),
               ),
               title: Text('Choose from Gallery', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              onTap: () {
+              onTap: () async {
+                FocusManager.instance.primaryFocus?.unfocus();
                 Get.back();
-                // TODO: Implement gallery picker
+                await Future.delayed(const Duration(milliseconds: 150));
+                await _pickProgressPhoto(ImageSource.gallery);
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _pickProgressPhoto(ImageSource source) async {
+    try {
+      final XFile? picked = await _imagePicker.pickImage(source: source, imageQuality: 85, maxWidth: 2048);
+
+      if (picked == null) return;
+
+      setState(() {
+        _progressPhotoPath = picked.path;
+      });
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Could not access ${source == ImageSource.camera ? 'camera' : 'gallery'}. Please check permissions.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+    }
   }
 
   @override
@@ -265,6 +414,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                             controller: _setsController,
                             labelText: 'Sets',
                             keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                             prefixIcon: const Icon(Icons.repeat),
                             validator: (value) => Validators.validatePositiveNumber(value, fieldName: 'Sets'),
                           ),
@@ -275,6 +425,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                             controller: _repsController,
                             labelText: 'Reps',
                             keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                             prefixIcon: const Icon(Icons.numbers),
                             validator: (value) => Validators.validatePositiveNumber(value, fieldName: 'Reps'),
                           ),
@@ -411,7 +562,10 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
               _buildSectionHeader('Progress Photo', Icons.photo_camera),
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: _showPhotoOptions,
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  _showPhotoOptions();
+                },
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
@@ -422,16 +576,25 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   ),
                   child: Column(
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
-                        child: const Icon(Icons.add_a_photo, color: AppColors.accent, size: 36),
-                      ),
+                      if (_progressPhotoPath == null)
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
+                          child: const Icon(Icons.add_a_photo, color: AppColors.accent, size: 36),
+                        )
+                      else
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.file(File(_progressPhotoPath!), width: 120, height: 120, fit: BoxFit.cover),
+                        ),
                       const SizedBox(height: 16),
-                      Text('Add Progress Photo', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
+                      Text(_progressPhotoPath == null ? 'Add Progress Photo' : 'Change Progress Photo', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
                       const SizedBox(height: 4),
-                      Text('Optional - Track your progress visually', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                      Text(
+                        _progressPhotoPath == null ? 'Optional - Track your progress visually' : 'Tap to replace',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray),
+                      ),
                     ],
                   ),
                 ),

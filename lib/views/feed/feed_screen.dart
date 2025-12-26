@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
@@ -374,22 +375,29 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         children: [
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: CircleAvatar(
-              backgroundColor: AppColors.accent.withOpacity(0.2),
-              child: Text(post['creatorImage'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)),
+            leading: GestureDetector(
+              onTap: () => _navigateToCreatorProfile(post),
+              child: CircleAvatar(
+                backgroundColor: AppColors.accent.withOpacity(0.2),
+                child: Text(post['creatorImage'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)),
+              ),
             ),
-            title: Row(
-              children: [
-                Text(
-                  post['creator'],
-                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-                ),
-                if (post['isTrainer'])
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4),
-                    child: Icon(Icons.verified, color: AppColors.completed, size: 16),
+            title: InkWell(
+              onTap: () => _navigateToCreatorProfile(post),
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                children: [
+                  Text(
+                    post['creator'],
+                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                   ),
-              ],
+                  if (post['isTrainer'])
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Icon(Icons.verified, color: AppColors.completed, size: 16),
+                    ),
+                ],
+              ),
             ),
             subtitle: Text('${post['timestamp']} • ${post['category']}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
             trailing: PopupMenuButton(
@@ -549,6 +557,35 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         ],
       ),
     );
+  }
+
+  void _navigateToCreatorProfile(Map<String, dynamic> post) {
+    final String creatorName = (post['creator'] ?? 'Creator').toString();
+    final String initials = (post['creatorImage'] ?? 'UT').toString();
+    final bool isTrainer = post['isTrainer'] == true;
+    final String category = (post['category'] ?? 'Fitness').toString();
+
+    final trainerData = <String, dynamic>{
+      'id': creatorName.toLowerCase().replaceAll(' ', '_'),
+      'name': creatorName,
+      'initials': initials,
+      'bio': isTrainer
+          ? 'Certified trainer sharing ${category.toLowerCase()} tips and routines to help you reach your goals.'
+          : 'Fitness enthusiast sharing ${category.toLowerCase()} content with the community.',
+      'specialties': <String>[category, 'Training', if (isTrainer) 'Coaching'],
+      'yearsOfExperience': isTrainer ? 6 : 2,
+      'certified': isTrainer,
+      'certifications': isTrainer ? ['Certified Personal Trainer'] : null,
+      'hourlyRate': 75.0,
+      'rating': 4.8,
+      'totalReviews': 127,
+      'students': 1250,
+      'activePrograms': 5,
+      'completedPrograms': 12,
+      'totalPrograms': 17,
+    };
+
+    Get.toNamed(AppRoutes.trainerProfile, arguments: trainerData);
   }
 
   Widget _buildInteractionButton({required IconData icon, required String label, required Color color, required VoidCallback onTap}) {

@@ -199,7 +199,10 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                         backgroundColor: AppColors.accent,
                         foregroundColor: AppColors.onAccent,
                         disabledBackgroundColor: AppColors.primaryGrayLight,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: _selected.isNotEmpty ? BorderSide.none : const BorderSide(color: AppColors.accent, width: 2),
+                        ),
                       ),
                       child: Text(
                         _isSuperset && _selected.length == 2
@@ -207,7 +210,7 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                             : _selected.isNotEmpty
                             ? 'Configure ${_selected.first.name}'
                             : 'Select an Exercise',
-                        style: AppTextStyles.buttonMedium,
+                        style: AppTextStyles.buttonMedium.copyWith(color: _selected.isNotEmpty ? AppColors.onAccent : AppColors.onBackground),
                       ),
                     ),
                   ),

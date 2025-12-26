@@ -400,7 +400,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
-          _buildQuickStartCard('Start\nWorkout', Icons.play_circle_filled, _greenAccent, () => Get.toNamed(AppRoutes.addWorkout)),
+          _buildQuickStartCard('Start\nWorkout', Icons.play_circle_filled, _greenAccent, () => Get.find<HomeNavigationController>().changeTab(2)),
           const SizedBox(width: 16),
           _buildQuickStartCard('Track\nRun', Icons.directions_run_rounded, _blackPrimary, () => Get.find<HomeNavigationController>().changeTab(2)),
           const SizedBox(width: 16),

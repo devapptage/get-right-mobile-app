@@ -23,6 +23,25 @@ class TrainerProfileScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: AppColors.accent,
             elevation: 0,
+            leading: IconButton(
+              tooltip: 'Back',
+              onPressed: () {
+                if (Get.key.currentState?.canPop() ?? false) {
+                  Get.back();
+                } else if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.25)),
+                ),
+                child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+              ),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
