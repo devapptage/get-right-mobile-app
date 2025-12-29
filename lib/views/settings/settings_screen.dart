@@ -37,7 +37,10 @@ class SettingsScreen extends StatelessWidget {
               title: Text('Enable Notifications', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
               subtitle: Text('Receive workout reminders and updates', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
               value: controller.notificationsEnabled,
-              activeColor: AppColors.accent,
+              // Ensure strong ON-state contrast (white thumb on green track).
+              // The app theme also defines these, but this makes the intent explicit here.
+              activeColor: AppColors.onAccent,
+              activeTrackColor: AppColors.accent,
               onChanged: controller.toggleNotifications,
             ),
           ),
