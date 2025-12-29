@@ -276,11 +276,14 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Already have an account? ', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15)),
+                          Text(
+                            'Already have an account? ',
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15),
+                          ).paddingOnly(top: 4),
                           TextButton(
                             onPressed: () => Get.back(),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 0),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),

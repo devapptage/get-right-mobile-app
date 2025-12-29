@@ -233,13 +233,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     // Sign up link
                     Center(
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('Don\'t have an account? ', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15)),
+                          Text(
+                            'Don\'t have an account? ',
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15),
+                          ).paddingOnly(top: 4),
                           TextButton(
                             onPressed: () => Get.toNamed(AppRoutes.signup),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 0),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
