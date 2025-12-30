@@ -44,6 +44,8 @@ import 'package:get_right/views/settings/change_password_screen.dart';
 import 'package:get_right/views/settings/notifications_screen.dart';
 import 'package:get_right/views/settings/help_feedback_screen.dart';
 import 'package:get_right/views/settings/about_screen.dart';
+import 'package:get_right/views/settings/blocked_users_screen.dart';
+import 'package:get_right/views/settings/reports_screen.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
 import 'package:get_right/views/chat/chat_room_screen.dart';
 import 'package:get_right/views/tracker/progress_screen.dart';
@@ -174,6 +176,8 @@ class AppPages {
     // Settings Pages
     GetPage(name: AppRoutes.settings, page: () => const SettingsScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.notifications, page: () => const NotificationsScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.blockedUsers, page: () => const BlockedUsersScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.reports, page: () => const ReportsScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.helpFeedback, page: () => const HelpFeedbackScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.about, page: () => const AboutScreen(), transition: Transition.rightToLeft),
     // GetPage(name: AppRoutes.createTrainerProfile, page: () => const CreateTrainerProfileScreen(), transition: Transition.rightToLeft),

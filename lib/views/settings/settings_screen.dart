@@ -54,6 +54,24 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => Get.to(() => const ChangePasswordScreen()),
           ),
 
+          // Blocked Users
+          ListTile(
+            leading: const Icon(Icons.person_off_outlined, color: AppColors.onBackground),
+            title: Text('Blocked Users', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
+            subtitle: Text('Manage people you’ve blocked', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
+            onTap: () => Get.toNamed(AppRoutes.blockedUsers),
+          ),
+
+          // Reports
+          ListTile(
+            leading: const Icon(Icons.report_outlined, color: AppColors.onBackground),
+            title: Text('Reports', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
+            subtitle: Text('Reported users and posts', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
+            onTap: () => Get.toNamed(AppRoutes.reports),
+          ),
+
           // Notifications Settings
           ListTile(
             leading: const Icon(Icons.tune, color: AppColors.onBackground),

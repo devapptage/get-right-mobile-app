@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'brogan_seier',
+                  'brogan seier',
                   style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
@@ -154,14 +154,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     Text(
                       'Personal Records',
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, color: AppColors.primaryGray, size: 20),
-                      onPressed: () {
-                        // TODO: Edit personal records
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),

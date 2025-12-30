@@ -108,6 +108,8 @@ class AppRoutes {
   // Settings Routes
   static const String settings = '/settings';
   static const String notifications = '/notifications';
+  static const String blockedUsers = '/blocked-users';
+  static const String reports = '/reports';
   static const String helpFeedback = '/help-feedback';
   static const String termsConditions = '/terms-conditions';
   static const String privacyPolicy = '/privacy-policy';
