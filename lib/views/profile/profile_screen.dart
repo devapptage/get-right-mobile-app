@@ -183,12 +183,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                     ),
                     Container(
-                      decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 4))],
+                      ),
                       child: IconButton(
                         icon: const Icon(Icons.add, color: Colors.white, size: 20),
-                        onPressed: () {
-                          // TODO: Add new post
-                        },
+                        onPressed: _showCreatePostOptions,
                         padding: const EdgeInsets.all(8),
                         constraints: const BoxConstraints(),
                       ),
@@ -452,37 +454,178 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 
   Widget _buildPostsGrid() {
-    // Mock posts data
-    final posts = List.generate(
-      9,
-      (index) => {
-        'id': index,
-        'isVideo': index == 0,
-        'color': const Color(0xFF5C8374), // Teal/green color from screenshot
+    // Mock posts data with more realistic content
+    final posts = [
+      {
+        'id': '1',
+        'isVideo': true,
+        'thumbnail': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400',
+        'title': 'Perfect Squat Form',
+        'description': 'Master your squat technique with these tips!',
+        'likes': 315,
+        'comments': 42,
+        'saves': 89,
+        'shares': 23,
+        'duration': '1:24',
+        'timestamp': '2 days ago',
+        'tags': ['#fitness', '#squat', '#formcheck'],
       },
-    );
+      {
+        'id': '2',
+        'isVideo': false,
+        'thumbnail': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400',
+        'title': 'Gym Progress',
+        'description': '6 months of consistent training!',
+        'likes': 428,
+        'comments': 67,
+        'saves': 124,
+        'shares': 31,
+        'timestamp': '5 days ago',
+        'tags': ['#progress', '#transformation', '#dedication'],
+      },
+      {
+        'id': '3',
+        'isVideo': true,
+        'thumbnail': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
+        'title': 'Deadlift PR',
+        'description': 'New personal record: 405 lbs!',
+        'likes': 892,
+        'comments': 134,
+        'saves': 267,
+        'shares': 89,
+        'duration': '0:45',
+        'timestamp': '1 week ago',
+        'tags': ['#deadlift', '#pr', '#powerlifting'],
+      },
+      {
+        'id': '4',
+        'isVideo': false,
+        'thumbnail': 'https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?w=400',
+        'title': 'Meal Prep Sunday',
+        'description': 'High protein meals for the week',
+        'likes': 234,
+        'comments': 28,
+        'saves': 156,
+        'shares': 45,
+        'timestamp': '1 week ago',
+        'tags': ['#mealprep', '#nutrition', '#healthy'],
+      },
+      {
+        'id': '5',
+        'isVideo': true,
+        'thumbnail': 'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=400',
+        'title': 'Morning Cardio',
+        'description': 'Starting the day right!',
+        'likes': 167,
+        'comments': 19,
+        'saves': 43,
+        'shares': 12,
+        'duration': '2:15',
+        'timestamp': '2 weeks ago',
+        'tags': ['#cardio', '#morning', '#running'],
+      },
+      {
+        'id': '6',
+        'isVideo': false,
+        'thumbnail': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400',
+        'title': 'Gym Selfie',
+        'description': 'Post-workout pump!',
+        'likes': 521,
+        'comments': 89,
+        'saves': 78,
+        'shares': 23,
+        'timestamp': '2 weeks ago',
+        'tags': ['#fitness', '#gym', '#motivation'],
+      },
+    ];
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 2, mainAxisSpacing: 2, childAspectRatio: 1),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 4, mainAxisSpacing: 4, childAspectRatio: 1),
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts[index];
         return GestureDetector(
-          onTap: () {
-            // TODO: View post detail
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: post['color'] as Color,
-              border: Border.all(color: AppColors.background, width: 1),
-            ),
-            child: post['isVideo'] as bool ? Center(child: Icon(Icons.play_circle_filled, color: Colors.white.withOpacity(0.9), size: 40)) : null,
+          onTap: () => _navigateToPostDetail(post),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Post Image/Thumbnail
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  post['thumbnail'] as String,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.accent, AppColors.accent.withOpacity(0.6)]),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+              // Gradient overlay for better icon visibility
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              // Video play icon
+              if (post['isVideo'] as bool)
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), shape: BoxShape.circle),
+                    child: Icon(Icons.play_arrow, color: Colors.white.withOpacity(0.9), size: 28),
+                  ),
+                ),
+              // Engagement stats overlay
+              Positioned(
+                bottom: 4,
+                left: 4,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.favorite,
+                      color: Colors.white,
+                      size: 14,
+                      shadows: [Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4)],
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      _formatCount(post['likes'] as int),
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        shadows: [Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4)],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
     );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
+  }
+
+  void _navigateToPostDetail(Map<String, dynamic> post) {
+    // Add creator info to post data
+    final postWithCreator = {...post, 'creator': 'brogan seier', 'creatorInitials': 'BS', 'isLiked': false, 'isSaved': false};
+    Get.toNamed(AppRoutes.postDetail, arguments: postWithCreator);
   }
 
   Widget _buildInfoRow(String label, String value, IconData icon) {
@@ -610,6 +753,142 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ),
             Icon(Icons.chevron_right, color: AppColors.error, size: 24),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showCreatePostOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, -5))],
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+              ),
+              const SizedBox(height: 20),
+
+              // Title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.add_photo_alternate, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Create Post',
+                      style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Options
+              _buildCreatePostOption(
+                icon: Icons.videocam,
+                title: 'Record Video',
+                subtitle: 'Capture a new video with your camera',
+                gradient: const LinearGradient(colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)]),
+                onTap: () {
+                  Navigator.pop(context);
+                  Get.toNamed(AppRoutes.createPost, arguments: {'type': 'record'});
+                },
+              ),
+              _buildCreatePostOption(
+                icon: Icons.video_library,
+                title: 'Upload Video',
+                subtitle: 'Choose a video from your gallery',
+                gradient: const LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                onTap: () {
+                  Navigator.pop(context);
+                  Get.toNamed(AppRoutes.createPost, arguments: {'type': 'video'});
+                },
+              ),
+              _buildCreatePostOption(
+                icon: Icons.image,
+                title: 'Upload Photo',
+                subtitle: 'Share a photo from your gallery',
+                gradient: const LinearGradient(colors: [Color(0xFF11998E), Color(0xFF38EF7D)]),
+                onTap: () {
+                  Navigator.pop(context);
+                  Get.toNamed(AppRoutes.createPost, arguments: {'type': 'image'});
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreatePostOption({required IconData icon, required String title, required String subtitle, required Gradient gradient, required VoidCallback onTap}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: gradient,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [BoxShadow(color: gradient.colors.first.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(subtitle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, color: AppColors.primaryGray, size: 18),
+              ],
+            ),
+          ),
         ),
       ),
     );
