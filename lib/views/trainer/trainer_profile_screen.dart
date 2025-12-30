@@ -237,6 +237,118 @@ class TrainerProfileScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                // Premium Subscription Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                    ),
+                    child: Stack(
+                      children: [
+                        // Decorative circles
+                        Positioned(
+                          top: -20,
+                          right: -20,
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1)),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: -30,
+                          left: -30,
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.08)),
+                          ),
+                        ),
+                        // Content
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                    ),
+                                    child: Icon(Icons.workspace_premium_rounded, color: AppColors.upcoming, size: 28),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Premium Access',
+                                          style: AppTextStyles.titleLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text('Get direct contact details', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9), fontSize: 13)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              // Benefits
+                              _buildPremiumBenefit(Icons.phone_rounded, 'Direct phone number'),
+                              const SizedBox(height: 12),
+                              _buildPremiumBenefit(Icons.email_rounded, 'Personal email address'),
+                              const SizedBox(height: 12),
+                              _buildPremiumBenefit(Icons.location_on_rounded, 'Training location details'),
+                              const SizedBox(height: 12),
+                              _buildPremiumBenefit(Icons.schedule_rounded, 'Priority booking access'),
+                              const SizedBox(height: 20),
+                              // Subscribe Button
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 6))],
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () => _showSubscriptionDialog(context, trainer),
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.diamond_rounded, color: AppColors.accent, size: 24),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            'Subscribe for \$9.99/month',
+                                            style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 32),
 
                 // About Section
@@ -790,6 +902,323 @@ class TrainerProfileScreen extends StatelessWidget {
       return '${(number / 1000).toStringAsFixed(1)}K';
     }
     return number.toString();
+  }
+
+  Widget _buildPremiumBenefit(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+          child: Icon(icon, color: Colors.white, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: AppTextStyles.bodyMedium.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+          ),
+        ),
+        Icon(Icons.check_circle_rounded, color: AppColors.upcoming, size: 20),
+      ],
+    );
+  }
+
+  static void _showSubscriptionDialog(BuildContext context, Map<String, dynamic> trainer) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 10))],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with gradient
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                      child: Icon(Icons.workspace_premium_rounded, color: AppColors.upcoming, size: 48),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Premium Subscription',
+                      style: AppTextStyles.headlineSmall.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Get direct access to ${trainer['name']}',
+                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    // Price
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '\$',
+                          style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '9.99',
+                          style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 48),
+                        ),
+                        const SizedBox(width: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text('/month', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Benefits list
+                    _buildDialogBenefit('Direct phone number access'),
+                    const SizedBox(height: 12),
+                    _buildDialogBenefit('Personal email address'),
+                    const SizedBox(height: 12),
+                    _buildDialogBenefit('Training location details'),
+                    const SizedBox(height: 12),
+                    _buildDialogBenefit('Priority booking'),
+                    const SizedBox(height: 12),
+                    _buildDialogBenefit('Exclusive content access'),
+                    const SizedBox(height: 24),
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: AppColors.primaryGray.withOpacity(0.3)),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant]),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _showContactDetails(context, trainer);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text(
+                                'Subscribe Now',
+                                style: AppTextStyles.titleSmall.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildDialogBenefit(String text) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.1), shape: BoxShape.circle),
+          child: Icon(Icons.check_circle_rounded, color: AppColors.completed, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(text, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
+        ),
+      ],
+    );
+  }
+
+  static void _showContactDetails(BuildContext context, Map<String, dynamic> trainer) {
+    Get.snackbar(
+      'Subscription Activated! 🎉',
+      'You now have access to ${trainer['name']}\'s contact details',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.completed,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+      icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
+    );
+
+    // Show contact details in a bottom sheet
+    Future.delayed(const Duration(milliseconds: 500), () {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+                ),
+                const SizedBox(height: 24),
+                // Title
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColors.accent, AppColors.accentVariant]),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.contact_phone_rounded, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Contact Details',
+                            style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                          ),
+                          Text(trainer['name'], style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                // Contact info cards
+                _buildContactCard(Icons.phone_rounded, 'Phone', '+1 (555) 123-4567', AppColors.accent),
+                const SizedBox(height: 12),
+                _buildContactCard(Icons.email_rounded, 'Email', '${trainer['name'].toString().toLowerCase().replaceAll(' ', '.')}@fitness.com', AppColors.accentVariant),
+                const SizedBox(height: 12),
+                _buildContactCard(Icons.location_on_rounded, 'Location', '123 Fitness Street, Gym City, GC 12345', AppColors.completed),
+                const SizedBox(height: 24),
+                // Close button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.surface,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(
+                      'Close',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  static Widget _buildContactCard(IconData icon, String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.copy_rounded, color: color),
+            onPressed: () {
+              Get.snackbar(
+                'Copied!',
+                '$label copied to clipboard',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: color.withOpacity(0.1),
+                colorText: color,
+                duration: const Duration(seconds: 2),
+                margin: const EdgeInsets.all(16),
+                borderRadius: 12,
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSeeAllProgramsCard(List<Map<String, dynamic>> programs, String sectionTitle) {
