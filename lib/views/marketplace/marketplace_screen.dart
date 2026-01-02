@@ -15,7 +15,9 @@ class MarketplaceScreen extends StatefulWidget {
 
 class _MarketplaceScreenState extends State<MarketplaceScreen> {
   String _selectedCategory = 'All';
-  String _selectedGoal = 'All';
+  String _selectedDifficulty = 'All';
+  String _selectedDuration = 'All';
+  String _sortBy = 'Featured'; // Featured, Newest, Highest Rated, Price Low-High, Price High-Low
   bool _showCertifiedOnly = false;
 
   // Motivational quotes for success modal
@@ -350,6 +352,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       'duration': '12 weeks',
       'category': 'Strength',
       'goal': 'Muscle Building',
+      'difficulty': 'Intermediate',
       'certified': true,
       'rating': 4.8,
       'students': 1250,
@@ -710,12 +713,61 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   ];
 
   List<Map<String, dynamic>> get _filteredPrograms {
-    return _programs.where((program) {
+    var filtered = _programs.where((program) {
       if (_selectedCategory != 'All' && program['category'] != _selectedCategory) return false;
-      if (_selectedGoal != 'All' && program['goal'] != _selectedGoal) return false;
+      if (_selectedDifficulty != 'All' && program['difficulty'] != _selectedDifficulty) return false;
+      if (_selectedDuration != 'All') {
+        final duration = program['duration'] as String;
+        if (_selectedDuration == '0-4 weeks' && !duration.contains(RegExp(r'[1-4]\s+week'))) return false;
+        if (_selectedDuration == '5-8 weeks' && !duration.contains(RegExp(r'[5-8]\s+week'))) return false;
+        if (_selectedDuration == '9-12 weeks' && !duration.contains(RegExp(r'(9|10|11|12)\s+week'))) return false;
+        if (_selectedDuration == '13+ weeks' && !duration.contains(RegExp(r'(1[3-9]|[2-9]\d)\s+week'))) return false;
+      }
       if (_showCertifiedOnly && !program['certified']) return false;
       return true;
     }).toList();
+
+    // Apply sorting
+    switch (_sortBy) {
+      case 'Newest':
+        // In production, sort by creation date
+        filtered = filtered.reversed.toList();
+        break;
+      case 'Highest Rated':
+        filtered.sort((a, b) => (b['rating'] as double).compareTo(a['rating'] as double));
+        break;
+      case 'Price Low-High':
+        filtered.sort((a, b) => (a['price'] as double).compareTo(b['price'] as double));
+        break;
+      case 'Price High-Low':
+        filtered.sort((a, b) => (b['price'] as double).compareTo(a['price'] as double));
+        break;
+      default: // Featured
+        // Keep original order
+        break;
+    }
+
+    return filtered;
+  }
+
+  List<Map<String, dynamic>> get _filteredBundles {
+    return _bundles.where((bundle) {
+      if (_showCertifiedOnly) {
+        final programs = bundle['programs'] as List<Map<String, dynamic>>;
+        if (!programs.every((p) => p['certified'] == true)) return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  // Featured/Hot programs (high engagement)
+  List<Map<String, dynamic>> get _featuredPrograms {
+    return _programs.where((p) => (p['students'] as int) > 1500 || (p['rating'] as double) >= 4.8).take(6).toList();
+  }
+
+  // New releases
+  List<Map<String, dynamic>> get _newReleases {
+    return _programs.take(5).toList();
   }
 
   void _showFilterModal() {
@@ -758,12 +810,13 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
-                _buildFilterSectionHeader('Category', Icons.category_outlined),
-                SizedBox(height: 12),
+                const SizedBox(height: 24),
+
+                // Sort By Section
+                _buildFilterSectionHeader('Sort By', Icons.sort_outlined),
+                const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
-
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.primaryVariant,
@@ -773,7 +826,50 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   child: Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: ['All', 'Strength', 'Cardio', 'Flexibility', 'Bodyweight', 'Running', 'Core'].map((category) {
+                    children: ['Featured', 'Newest', 'Highest Rated', 'Price Low-High', 'Price High-Low'].map((sort) {
+                      final isSelected = _sortBy == sort;
+                      return GestureDetector(
+                        onTap: () {
+                          setModalState(() {
+                            _sortBy = sort;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.accent : AppColors.surface,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
+                          ),
+                          child: Text(
+                            sort,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: isSelected ? AppColors.onAccent : AppColors.onBackground,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Category Section
+                _buildFilterSectionHeader('Category', Icons.category_outlined),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryVariant,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ['All', 'Strength', 'Cardio', 'Flexibility', 'Bodyweight', 'Running', 'Core', 'Fat Loss', 'Hypertrophy', 'Sports-Specific'].map((category) {
                       final isSelected = _selectedCategory == category;
                       return GestureDetector(
                         onTap: () {
@@ -802,8 +898,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Goal Section
-                _buildFilterSectionHeader('Fitness Goal', Icons.flag_outlined),
+                // Difficulty Section
+                _buildFilterSectionHeader('Difficulty', Icons.bar_chart_outlined),
                 const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
@@ -816,12 +912,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   child: Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: ['All', 'Muscle Building', 'Weight Loss', 'Flexibility', 'General Fitness', 'Endurance', 'Strength'].map((goal) {
-                      final isSelected = _selectedGoal == goal;
+                    children: ['All', 'Beginner', 'Intermediate', 'Advanced'].map((difficulty) {
+                      final isSelected = _selectedDifficulty == difficulty;
                       return GestureDetector(
                         onTap: () {
                           setModalState(() {
-                            _selectedGoal = goal;
+                            _selectedDifficulty = difficulty;
                           });
                         },
                         child: Container(
@@ -832,7 +928,50 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
                           ),
                           child: Text(
-                            goal,
+                            difficulty,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: isSelected ? AppColors.onAccent : AppColors.onBackground,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Duration Section
+                _buildFilterSectionHeader('Duration', Icons.schedule_outlined),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryVariant,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ['All', '0-4 weeks', '5-8 weeks', '9-12 weeks', '13+ weeks'].map((duration) {
+                      final isSelected = _selectedDuration == duration;
+                      return GestureDetector(
+                        onTap: () {
+                          setModalState(() {
+                            _selectedDuration = duration;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.accent : AppColors.surface,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray, width: isSelected ? 2 : 1),
+                          ),
+                          child: Text(
+                            duration,
                             style: AppTextStyles.labelMedium.copyWith(
                               color: isSelected ? AppColors.onAccent : AppColors.onBackground,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -897,7 +1036,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           onPressed: () {
                             setModalState(() {
                               _selectedCategory = 'All';
-                              _selectedGoal = 'All';
+                              _selectedDifficulty = 'All';
+                              _selectedDuration = 'All';
+                              _sortBy = 'Featured';
                               _showCertifiedOnly = false;
                             });
                           },
@@ -1503,6 +1644,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredPrograms = _filteredPrograms;
+    final filteredBundles = _filteredBundles;
+    final featuredPrograms = _featuredPrograms;
+    final newReleases = _newReleases;
+
+    final hasActiveFilters = _selectedCategory != 'All' || _selectedDifficulty != 'All' || _selectedDuration != 'All' || _sortBy != 'Featured' || _showCertifiedOnly;
 
     return Container(
       decoration: const BoxDecoration(
@@ -1520,7 +1666,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             },
           ),
           title: Text(
-            'Market Place',
+            'Marketplace',
             style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
           ),
           centerTitle: true,
@@ -1534,10 +1680,10 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             Stack(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.filter_list, color: Color(0xFF000000)),
+                  icon: const Icon(Icons.tune, color: Color(0xFF000000)),
                   onPressed: _showFilterModal,
                 ),
-                if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly)
+                if (hasActiveFilters)
                   Positioned(
                     right: 8,
                     top: 8,
@@ -1552,50 +1698,69 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           ],
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Bundle Programs Section
-              Text(
-                'Bundle Programs',
-                style: AppTextStyles.titleMedium.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                height: 320.h,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  itemCount: 4, // Show 3 bundles + See More card
-                  itemBuilder: (context, index) {
-                    if (index < 3) {
-                      return _buildBundleCard(_bundles[index]);
-                    } else {
-                      return _buildSeeMoreCard();
-                    }
-                  },
-                ),
-              ),
+              // FEATURED SECTION - Netflix Style
+              _buildFeaturedSection(featuredPrograms),
+
+              SizedBox(height: 24.h),
+              // BUNDLES Section
+              _buildBundlesSection(filteredBundles),
+
+              SizedBox(height: 24.h),
+              // NEW RELEASES Section
+              _buildHorizontalSection('New Releases', Icons.fiber_new_rounded, newReleases),
+
               SizedBox(height: 24.h),
 
               // Active filters indicator
-              if (_selectedCategory != 'All' || _selectedGoal != 'All' || _showCertifiedOnly) ...[
-                Row(
-                  children: [
-                    Text('Active Filters: ', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
-                    if (_selectedCategory != 'All')
-                      Chip(label: Text(_selectedCategory), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _selectedCategory = 'All')),
-                    if (_selectedGoal != 'All')
-                      Chip(label: Text(_selectedGoal), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _selectedGoal = 'All')),
-                    if (_showCertifiedOnly)
-                      Chip(label: const Text('Certified'), deleteIcon: const Icon(Icons.close, size: 16), onDeleted: () => setState(() => _showCertifiedOnly = false)),
-                  ],
+              if (hasActiveFilters) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      Text(
+                        'Active Filters: ',
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                      ),
+                      if (_sortBy != 'Featured') _buildFilterChip(_sortBy, () => setState(() => _sortBy = 'Featured')),
+                      if (_selectedCategory != 'All') _buildFilterChip(_selectedCategory, () => setState(() => _selectedCategory = 'All')),
+                      if (_selectedDifficulty != 'All') _buildFilterChip(_selectedDifficulty, () => setState(() => _selectedDifficulty = 'All')),
+                      if (_selectedDuration != 'All') _buildFilterChip(_selectedDuration, () => setState(() => _selectedDuration = 'All')),
+                      if (_showCertifiedOnly) _buildFilterChip('Certified', () => setState(() => _showCertifiedOnly = false)),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 16.h),
               ],
 
-              // Programs by Category
+              // MARKETPLACE GRID - All Programs
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'All Programs',
+                      style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                      child: Text(
+                        '${filteredPrograms.length}',
+                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16.h),
+
+              // Programs Grid
               filteredPrograms.isEmpty
                   ? Center(
                       child: Padding(
@@ -1609,7 +1774,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             TextButton(
                               onPressed: () => setState(() {
                                 _selectedCategory = 'All';
-                                _selectedGoal = 'All';
+                                _selectedDifficulty = 'All';
+                                _selectedDuration = 'All';
+                                _sortBy = 'Featured';
                                 _showCertifiedOnly = false;
                               }),
                               child: const Text('Clear Filters'),
@@ -1618,9 +1785,356 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                         ),
                       ),
                     )
-                  : _buildProgramsByCategory(filteredPrograms),
+                  : _buildProgramsGrid(filteredPrograms),
+
+              SizedBox(height: 24.h),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, VoidCallback onDelete) {
+    return Chip(
+      label: Text(label),
+      deleteIcon: const Icon(Icons.close, size: 16),
+      onDeleted: onDelete,
+      backgroundColor: AppColors.accent.withOpacity(0.2),
+      labelStyle: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+    );
+  }
+
+  // Featured Section - Large Hero Cards (Netflix Style)
+  Widget _buildFeaturedSection(List<Map<String, dynamic>> programs) {
+    if (programs.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Row(
+            children: [
+              Icon(Icons.local_fire_department, color: AppColors.error, size: 24),
+              SizedBox(width: 8.w),
+              Text(
+                'Featured & Trending',
+                style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 12.h),
+        SizedBox(
+          height: 240.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: programs.length,
+            itemBuilder: (context, index) {
+              return _buildFeaturedCard(programs[index]);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeaturedCard(Map<String, dynamic> program) {
+    return GestureDetector(
+      onTap: () => _showProgramDetail(program),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.85,
+        margin: EdgeInsets.only(right: 16.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))],
+        ),
+        child: Stack(
+          children: [
+            // Background Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                program['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=400&fit=crop',
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  ),
+                ),
+              ),
+            ),
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.8)]),
+              ),
+            ),
+            // Content
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Hot Badge
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      decoration: BoxDecoration(color: AppColors.error, borderRadius: BorderRadius.circular(4)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.local_fire_department, color: Colors.white, size: 14),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'HOT',
+                            style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    // Title
+                    Text(
+                      program['title'],
+                      style: AppTextStyles.titleLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 4.h),
+                    // Trainer
+                    Text(program['trainer'], style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9))),
+                    SizedBox(height: 8.h),
+                    // Stats Row
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: AppColors.upcoming, size: 16),
+                        SizedBox(width: 4.w),
+                        Text(
+                          '${program['rating']}',
+                          style: AppTextStyles.labelMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 12.w),
+                        Icon(Icons.people, color: Colors.white, size: 16),
+                        SizedBox(width: 4.w),
+                        Text(_formatNumber(program['students'] as int), style: AppTextStyles.labelMedium.copyWith(color: Colors.white)),
+                        const Spacer(),
+                        Text(
+                          '\$${program['price'].toStringAsFixed(2)}',
+                          style: AppTextStyles.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Certified Badge
+            if (program['certified'])
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(color: AppColors.completed, shape: BoxShape.circle),
+                  child: Icon(Icons.verified, color: Colors.white, size: 16),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHorizontalSection(String title, IconData icon, List<Map<String, dynamic>> programs) {
+    if (programs.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Row(
+            children: [
+              Icon(icon, color: AppColors.accent, size: 24),
+              SizedBox(width: 8.w),
+              Text(
+                title,
+                style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 12.h),
+        SizedBox(
+          height: 300.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: programs.length,
+            itemBuilder: (context, index) {
+              return SizedBox(width: MediaQuery.of(context).size.width * 0.5, child: _buildProgramCard(programs[index]));
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBundlesSection(List<Map<String, dynamic>> bundles) {
+    if (bundles.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Row(
+            children: [
+              Icon(Icons.inventory_2, color: AppColors.accent, size: 24),
+              SizedBox(width: 8.w),
+              Text(
+                'Bundle Deals',
+                style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 12.h),
+        SizedBox(
+          height: 320.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: bundles.length > 3 ? 4 : bundles.length,
+            itemBuilder: (context, index) {
+              if (index < 3 && index < bundles.length) {
+                return _buildBundleCard(bundles[index]);
+              } else if (bundles.length > 3) {
+                return _buildSeeMoreCard();
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgramsGrid(List<Map<String, dynamic>> programs) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.65, crossAxisSpacing: 12.w, mainAxisSpacing: 12.h),
+        itemCount: programs.length,
+        itemBuilder: (context, index) {
+          return _buildGridProgramCard(programs[index]);
+        },
+      ),
+    );
+  }
+
+  Widget _buildGridProgramCard(Map<String, dynamic> program) {
+    return GestureDetector(
+      onTap: () => _showProgramDetail(program),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.network(
+                    program['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop',
+                    width: double.infinity,
+                    height: 140.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 140.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      ),
+                      child: Icon(Icons.fitness_center, size: 40, color: Colors.white),
+                    ),
+                  ),
+                ),
+                if (program['certified'])
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(color: AppColors.completed, shape: BoxShape.circle),
+                      child: Icon(Icons.verified, color: Colors.white, size: 14),
+                    ),
+                  ),
+              ],
+            ),
+            // Content
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(10.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      program['title'],
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      program['trainer'],
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11.sp),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 6.h),
+                    Row(
+                      children: [
+                        Icon(Icons.star, color: AppColors.upcoming, size: 12),
+                        SizedBox(width: 2.w),
+                        Text(
+                          '${program['rating']}',
+                          style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(program['duration'], style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                        Text(
+                          '\$${program['price'].toStringAsFixed(0)}',
+                          style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1829,80 +2343,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       return '${(number / 1000).toStringAsFixed(1)}K';
     }
     return number.toString();
-  }
-
-  Widget _buildProgramsByCategory(List<Map<String, dynamic>> programs) {
-    final Map<String, List<Map<String, dynamic>>> programsByCategory = {};
-    for (var program in programs) {
-      final category = program['category'] ?? 'Other';
-      if (!programsByCategory.containsKey(category)) {
-        programsByCategory[category] = [];
-      }
-      programsByCategory[category]!.add(program);
-    }
-
-    // Category display names
-    final categoryNames = {
-      'Strength': 'Strength Programs',
-      'Cardio': 'Cardio Programs',
-      'Flexibility': 'Flexibility Programs',
-      'Bodyweight': 'Bodyweight Programs',
-      'Running': 'Running Programs',
-      'Core': 'Core Programs',
-      'Web Development': 'Web Development Programs',
-      'Data Science': 'Data Science Programs',
-      'Frontend': 'Frontend Programs',
-      'Cloud': 'Cloud Programs',
-      'Marketing': 'Marketing Programs',
-      'Mobile Development': 'Mobile Development Programs',
-      'Blockchain': 'Blockchain Programs',
-      'Design': 'Design Programs',
-    };
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: programsByCategory.entries.map((entry) {
-        final category = entry.key;
-        final categoryPrograms = entry.value;
-        final displayName = categoryNames[category] ?? '${category} Programs';
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  displayName,
-                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-                  child: Text(
-                    '${categoryPrograms.length}',
-                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 12.sp),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            SizedBox(
-              height: 300.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                itemCount: categoryPrograms.length,
-                itemBuilder: (context, index) {
-                  return SizedBox(width: MediaQuery.of(context).size.width * 0.5, child: _buildProgramCard(categoryPrograms[index]));
-                },
-              ),
-            ),
-            SizedBox(height: 24.h),
-          ],
-        );
-      }).toList(),
-    );
   }
 
   Widget _buildProgramCard(Map<String, dynamic> program) {

@@ -177,8 +177,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
               title: Text('Add Workout', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
               trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
               onTap: () {
-                Navigator.pop(context);
-                _navigateToJournalWithDate();
+                Get.back();
+                Get.toNamed(AppRoutes.logRun);
               },
             ),
             ListTile(
@@ -639,8 +639,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
           IconButton(
             icon: const Icon(Icons.photo_library_outlined, color: AppColors.onPrimary),
             onPressed: () {
-              // TODO: Navigate to Progress Gallery
-              Get.snackbar('Coming Soon', 'Progress Gallery feature', backgroundColor: AppColors.accent, colorText: AppColors.onAccent, snackPosition: SnackPosition.BOTTOM);
+              _addProgressPhoto();
             },
           ),
         ],
@@ -738,10 +737,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(_formatDate(_selectedDate), style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-                  TextButton(
-                    onPressed: _navigateToJournalWithDate,
-                    child: Text('Select Date', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent)),
-                  ),
+                  Text('Select Date', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent)),
                 ],
               ),
             ),
