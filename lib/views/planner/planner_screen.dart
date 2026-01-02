@@ -144,11 +144,6 @@ class _PlannerScreenState extends State<PlannerScreen> {
     }
   }
 
-  void _navigateToJournalWithDate() {
-    // Navigate to workout journal with selected date
-    Get.toNamed(AppRoutes.journal, arguments: {'selectedDate': _selectedDate});
-  }
-
   void _showAddWorkoutDialog() {
     // Check if date is in the past or future for different options
     final now = DateTime.now();
@@ -284,6 +279,225 @@ class _PlannerScreenState extends State<PlannerScreen> {
     });
 
     Get.snackbar('Success', 'Day marked as rest day', backgroundColor: const Color(0xFF4A90E2), colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
+  }
+
+  void _showPhotoHistory() {
+    // Get all dates with progress photos
+    final photoDates = _dayData.entries.where((entry) => entry.value['hasProgressPhoto'] == true).map((entry) => entry.key).toList();
+
+    if (photoDates.isEmpty) {
+      Get.snackbar('No Photos', 'You haven\'t added any progress photos yet', backgroundColor: AppColors.error, colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
+    // Sort dates in descending order (newest first)
+    photoDates.sort((a, b) => b.compareTo(a));
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: const BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.onPrimary),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'Progress Photo History',
+                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
+            ),
+            // Photo Timeline
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: photoDates.length,
+                itemBuilder: (context, index) {
+                  final date = photoDates[index];
+                  return _buildPhotoHistoryItem(date, index == 0);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhotoHistoryItem(DateTime date, bool isLatest) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: isLatest ? AppColors.accent : AppColors.primaryGray, width: isLatest ? 2 : 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.calendar_today, color: AppColors.accent, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                _formatDate(date),
+                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              if (isLatest)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                  child: Text(
+                    'Latest',
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _viewPhotoFullScreen(date, 'front');
+                  },
+                  child: Container(
+                    height: 150,
+                    decoration: BoxDecoration(color: AppColors.primaryGrayLight, borderRadius: BorderRadius.circular(8)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.camera_front, size: 50, color: AppColors.primaryGray),
+                        const SizedBox(height: 8),
+                        Text('Front Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                        const SizedBox(height: 4),
+                        Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _viewPhotoFullScreen(date, 'side');
+                  },
+                  child: Container(
+                    height: 150,
+                    decoration: BoxDecoration(color: AppColors.primaryGrayLight, borderRadius: BorderRadius.circular(8)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.camera_alt, size: 50, color: AppColors.primaryGray),
+                        const SizedBox(height: 8),
+                        Text('Side Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                        const SizedBox(height: 4),
+                        Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _viewPhotoFullScreen(DateTime date, String type) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.camera_alt, color: AppColors.onPrimary, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${type == 'front' ? 'Front' : 'Side'} Photo',
+                                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.bold),
+                              ),
+                              Text(_formatDate(date), style: AppTextStyles.labelSmall.copyWith(color: AppColors.onPrimary.withOpacity(0.8))),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: AppColors.onPrimary),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Photo placeholder
+                  Container(
+                    height: 400,
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: AppColors.primaryGrayLight, borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(type == 'front' ? Icons.camera_front : Icons.camera_alt, size: 80, color: AppColors.primaryGray),
+                        const SizedBox(height: 16),
+                        Text('Photo Preview', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                        const SizedBox(height: 8),
+                        Text('TODO: Load actual photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray.withOpacity(0.7))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showShareOptions() {
@@ -650,6 +864,23 @@ class _PlannerScreenState extends State<PlannerScreen> {
           children: [
             const SizedBox(height: 16),
 
+            // Photo History Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: OutlinedButton.icon(
+                onPressed: _showPhotoHistory,
+                icon: const Icon(Icons.photo_library, size: 20),
+                label: const Text('View Photo History'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.accent,
+                  side: const BorderSide(color: AppColors.accent),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  minimumSize: const Size(double.infinity, 44),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Calendar Legend
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -926,9 +1157,20 @@ class _PlannerScreenState extends State<PlannerScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Progress Pictures',
-            style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Progress Pictures',
+                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+              TextButton.icon(
+                onPressed: _showPhotoHistory,
+                icon: const Icon(Icons.history, size: 16),
+                label: const Text('History'),
+                style: TextButton.styleFrom(foregroundColor: AppColors.accent, padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Row(
@@ -936,7 +1178,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // TODO: View photo
+                    _viewPhotoFullScreen(_selectedDate, 'front');
                   },
                   child: Container(
                     height: 120,
@@ -947,6 +1189,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
                         const Icon(Icons.camera_front, size: 40, color: AppColors.primaryGray),
                         const SizedBox(height: 8),
                         Text('Front Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                        const SizedBox(height: 4),
+                        Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 10)),
                       ],
                     ),
                   ),
@@ -956,7 +1200,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // TODO: View photo
+                    _viewPhotoFullScreen(_selectedDate, 'side');
                   },
                   child: Container(
                     height: 120,
@@ -967,19 +1211,14 @@ class _PlannerScreenState extends State<PlannerScreen> {
                         const Icon(Icons.camera_alt, size: 40, color: AppColors.primaryGray),
                         const SizedBox(height: 8),
                         Text('Side Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                        const SizedBox(height: 4),
+                        Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 10)),
                       ],
                     ),
                   ),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          Center(
-            child: TextButton(
-              onPressed: _addProgressPhoto,
-              child: Text('Swipe left for Summary', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-            ),
           ),
         ],
       ),
