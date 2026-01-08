@@ -88,7 +88,7 @@ class _CustomButtonState extends State<CustomButton> with SingleTickerProviderSt
           width: widget.isFullWidth ? double.infinity : null,
           height: widget.height ?? 58,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(10),
             gradient: widget.onPressed == null || widget.isLoading
                 ? isGreenButton
                       ? LinearGradient(colors: [AppColors.accent, AppColors.accent], begin: Alignment.topLeft, end: Alignment.bottomRight)
@@ -97,7 +97,7 @@ class _CustomButtonState extends State<CustomButton> with SingleTickerProviderSt
                 ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
                 : null,
             color: widget.onPressed == null || widget.isLoading
-                ? AppColors.accent
+                ? actualBackgroundColor
                 : isGreenButton
                 ? null
                 : actualBackgroundColor,
@@ -173,7 +173,7 @@ class _CustomOutlineButtonState extends State<CustomOutlineButton> {
         width: widget.isFullWidth ? double.infinity : null,
         height: widget.height ?? 58,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: _isHovered ? AppColors.accent : actualBorderColor, width: 2),
           color: _isHovered ? AppColors.accent.withOpacity(0.05) : Colors.transparent,
         ),

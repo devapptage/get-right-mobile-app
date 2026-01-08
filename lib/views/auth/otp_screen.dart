@@ -164,25 +164,15 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                     const SizedBox(height: 24),
 
                     // Icon with animation
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(colors: [AppColors.surface, AppColors.surface.withOpacity(0.8)]),
-                        border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
-                        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 30, spreadRadius: 5)],
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
-                          ),
-                          child: const Icon(Icons.verified_outlined, size: 30, color: AppColors.onAccent),
+                    Center(
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
                         ),
+                        child: const Icon(Icons.verified_outlined, size: 60, color: AppColors.onAccent),
                       ),
                     ),
                     const SizedBox(height: 40),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
-/// Notifications Screen with mock data
+/// Notifications Screen using NotificationController
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -12,7 +13,9 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  // Mock notification data
+  late NotificationController _controller;
+
+  // Enhanced notifications with IconData and Color for UI
   final List<Map<String, dynamic>> _notifications = [
     {
       'id': 1,
@@ -96,16 +99,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     },
   ];
 
-  int get _unreadCount => _notifications.where((n) => !n['isRead']).length;
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.find<NotificationController>();
+    // Sync UI notifications with controller
+    _syncNotifications();
+  }
+
+  void _syncNotifications() {
+    final controllerNotifications = _controller.notifications;
+    for (var i = 0; i < controllerNotifications.length && i < _notifications.length; i++) {
+      _notifications[i]['isRead'] = controllerNotifications[i]['isRead'];
+    }
+  }
 
   void _markAsRead(int id) {
+    _controller.markAsRead(id);
     setState(() {
-      final notification = _notifications.firstWhere((n) => n['id'] == id);
-      notification['isRead'] = true;
+      final index = _notifications.indexWhere((n) => n['id'] == id);
+      if (index != -1) {
+        _notifications[index]['isRead'] = true;
+      }
     });
   }
 
   void _markAllAsRead() {
+    _controller.markAllAsRead();
     setState(() {
       for (var notification in _notifications) {
         notification['isRead'] = true;
@@ -115,33 +135,39 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text('Notifications', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-          ),
-          onPressed: () => Get.back(),
-        ),
-        actions: [
-          if (_unreadCount > 0)
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              child: TextButton.icon(
-                onPressed: _markAllAsRead,
-                icon: Icon(Icons.done_all, size: 18, color: AppColors.accent),
-                label: Text('Mark all read', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-              ),
+    return Obx(() {
+      // Rebuild when notifications change
+      final currentUnreadCount = _controller.unreadCount;
+      _syncNotifications();
+
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          title: Text('Notifications', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+          leading: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
             ),
-        ],
-      ),
-      body: _notifications.isEmpty ? _buildEmptyState() : _buildNotificationList(),
-    );
+            onPressed: () => Get.back(),
+          ),
+          actions: [
+            if (currentUnreadCount > 0)
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                child: TextButton.icon(
+                  onPressed: _markAllAsRead,
+                  icon: Icon(Icons.done_all, size: 18, color: AppColors.accent),
+                  label: Text('Mark all read', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
+                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                ),
+              ),
+          ],
+        ),
+        body: _notifications.isEmpty ? _buildEmptyState() : _buildNotificationList(currentUnreadCount),
+      );
+    });
   }
 
   Widget _buildEmptyState() {
@@ -194,11 +220,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildNotificationList() {
+  Widget _buildNotificationList(int unreadCount) {
     return Column(
       children: [
         // Unread count banner
-        if (_unreadCount > 0)
+        if (unreadCount > 0)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -215,7 +241,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  '$_unreadCount unread notification${_unreadCount > 1 ? 's' : ''}',
+                  '$unreadCount unread notification${unreadCount > 1 ? 's' : ''}',
                   style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
                 ),
               ],

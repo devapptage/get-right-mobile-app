@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/journal/combined_journal_screen.dart';
 import 'package:get_right/views/feed/feed_screen.dart';
@@ -34,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _navController = Get.put(HomeNavigationController());
     // Store scaffold key in controller for global access
     _navController.scaffoldKey = _scaffoldKey;
+    // Initialize notification controller
+    Get.put(NotificationController());
   }
 
   @override
@@ -44,10 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           key: _scaffoldKey,
           drawer: const AppDrawer(), // Professional app drawer
-          body: IndexedStack(
-            index: _navController.currentIndex,
-            children: _screens,
-          ),
+          body: IndexedStack(index: _navController.currentIndex, children: _screens),
           bottomNavigationBar: _buildProfessionalBottomNav(),
         ),
       ),
@@ -57,43 +57,17 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Modern 2024/2025 bottom navigation bar
   Widget _buildProfessionalBottomNav() {
     final navItems = [
-      {
-        'icon': Icons.home_outlined,
-        'activeIcon': Icons.home_rounded,
-        'label': 'Home',
-      },
-      {
-        'icon': Icons.explore_outlined,
-        'activeIcon': Icons.explore_rounded,
-        'label': 'Feed',
-      },
-      {
-        'icon': Icons.add_circle_outline,
-        'activeIcon': Icons.add_circle,
-        'label': 'Journal',
-      },
-      {
-        'icon': Icons.storefront_outlined,
-        'activeIcon': Icons.storefront_rounded,
-        'label': 'Market',
-      },
-      {
-        'icon': Icons.menu_book_outlined,
-        'activeIcon': Icons.menu_book_rounded,
-        'label': 'Library',
-      },
+      {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
+      {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Feed'},
+      {'icon': Icons.add_circle_outline, 'activeIcon': Icons.add_circle, 'label': 'Journal'},
+      {'icon': Icons.storefront_outlined, 'activeIcon': Icons.storefront_rounded, 'label': 'Market'},
+      {'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded, 'label': 'Library'},
     ];
 
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 24,
-            offset: const Offset(0, -8),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 24, offset: const Offset(0, -8))],
       ),
       child: SafeArea(
         top: false,
@@ -120,14 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Modern navigation item
-  Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
-    required int index,
-    required bool isSelected,
-    bool isCenter = false,
-  }) {
+  Widget _buildNavItem({required IconData icon, required IconData activeIcon, required String label, required int index, required bool isSelected, bool isCenter = false}) {
     const greenAccent = Color(0xFF29603C);
     const blackPrimary = Color(0xFF000000);
     const textSecondary = Color(0xFF404040);
@@ -155,15 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? greenAccent.withOpacity(0.12)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(isCenter ? 26 : 22),
-                  boxShadow: isCenter
-                      ? [
-                          BoxShadow(
-                            color: greenAccent.withOpacity(0.3),
-                            blurRadius: 16,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : null,
+                  boxShadow: isCenter ? [BoxShadow(color: greenAccent.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))] : null,
                 ),
                 child: Center(
                   child: AnimatedSwitcher(
@@ -197,11 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     letterSpacing: 0.2,
                     height: 1.0,
                   ),
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
               ],
             ],

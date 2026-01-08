@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -76,18 +77,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     const SizedBox(height: 40),
 
                     // Logo with modern styling
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
-                          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
-                          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
-                        ),
-                        child: const AppLogo(size: 100, borderRadius: 16),
-                      ),
-                    ),
+                    Center(child: const AppLogo(borderRadius: 16, size: 100)),
                     const SizedBox(height: 25),
 
                     // Welcome text with modern typography

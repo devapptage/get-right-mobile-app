@@ -9,6 +9,10 @@ import 'package:get_right/views/auth/otp_screen.dart';
 import 'package:get_right/views/auth/forgot_password_screen.dart';
 import 'package:get_right/views/auth/reset_password_screen.dart';
 import 'package:get_right/views/auth/profile_setup_screen.dart';
+import 'package:get_right/views/auth/preference_selection_screen.dart';
+import 'package:get_right/views/auth/goal_selection_screen.dart';
+import 'package:get_right/views/auth/fitness_level_selection_screen.dart';
+import 'package:get_right/views/auth/exercise_frequency_selection_screen.dart';
 import 'package:get_right/views/auth/terms_conditions_screen.dart';
 import 'package:get_right/views/auth/privacy_policy_screen.dart';
 import 'package:get_right/views/home/home_screen.dart';
@@ -94,6 +98,10 @@ class AppPages {
     GetPage(name: AppRoutes.resetPassword, page: () => const ResetPasswordScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.changePassword, page: () => const ChangePasswordScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.profileSetup, page: () => const ProfileSetupScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.preferenceSelection, page: () => const PreferenceSelectionScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.goalSelection, page: () => const GoalSelectionScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.fitnessLevelSelection, page: () => const FitnessLevelSelectionScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.exerciseFrequencySelection, page: () => const ExerciseFrequencySelectionScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.termsConditions, page: () => const TermsConditionsScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.privacyPolicy, page: () => const PrivacyPolicyScreen(), transition: Transition.rightToLeft),
 

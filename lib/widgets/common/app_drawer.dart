@@ -4,9 +4,9 @@ import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/controllers/auth_controller.dart';
+import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
-import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
 
 /// Professional App Drawer
@@ -25,7 +25,7 @@ class AppDrawer extends StatelessWidget {
     // Safely get StorageService with fallback
     String userName = 'Demo User';
     String userEmail = 'demo@getright.com';
-    final HomeNavigationController navController = Get.put(HomeNavigationController());
+    final NotificationController notificationController = Get.put(NotificationController());
 
     try {
       final storageService = Get.find<StorageService>();
@@ -145,6 +145,19 @@ class AppDrawer extends StatelessWidget {
                 // Community Section
                 _buildSectionLabel('COMMUNITY'),
 
+                // Notifications item with badge
+                Obx(
+                  () => _buildDrawerItemWithBadge(
+                    icon: Icons.notifications_outlined,
+                    activeIcon: Icons.notifications,
+                    title: 'Notifications',
+                    unreadCount: notificationController.unreadCount,
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(AppRoutes.notifications);
+                    },
+                  ),
+                ),
                 _buildDrawerItem(
                   icon: Icons.favorite_outline,
                   activeIcon: Icons.favorite,
@@ -335,6 +348,44 @@ class AppDrawer extends StatelessWidget {
   Widget _buildDrawerItem({required IconData icon, required IconData activeIcon, required String title, required VoidCallback onTap}) {
     return ListTile(
       leading: Icon(icon, color: AppColors.accent, size: 24),
+      title: Text(
+        title,
+        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w500),
+      ),
+      onTap: onTap,
+      hoverColor: AppColors.accent.withOpacity(0.1),
+      selectedTileColor: AppColors.accent.withOpacity(0.15),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      dense: true,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  /// Drawer Item with Badge (for notifications)
+  Widget _buildDrawerItemWithBadge({required IconData icon, required IconData activeIcon, required String title, required int unreadCount, required VoidCallback onTap}) {
+    return ListTile(
+      leading: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(icon, color: AppColors.accent, size: 24),
+          if (unreadCount > 0)
+            Positioned(
+              right: -8,
+              top: -4,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                child: Text(
+                  unreadCount > 99 ? '99+' : '$unreadCount',
+                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, height: 1.0),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
+      ),
       title: Text(
         title,
         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w500),

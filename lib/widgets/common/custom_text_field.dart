@@ -79,6 +79,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
+          height: 56, // Fixed height for all text fields
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: widget.enabled ? AppColors.surface : AppColors.surface.withOpacity(0.5),
@@ -87,7 +88,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                   ? AppColors.error
                   : _isFocused
                   ? AppColors.accent
-                  : AppColors.primaryGray.withOpacity(0.3),
+                  : const Color(0xFF666666), // Dark gray border
               width: _isFocused ? 2 : 1.5,
             ),
             boxShadow: _isFocused ? [BoxShadow(color: AppColors.accent.withOpacity(0.15), blurRadius: 12, spreadRadius: 0, offset: const Offset(0, 4))] : null,
@@ -136,7 +137,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
               prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               filled: false,
-              contentPadding: EdgeInsets.symmetric(horizontal: widget.prefixIcon != null ? 0 : 18, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(horizontal: widget.prefixIcon != null ? 0 : 18, vertical: 16),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
@@ -145,7 +146,11 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
               disabledBorder: InputBorder.none,
               labelStyle: AppTextStyles.bodyMedium.copyWith(color: _isFocused ? AppColors.accent : AppColors.primaryGray, fontSize: 15, fontWeight: FontWeight.w500),
               floatingLabelStyle: AppTextStyles.labelMedium.copyWith(color: _isFocused ? AppColors.accent : AppColors.primaryGray, fontSize: 13, fontWeight: FontWeight.w600),
-              hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray.withOpacity(0.6), fontSize: 15, fontWeight: FontWeight.w400),
+              hintStyle: AppTextStyles.bodyMedium.copyWith(
+                color: const Color.fromARGB(255, 117, 116, 116), // Consistent light grey hint text color
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
               errorStyle: const TextStyle(height: 0.01, color: Colors.transparent),
               counterText: '',
             ),
@@ -196,6 +201,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
       hintText: widget.hintText ?? 'Enter your password',
       errorText: widget.errorText,
       obscureText: _obscureText,
+
       keyboardType: TextInputType.visiblePassword,
       validator: widget.validator,
       onChanged: widget.onChanged,

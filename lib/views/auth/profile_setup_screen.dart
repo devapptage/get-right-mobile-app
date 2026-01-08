@@ -1,7 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:get_right/constants/app_constants.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -9,7 +8,6 @@ import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/widgets/common/custom_button.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
-import 'package:image_picker/image_picker.dart';
 
 /// Profile Setup screen - post-signup profile completion
 class ProfileSetupScreen extends StatefulWidget {
@@ -20,23 +18,11 @@ class ProfileSetupScreen extends StatefulWidget {
 }
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTickerProviderStateMixin {
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _heightController = TextEditingController();
-  final _weightController = TextEditingController();
-  final _targetWeightController = TextEditingController();
+  final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _medicalConditionsController = TextEditingController();
-  final _emergencyContactNameController = TextEditingController();
-  final _emergencyContactPhoneController = TextEditingController();
 
+  DateTime? _dateOfBirth;
   String? _selectedGender;
-  String? _selectedFitnessGoal;
-  String? _selectedActivityLevel;
-  String? _selectedUnits;
-  List<String> _selectedWorkoutTypes = [];
-  String? _profileImagePath;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -57,186 +43,37 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _ageController.dispose();
-    _heightController.dispose();
-    _weightController.dispose();
-    _targetWeightController.dispose();
+    _fullNameController.dispose();
     _phoneController.dispose();
-    _medicalConditionsController.dispose();
-    _emergencyContactNameController.dispose();
-    _emergencyContactPhoneController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  void _pickProfileImage() {
-    Get.dialog(
-      Dialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Choose Profile Picture',
-                style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontSize: 20, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 24),
-
-              // Gallery option
-              InkWell(
-                onTap: () async {
-                  Get.back();
-                  await _pickImageFromSource(ImageSource.gallery);
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1.5),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                        child: Icon(Icons.photo_library_rounded, color: AppColors.accent, size: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Gallery',
-                              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-                            ),
-                            const SizedBox(height: 2),
-                            Text('Choose from your photos', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.chevron_right_rounded, color: AppColors.primaryGray),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Camera option
-              InkWell(
-                onTap: () async {
-                  Get.back();
-                  await _pickImageFromSource(ImageSource.camera);
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1.5),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                        child: Icon(Icons.camera_alt_rounded, color: AppColors.accent, size: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Camera',
-                              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-                            ),
-                            const SizedBox(height: 2),
-                            Text('Take a new photo', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.chevron_right_rounded, color: AppColors.primaryGray),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Cancel button
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text(
-                  'Cancel',
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
+  Future<void> _selectDateOfBirth() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _dateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 25)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(primary: AppColors.accent, onPrimary: AppColors.onAccent, surface: Colors.white, onSurface: AppColors.onBackground),
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImageFromSource(ImageSource source) async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: source, maxWidth: 1024, maxHeight: 1024, imageQuality: 85);
-
-      if (image != null) {
-        setState(() {
-          _profileImagePath = image.path;
-        });
-
-        Get.snackbar(
-          'Success',
-          'Profile picture selected',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.accent,
-          colorText: AppColors.onAccent,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
-          duration: const Duration(seconds: 2),
+          child: child!,
         );
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to pick image: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _dateOfBirth = picked;
+      });
     }
   }
 
-  void _completeProfile() {
-    // TODO: Save profile data via authController
-    // final authController = Get.find<AuthController>();
-    // authController.saveProfileData(...);
-
-    Get.snackbar(
-      'Success',
-      'Profile setup completed!',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.accent,
-      colorText: AppColors.onAccent,
-      margin: const EdgeInsets.all(16),
-      borderRadius: 12,
-      duration: const Duration(seconds: 2),
-    );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.offAllNamed(AppRoutes.home);
-    });
+  void _continue() {
+    // Navigate to preference selection screen
+    Get.toNamed(AppRoutes.preferenceSelection);
   }
 
   @override
@@ -276,223 +113,131 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                     //     ),
                     //   ],
                     // ),
-                    const SizedBox(height: 8),
 
                     // Header
                     Column(
                       children: [
                         const SizedBox(height: 16),
                         Text(
-                          'Complete Your Profile',
-                          style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
+                          'Welcome to GetRight',
+                          style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.5),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Let\'s personalize your fitness experience',
-                          style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
-                          textAlign: TextAlign.center,
+                        const SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'Create an account to access your personal fitness journal, workout programs, and more.',
+                            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400, height: 1.5),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
 
-                    // Profile Picture
-                    _buildProfilePicturePicker(),
-                    const SizedBox(height: 32),
-
-                    // Name fields
-                    Row(
+                    // Full Name
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: CustomTextField(controller: _firstNameController, labelText: 'First Name', hintText: 'John', prefixIcon: const Icon(Icons.person_outline_rounded)),
+                        _buildLabelWithAsterisk('Full name'),
+
+                        const SizedBox(height: 8),
+                        CustomTextField(controller: _fullNameController, labelText: null, hintText: 'Full name', prefixIcon: null),
+                        const SizedBox(height: 10),
+
+                        // Date of Birth
+                        _buildLabelWithAsterisk('Date of Birth'),
+                        const SizedBox(height: 8),
+                        _buildDateOfBirthField(),
+                        const SizedBox(height: 10),
+
+                        // Phone Number (Optional)
+                        _buildLabel('Phone Number (Optional)'),
+                        const SizedBox(height: 8),
+                        CustomTextField(controller: _phoneController, labelText: null, hintText: 'Enter your phone number', keyboardType: TextInputType.phone, prefixIcon: null),
+                        const SizedBox(height: 10),
+
+                        // Gender dropdown
+                        _buildLabelWithAsterisk('Gender'),
+                        const SizedBox(height: 8),
+                        _buildDropdownField(
+                          label: null,
+                          value: _selectedGender,
+                          items: AppConstants.genderOptions,
+                          icon: null,
+                          onChanged: (value) => setState(() => _selectedGender = value),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomTextField(controller: _lastNameController, labelText: 'Last Name', hintText: 'Doe', prefixIcon: const Icon(Icons.person_outline_rounded)),
-                        ),
+                        const SizedBox(height: 18),
                       ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Age
-                    CustomTextField(
-                      controller: _ageController,
-                      labelText: 'Age',
-                      hintText: 'Enter your age',
-                      keyboardType: TextInputType.number,
-                      prefixIcon: const Icon(Icons.cake_outlined),
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Phone Number
-                    CustomTextField(
-                      controller: _phoneController,
-                      labelText: 'Contact Number',
-                      hintText: '+1 234 567 8900',
-                      keyboardType: TextInputType.phone,
-                      prefixIcon: const Icon(Icons.phone_outlined),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Gender dropdown
-                    _buildDropdownField(
-                      label: 'Gender',
-                      value: _selectedGender,
-                      items: AppConstants.genderOptions,
-                      icon: Icons.wc_outlined,
-                      onChanged: (value) => setState(() => _selectedGender = value),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Units preference
-                    _buildDropdownField(
-                      label: 'Measurement System',
-                      value: _selectedUnits,
-                      items: AppConstants.unitsOptions,
-                      icon: Icons.straighten_outlined,
-                      onChanged: (value) => setState(() => _selectedUnits = value),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Height and Weight
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomTextField(
-                            controller: _heightController,
-                            labelText: _selectedUnits == 'Metric' ? 'Height (cm)' : 'Height (ft)',
-                            hintText: _selectedUnits == 'Metric' ? '170' : '5.7',
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            prefixIcon: const Icon(Icons.height_outlined),
-                          ),
+                    // Terms and Conditions
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'By continuing, you agree to GetRight\'s ',
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w400),
+                          children: [
+                            TextSpan(
+                              text: 'Terms & Conditions',
+                              style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                            ),
+                            const TextSpan(text: ' and '),
+                            TextSpan(
+                              text: 'Privacy Policy',
+                              style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                            ),
+                            const TextSpan(text: '.'),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomTextField(
-                            controller: _weightController,
-                            labelText: _selectedUnits == 'Metric' ? 'Weight (kg)' : 'Weight (lbs)',
-                            hintText: _selectedUnits == 'Metric' ? 'e.g. 70 (kg)' : 'e.g. 154 (lbs)',
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            prefixIcon: const Icon(Icons.monitor_weight_outlined),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Fitness Goal dropdown
-                    _buildDropdownField(
-                      label: 'Fitness Goal',
-                      value: _selectedFitnessGoal,
-                      items: AppConstants.fitnessGoals,
-                      icon: Icons.flag_outlined,
-                      onChanged: (value) => setState(() => _selectedFitnessGoal = value),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Target Weight (optional)
-                    if (_selectedFitnessGoal == 'Weight Loss' || _selectedFitnessGoal == 'Muscle Gain')
-                      Column(
-                        children: [
-                          CustomTextField(
-                            controller: _targetWeightController,
-                            labelText: _selectedUnits == 'Metric' ? 'Target Weight (kg)' : 'Target Weight (lbs)',
-                            hintText: _selectedUnits == 'Metric' ? '65' : '143',
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            prefixIcon: const Icon(Icons.track_changes_outlined),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
+                        textAlign: TextAlign.center,
                       ),
-
-                    // Activity Level dropdown
-                    _buildDropdownField(
-                      label: 'Activity Level',
-                      value: _selectedActivityLevel,
-                      items: AppConstants.activityLevels,
-                      icon: Icons.directions_run_outlined,
-                      onChanged: (value) => setState(() => _selectedActivityLevel = value),
                     ),
                     const SizedBox(height: 20),
 
-                    // Preferred Workout Types (multi-select chips)
-                    _buildWorkoutTypesSection(),
-                    const SizedBox(height: 32),
-
-                    // Medical & Emergency Section Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 22),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Health & Safety Information',
-                          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Medical Conditions (Optional)
-                    CustomTextField(
-                      controller: _medicalConditionsController,
-                      labelText: 'Medical Conditions (Optional)',
-                      hintText: 'e.g., Asthma, Diabetes, Allergies',
-                      maxLines: 3,
-                      prefixIcon: const Icon(Icons.health_and_safety_outlined),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Emergency Contact Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(Icons.emergency_outlined, color: AppColors.accent, size: 22),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Emergency Contact',
-                          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Emergency Contact Name
-
-                    // Emergency Contact Phone
-                    CustomTextField(
-                      controller: _emergencyContactPhoneController,
-                      labelText: 'Emergency Contact Phone',
-                      hintText: '+1 234 567 8900',
-                      keyboardType: TextInputType.phone,
-                      prefixIcon: const Icon(Icons.phone_in_talk_outlined),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Complete Profile button
+                    // Continue button
                     GetBuilder<AuthController>(
                       builder: (controller) {
                         return CustomButton(
-                          text: 'Complete Profile',
-                          onPressed: _completeProfile,
+                          text: 'Continue',
+                          onPressed: _continue,
                           isLoading: controller.isLoading,
-                          icon: const Icon(Icons.check_circle_outline_rounded),
+                          backgroundColor: AppColors.accent,
+                          textColor: AppColors.onAccent,
                         );
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
-                    // Skip button
-                    TextButton(
-                      onPressed: () => Get.offAllNamed(AppRoutes.home),
-                      child: Text(
-                        'Skip for now',
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontSize: 15, fontWeight: FontWeight.w500),
-                      ),
+                    // Divider with "or"
+                    Row(
+                      children: [
+                        Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'or',
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                      ],
                     ),
                     const SizedBox(height: 24),
+
+                    // Social login icons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildSocialIcon(Icons.apple_rounded, Colors.black, () {}),
+                        const SizedBox(width: 20),
+                        _buildSocialIcon(Icons.facebook_rounded, const Color(0xFF1877F2), () {}),
+                        const SizedBox(width: 20),
+                        _buildSocialIcon(Icons.g_mobiledata_rounded, Colors.white, () {}),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
@@ -503,67 +248,95 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
     );
   }
 
-  Widget _buildProfilePicturePicker() {
-    return GestureDetector(
-      onTap: _pickProfileImage,
-      child: Stack(
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.surface,
-              border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 2),
-              boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
-            ),
-            child: _profileImagePath == null
-                ? Icon(Icons.add_a_photo_outlined, size: 40, color: AppColors.primaryGray)
-                : ClipOval(
-                    child: Image.file(
-                      File(_profileImagePath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.person_outline_rounded, size: 50, color: AppColors.primaryGray);
-                      },
-                    ),
-                  ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.accent,
-                border: Border.all(color: AppColors.background, width: 2),
-              ),
-              child: const Icon(Icons.camera_alt_rounded, size: 18, color: AppColors.onAccent),
-            ),
+  Widget _buildLabelWithAsterisk(String label) {
+    return RichText(
+      text: TextSpan(
+        text: label,
+        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.w500),
+        children: const [
+          TextSpan(
+            text: ' *',
+            style: TextStyle(color: Colors.red),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDropdownField({required String label, required String? value, required List<String> items, required IconData icon, required ValueChanged<String?> onChanged}) {
+  Widget _buildLabel(String label) {
+    return Text(
+      label,
+      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.w500),
+    );
+  }
+
+  Widget _buildDateOfBirthField() {
+    return InkWell(
+      onTap: _selectDateOfBirth,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: AppColors.surface,
+          border: Border.all(color: const Color(0xFF666666), width: 1.5), // Dark gray border
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _dateOfBirth != null ? DateFormat('MMMM dd, yyyy').format(_dateOfBirth!) : 'December 22, 2025',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: _dateOfBirth != null ? AppColors.onBackground : const Color.fromARGB(255, 117, 116, 116),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            Icon(Icons.calendar_today_rounded, color: AppColors.accent, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialIcon(IconData icon, Color backgroundColor, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: backgroundColor,
+          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+        ),
+        child: Icon(icon, color: backgroundColor == Colors.white ? AppColors.onBackground : Colors.white, size: 24),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({required String? label, required String? value, required List<String> items, required IconData? icon, required ValueChanged<String?> onChanged}) {
     return Container(
+      height: 56,
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF666666), width: 1.5), // Dark gray border
       ),
       child: DropdownButtonFormField<String>(
         value: value,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 12),
-            child: Icon(icon, color: AppColors.primaryGray, size: 22),
-          ),
+          prefixIcon: icon != null
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 12),
+                  child: Icon(icon, color: AppColors.primaryGray, size: 22),
+                )
+              : null,
           prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 18),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           filled: false,
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
@@ -574,80 +347,25 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
           labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontSize: 15, fontWeight: FontWeight.w500),
           floatingLabelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontSize: 13, fontWeight: FontWeight.w600),
         ),
-        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 15, fontWeight: FontWeight.w500),
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: value != null ? AppColors.onBackground : const Color.fromARGB(255, 117, 116, 116),
+          fontSize: 15,
+          fontWeight: FontWeight.w400,
+        ),
         dropdownColor: AppColors.surface,
         icon: Padding(
           padding: const EdgeInsets.only(right: 16),
-          child: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primaryGray),
+          child: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.accent, size: 20),
+        ),
+        hint: Text(
+          'Select gender',
+          style: AppTextStyles.bodyMedium.copyWith(color: const Color.fromARGB(255, 117, 116, 116), fontSize: 15, fontWeight: FontWeight.w400),
         ),
         items: items.map((String item) {
           return DropdownMenuItem<String>(value: item, child: Text(item));
         }).toList(),
         onChanged: onChanged,
       ),
-    );
-  }
-
-  Widget _buildWorkoutTypesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
-          child: Row(
-            children: [
-              Icon(Icons.fitness_center_rounded, size: 20, color: AppColors.primaryGray),
-              const SizedBox(width: 8),
-              Text(
-                'Preferred Workout Types',
-                style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray, fontSize: 13, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: AppConstants.workoutTypes.map((type) {
-            final isSelected = _selectedWorkoutTypes.contains(type);
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (isSelected) {
-                    _selectedWorkoutTypes.remove(type);
-                  } else {
-                    _selectedWorkoutTypes.add(type);
-                  }
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.accent : AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isSelected ? AppColors.accent : AppColors.primaryGray.withOpacity(0.3), width: 1.5),
-                  boxShadow: isSelected ? [BoxShadow(color: AppColors.accent.withOpacity(0.15), blurRadius: 8, spreadRadius: 0, offset: const Offset(0, 2))] : null,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isSelected)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: Icon(Icons.check_circle_rounded, size: 16, color: AppColors.onAccent),
-                      ),
-                    Text(
-                      type,
-                      style: AppTextStyles.labelMedium.copyWith(color: isSelected ? AppColors.onAccent : AppColors.onBackground, fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 }

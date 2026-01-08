@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_right/constants/asset_paths.dart';
 import 'package:get_right/theme/color_constants.dart';
 
@@ -10,25 +11,22 @@ class AppLogo extends StatelessWidget {
   final bool showShadow;
   final EdgeInsets? padding;
 
-  const AppLogo({super.key, this.size = 80, this.backgroundColor, this.borderRadius = 16, this.showShadow = false, this.padding});
+  const AppLogo({super.key, this.size = 150, this.backgroundColor, this.borderRadius = 16, this.showShadow = false, this.padding});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: size,
-      height: size,
       decoration: BoxDecoration(
-        // color: backgroundColor ?? AppColors.secondary, // Gray background by default
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: showShadow ? [BoxShadow(color: (backgroundColor ?? AppColors.secondary).withOpacity(0.3), blurRadius: 20, spreadRadius: 3, offset: const Offset(0, 5))] : null,
       ),
-      child: Image.asset(
-        AssetPaths.logo,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          // Fallback to icon if image not found
-          return Icon(Icons.fitness_center, size: size * 0.10, color: backgroundColor == AppColors.accent ? AppColors.onPrimary : AppColors.onSecondary);
-        },
+      child: Column(
+        children: [
+          Image.asset("assets/images/logo-04.png", fit: BoxFit.contain),
+          10.h.verticalSpace,
+          Image.asset("assets/images/logo-05.png", fit: BoxFit.contain),
+        ],
       ),
     );
   }

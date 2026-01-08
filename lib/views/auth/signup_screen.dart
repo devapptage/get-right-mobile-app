@@ -4,7 +4,6 @@ import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
-import 'package:get_right/widgets/common/app_logo.dart';
 import 'package:get_right/widgets/common/custom_button.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
 
@@ -20,7 +19,6 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _acceptedTerms = false;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -68,236 +66,115 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(center: Alignment.topLeft, radius: 1.2, colors: [AppColors.accent.withOpacity(0.05), AppColors.background]),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 28),
+          onPressed: () => Get.back(),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
-                        ),
-                        child: const Icon(Icons.arrow_back_rounded, size: 20),
-                      ),
-                      onPressed: () => Get.back(),
-                    ),
+        centerTitle: true,
+        title: Text(
+          'Create Account',
+          style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
 
-                    // Logo
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                  // Email
+                  _buildLabelWithAsterisk('Email'),
+                  const SizedBox(height: 8),
+                  CustomTextField(
+                    controller: _emailController,
+                    labelText: null,
+                    hintText: 'Enter your email address',
+                    keyboardType: TextInputType.emailAddress,
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    onChanged: (value) => setState(() {}),
+                  ),
+                  const SizedBox(height: 24),
 
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
-                          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
-                          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 20, spreadRadius: 0, offset: const Offset(0, 8))],
-                        ),
-                        child: const AppLogo(size: 80, borderRadius: 14),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                  // Password
+                  _buildLabelWithAsterisk('Password'),
+                  const SizedBox(height: 8),
+                  PasswordTextField(controller: _passwordController, labelText: null, hintText: 'Enter your password', onChanged: (value) => setState(() {})),
+                  const SizedBox(height: 24),
 
-                    // Title
-                    Text(
-                      'Sign Up',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 36, fontWeight: FontWeight.w800, letterSpacing: -1),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Sign up to start your fitness journey',
-                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.2),
-                    ),
-                    const SizedBox(height: 25),
+                  // Confirm Password
+                  _buildLabelWithAsterisk('Confirm Password'),
+                  const SizedBox(height: 8),
+                  PasswordTextField(controller: _confirmPasswordController, labelText: null, hintText: 'Confirm your password', onChanged: (value) => setState(() {})),
+                  const SizedBox(height: 16),
 
-                    // Email
-                    CustomTextField(
-                      controller: _emailController,
-                      labelText: 'Email Address',
-                      hintText: 'Enter your email',
-                      keyboardType: TextInputType.emailAddress,
-                      prefixIcon: const Icon(Icons.email_outlined),
-                    ),
-                    const SizedBox(height: 20),
+                  // Instructions
+                  Text(
+                    'Password must be at least 8 characters long and include uppercase and lowercase letters.',
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400, height: 1.4),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'After creating your account, check your email (including spam folder) for verification.',
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400, height: 1.4),
+                  ),
+                  const SizedBox(height: 32),
 
-                    // Password
-                    PasswordTextField(controller: _passwordController),
-                    const SizedBox(height: 20),
+                  // Create Account button
+                  GetBuilder<AuthController>(
+                    builder: (controller) {
+                      final isValid = _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty && _confirmPasswordController.text.isNotEmpty;
+                      return CustomButton(text: 'Create Account', onPressed: _signup, isLoading: controller.isLoading, backgroundColor: AppColors.accent, textColor: Colors.white);
+                    },
+                  ),
+                  const SizedBox(height: 32),
 
-                    // Confirm Password
-                    PasswordTextField(controller: _confirmPasswordController, labelText: 'Confirm Password', hintText: 'Re-enter your password'),
-                    const SizedBox(height: 24),
-
-                    // Terms and conditions
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          _acceptedTerms = !_acceptedTerms;
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: _acceptedTerms ? AppColors.accent.withOpacity(0.5) : AppColors.primaryGray.withOpacity(0.2), width: 1.5),
-                        ),
-                        child: Row(
-                          children: [
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: _acceptedTerms ? AppColors.accent : Colors.transparent,
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: _acceptedTerms ? AppColors.accent : AppColors.primaryGray.withOpacity(0.4), width: 2),
-                              ),
-                              child: _acceptedTerms ? const Icon(Icons.check_rounded, size: 16, color: AppColors.onAccent) : null,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => Get.toNamed(AppRoutes.termsConditions),
-                                child: Text.rich(
-                                  TextSpan(
-                                    text: 'I agree to the ',
-                                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.7)),
-                                    children: [
-                                      TextSpan(
-                                        text: 'Terms & Conditions',
-                                        style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700),
-                                      ),
-                                      const TextSpan(text: ' and '),
-                                      TextSpan(
-                                        text: 'Privacy Policy',
-                                        style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                  // Divider with "or"
+                  Row(
+                    children: [
+                      Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'or',
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 25),
+                      Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
 
-                    // Signup button (disabled if terms not accepted)
-                    GetBuilder<AuthController>(
-                      builder: (controller) {
-                        return CustomButton(text: 'Sign Up', onPressed: _acceptedTerms ? _signup : null, isLoading: controller.isLoading);
-                      },
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Divider with "OR"
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AppColors.primaryGray.withOpacity(0.3)])),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'OR SIGN UP WITH',
-                            style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600, fontSize: 12),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            decoration: BoxDecoration(gradient: LinearGradient(colors: [AppColors.primaryGray.withOpacity(0.3), Colors.transparent])),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Social signup buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildSocialButton(
-                            icon: Icons.g_mobiledata_rounded,
-                            label: 'Google',
-                            onPressed: () {
-                              // TODO: Implement Google sign up
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Expanded(
-                        //   child: _buildSocialButton(
-                        //     icon: Icons.apple_rounded,
-                        //     label: 'Apple',
-                        //     onPressed: () {
-                        //       // TODO: Implement Apple sign up
-                        //     },
-                        //   ),
-                        // ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildSocialButton(
-                            icon: Icons.facebook_rounded,
-                            label: 'Facebook',
-                            onPressed: () {
-                              // TODO: Implement Facebook sign up
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-
-                    // Login link
-                    Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Already have an account? ',
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15),
-                          ).paddingOnly(top: 4),
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 0),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              'Sign In',
-                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700, fontSize: 15),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                  // Social signup buttons
+                  _buildSocialButton(
+                    icon: Icons.g_mobiledata_rounded,
+                    label: 'Continue with Google',
+                    onPressed: () {
+                      // TODO: Implement Google sign up
+                    },
+                    isFullWidth: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildSocialButton(
+                    icon: Icons.apple_rounded,
+                    label: 'Continue with Apple',
+                    onPressed: () {
+                      // TODO: Implement Apple sign up
+                    },
+                    isFullWidth: true,
+                  ),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
           ),
@@ -306,24 +183,41 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildSocialButton({required IconData icon, required String label, required VoidCallback onPressed}) {
+  Widget _buildLabelWithAsterisk(String label) {
+    return RichText(
+      text: TextSpan(
+        text: label,
+        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.w500),
+        children: const [
+          TextSpan(
+            text: ' *',
+            style: TextStyle(color: Colors.red),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({required IconData icon, required String label, required VoidCallback onPressed, bool isFullWidth = false}) {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        width: isFullWidth ? double.infinity : null,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1.5),
+          border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
         ),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 24, color: AppColors.onBackground),
-            const SizedBox(height: 4),
+            const SizedBox(width: 12),
             Text(
               label,
-              style: AppTextStyles.labelSmall.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w600),
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 15, fontWeight: FontWeight.w500),
             ),
           ],
         ),

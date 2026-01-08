@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/models/workout_journal_model.dart';
 import 'package:get_right/models/workout_exercise_model.dart';
@@ -202,7 +203,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
         ),
         title: Text(
           'Workout Journal',
-          style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+          style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 18.sp),
         ),
         centerTitle: true,
         actions: [
@@ -241,7 +242,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
               child: ElevatedButton.icon(
                 onPressed: _onAddWarmup,
                 icon: const Icon(Icons.whatshot_outlined, size: 22),
-                label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
+                label: Text('Add Warmup Exercise', style: AppTextStyles.buttonMedium),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.secondary,
                   foregroundColor: AppColors.onSecondary,
@@ -257,7 +258,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
               child: ElevatedButton.icon(
                 onPressed: _onAddWorkout,
                 icon: const Icon(Icons.fitness_center, size: 22),
-                label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
+                label: Text('Add Workout Exercise', style: AppTextStyles.buttonMedium),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   foregroundColor: AppColors.onAccent,

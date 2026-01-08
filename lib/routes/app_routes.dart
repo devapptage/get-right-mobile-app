@@ -13,6 +13,10 @@ class AppRoutes {
   static const String resetPassword = '/reset-password';
   static const String changePassword = '/change-password';
   static const String profileSetup = '/profile-setup';
+  static const String preferenceSelection = '/preference-selection';
+  static const String goalSelection = '/goal-selection';
+  static const String fitnessLevelSelection = '/fitness-level-selection';
+  static const String exerciseFrequencySelection = '/exercise-frequency-selection';
 
   // Main App Routes
   static const String home = '/home';

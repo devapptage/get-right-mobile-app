@@ -95,46 +95,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Logo with scale animation and shimmer
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
-                          gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)]),
-                          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1.5),
-                          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.2), blurRadius: 30, spreadRadius: 5, offset: const Offset(0, 10))],
-                        ),
-                        child: const AppLogo(size: 120, borderRadius: 20),
-                      ),
+                      const AppLogo(borderRadius: 20),
                       const SizedBox(height: 48),
 
                       // App name with premium typography
-                      AnimatedBuilder(
-                        animation: _shimmerAnimation,
-                        builder: (context, child) {
-                          return ShaderMask(
-                            shaderCallback: (bounds) {
-                              return LinearGradient(
-                                begin: Alignment(_shimmerAnimation.value - 1, 0),
-                                end: Alignment(_shimmerAnimation.value + 1, 0),
-                                colors: const [AppColors.onBackground, AppColors.accent, AppColors.onBackground],
-                                stops: const [0.0, 0.5, 1.0],
-                              ).createShader(bounds);
-                            },
-                            child: Text(
-                              'Get Right',
-                              style: AppTextStyles.headlineLarge.copyWith(
-                                color: AppColors.onBackground,
-                                fontSize: 42,
-                                letterSpacing: -1.5,
-                                fontWeight: FontWeight.w800,
-                                height: 1.1,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
 
                       // Tagline with fade
                       Text(
