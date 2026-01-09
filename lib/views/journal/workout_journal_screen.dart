@@ -10,7 +10,6 @@ import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/widgets/journal/exercise_card.dart';
 import 'package:get_right/widgets/journal/superset_card.dart';
 import 'package:get_right/views/journal/workout_celebration_screen.dart';
-import 'package:get_right/views/home/dashboard_screen.dart';
 
 class WorkoutJournalScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -153,28 +152,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   });
   void _onAddExercise() => Get.toNamed(AppRoutes.addExercise);
 
-  void _onPlusButtonTap() {
-    if (widget.isEmbedded) {
-      // When embedded, check the tab index from HomeNavigationController
-      try {
-        final navController = Get.find<HomeNavigationController>();
-        if (navController.journalTabIndex.value == 0) {
-          // Navigate to add exercise when on Workout Journal tab
-          Get.toNamed(AppRoutes.addExercise);
-        } else {
-          // Navigate to log run when on Runner Log tab
-          Get.toNamed(AppRoutes.logRun);
-        }
-      } catch (e) {
-        // Fallback if controller not found
-        Get.toNamed(AppRoutes.addExercise);
-      }
-    } else {
-      // When standalone, always navigate to add exercise
-      Get.toNamed(AppRoutes.addExercise);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.isEmbedded) {
@@ -226,7 +203,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
         ),
         title: Text(
           'Workout Journal',
-          style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold, fontSize: 18.sp),
+          style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
@@ -284,7 +261,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
           right: 0,
           child: Center(
             child: GestureDetector(
-              onTap: _onPlusButtonTap,
+              onTap: _buildAddExerciseContent,
               child: Container(
                 width: 80,
                 height: 80,
@@ -321,6 +298,50 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAddExerciseContent() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: _onAddWarmup,
+                icon: const Icon(Icons.whatshot_outlined, size: 22),
+                label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: AppColors.onSecondary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: _onAddWorkout,
+                icon: const Icon(Icons.fitness_center, size: 22),
+                label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  foregroundColor: AppColors.onAccent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
