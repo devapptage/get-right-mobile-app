@@ -197,7 +197,6 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   Widget build(BuildContext context) {
     return CustomTextField(
       controller: widget.controller,
-      labelText: widget.labelText ?? 'Password',
       hintText: widget.hintText ?? 'Enter your password',
       errorText: widget.errorText,
       obscureText: _obscureText,

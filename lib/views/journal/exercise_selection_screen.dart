@@ -116,27 +116,27 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
                 ),
               ),
-              if (!_isWarmup)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: _isSuperset,
-                        onChanged: (v) => setState(() {
-                          _isSuperset = v ?? false;
-                          if (!_isSuperset && _selected.length > 1) {
-                            final first = _selected.first;
-                            _selected.clear();
-                            _selected.add(first);
-                          }
-                        }),
-                        activeColor: AppColors.accent,
-                      ),
-                      Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
-                    ],
-                  ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: _isSuperset,
+                      onChanged: (v) => setState(() {
+                        _isSuperset = v ?? false;
+                        if (!_isSuperset && _selected.length > 1) {
+                          final first = _selected.first;
+                          _selected.clear();
+                          _selected.add(first);
+                        }
+                      }),
+                      activeColor: AppColors.accent,
+                    ),
+                    Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
+                  ],
                 ),
+              ),
               Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.only(bottom: showButtons ? 140 : 0),

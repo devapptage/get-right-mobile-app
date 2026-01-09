@@ -227,47 +227,47 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     );
   }
 
-  /// Build stats overlay
+  /// Build stats overlay (for Stack positioning)
   Widget _buildStatsOverlay() {
-    return Positioned(
-      top: MediaQuery.of(context).padding.top + 80,
-      left: 16,
-      right: 16,
-      child: Obx(() {
-        return Column(
-          children: [
-            // Main stat cards - Row 1
-            Row(
-              children: [
-                Expanded(child: _buildStatCard('Distance', _controller.formatDistance(_controller.distanceMeters.value), Icons.straighten_rounded)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Time', _controller.formatDuration(_controller.elapsedTime.value), Icons.timer_rounded)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Row 2
-            Row(
-              children: [
-                Expanded(child: _buildStatCard('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km', Icons.speed_rounded)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Avg Pace', '${_controller.formatPace(_controller.averagePace.value)}/km', Icons.insights_rounded)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Row 3
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard('Calories', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value} cal' : '--', Icons.local_fire_department_rounded),
-                ),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Elevation', _controller.formatElevation(_controller.elevationGain.value), Icons.terrain_rounded)),
-              ],
-            ),
-          ],
-        );
-      }),
-    );
+    return Positioned(top: MediaQuery.of(context).padding.top + 80, left: 16, right: 16, child: _buildStatsContent());
+  }
+
+  /// Build stats content (without Positioned wrapper, for use in Column)
+  Widget _buildStatsContent() {
+    return Obx(() {
+      return Column(
+        children: [
+          // Main stat cards - Row 1
+          Row(
+            children: [
+              Expanded(child: _buildStatCard('Distance', _controller.formatDistance(_controller.distanceMeters.value), Icons.straighten_rounded)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildStatCard('Time', _controller.formatDuration(_controller.elapsedTime.value), Icons.timer_rounded)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 2
+          Row(
+            children: [
+              Expanded(child: _buildStatCard('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km', Icons.speed_rounded)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildStatCard('Avg Pace', '${_controller.formatPace(_controller.averagePace.value)}/km', Icons.insights_rounded)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 3
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard('Calories', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value} cal' : '--', Icons.local_fire_department_rounded),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: _buildStatCard('Elevation', _controller.formatElevation(_controller.elevationGain.value), Icons.terrain_rounded)),
+            ],
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildStatCard(String label, String value, IconData icon) {
@@ -405,7 +405,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
                                 ),
                               ],
                             ),
-                            _buildStatsOverlay(),
+                            _buildStatsContent(),
                           ],
 
                           SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
