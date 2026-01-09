@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/notification_controller.dart';
+import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/views/journal/workout_journal_screen.dart';
@@ -63,6 +65,8 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          toolbarHeight: 56,
+          systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark, statusBarBrightness: Brightness.light),
           leading: Obx(() {
             final notificationController = Get.find<NotificationController>();
             final unreadCount = notificationController.unreadCount;
@@ -120,16 +124,17 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
               GestureDetector(
                 onTap: () => _tabController.animateTo(0),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Workout Journal',
                       style: AppTextStyles.titleMedium.copyWith(
-                        fontSize: 17.sp,
+                        fontSize: 14.sp,
                         color: _tabController.index == 0 ? AppColors.accent : const Color(0xFF000000),
                         fontWeight: _tabController.index == 0 ? FontWeight.w900 : FontWeight.w600,
                       ),
                     ),
-                    if (_tabController.index == 0) Container(height: 3, width: 120, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
+                    if (_tabController.index == 0) Container(height: 3, width: 100, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
                   ],
                 ),
               ),
@@ -137,16 +142,17 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
               GestureDetector(
                 onTap: () => _tabController.animateTo(1),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Runner Log',
                       style: AppTextStyles.titleMedium.copyWith(
-                        fontSize: 17.sp,
+                        fontSize: 14.sp,
                         color: _tabController.index == 1 ? AppColors.accent : const Color(0xFF000000),
                         fontWeight: _tabController.index == 1 ? FontWeight.w900 : FontWeight.w600,
                       ),
                     ),
-                    if (_tabController.index == 1) Container(height: 3, width: 90, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
+                    if (_tabController.index == 1) Container(height: 3, width: 80, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
                   ],
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/notification_controller.dart';
@@ -54,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Modern 2024/2025 bottom navigation bar
+  /// Modern 2024/2025 bottom navigation bar with liquid glass effect
   Widget _buildProfessionalBottomNav() {
     final navItems = [
       {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
@@ -64,29 +65,34 @@ class _HomeScreenState extends State<HomeScreen> {
       {'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded, 'label': 'Library'},
     ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 24, offset: const Offset(0, -8))],
-      ),
-      child: SafeArea(
-        top: false,
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          height: 78,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(navItems.length, (index) {
-              final isCenter = index == 2;
-              return _buildNavItem(
-                icon: navItems[index]['icon'] as IconData,
-                activeIcon: navItems[index]['activeIcon'] as IconData,
-                label: navItems[index]['label'] as String,
-                index: index,
-                isSelected: _navController.currentIndex == index,
-                isCenter: isCenter,
-              );
-            }),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F5).withOpacity(0.8),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 24, offset: const Offset(0, -8))],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Container(
+              height: 68,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(navItems.length, (index) {
+                  final isCenter = index == 2;
+                  return _buildNavItem(
+                    icon: navItems[index]['icon'] as IconData,
+                    activeIcon: navItems[index]['activeIcon'] as IconData,
+                    label: navItems[index]['label'] as String,
+                    index: index,
+                    isSelected: _navController.currentIndex == index,
+                    isCenter: isCenter,
+                  );
+                }),
+              ),
+            ),
           ),
         ),
       ),
@@ -113,8 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
-                width: isCenter ? 52 : (isSelected ? 44 : 38),
-                height: isCenter ? 52 : (isSelected ? 44 : 38),
+                width: isCenter ? 48 : (isSelected ? 40 : 34),
+                height: isCenter ? 48 : (isSelected ? 40 : 34),
                 decoration: BoxDecoration(
                   color: isCenter
                       ? greenAccent
@@ -138,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           : isSelected
                           ? greenAccent
                           : textSecondary,
-                      size: isCenter ? 26 : 22,
+                      size: isCenter ? 24 : 20,
                     ),
                   ),
                 ),
@@ -150,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOutCubic,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     color: isSelected ? blackPrimary : textSecondary,
                     letterSpacing: 0.2,

@@ -10,6 +10,7 @@ import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/widgets/journal/exercise_card.dart';
 import 'package:get_right/widgets/journal/superset_card.dart';
 import 'package:get_right/views/journal/workout_celebration_screen.dart';
+import 'package:get_right/views/home/dashboard_screen.dart';
 
 class WorkoutJournalScreen extends StatefulWidget {
   final bool isEmbedded;
@@ -152,6 +153,28 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   });
   void _onAddExercise() => Get.toNamed(AppRoutes.addExercise);
 
+  void _onPlusButtonTap() {
+    if (widget.isEmbedded) {
+      // When embedded, check the tab index from HomeNavigationController
+      try {
+        final navController = Get.find<HomeNavigationController>();
+        if (navController.journalTabIndex.value == 0) {
+          // Navigate to add exercise when on Workout Journal tab
+          Get.toNamed(AppRoutes.addExercise);
+        } else {
+          // Navigate to log run when on Runner Log tab
+          Get.toNamed(AppRoutes.logRun);
+        }
+      } catch (e) {
+        // Fallback if controller not found
+        Get.toNamed(AppRoutes.addExercise);
+      }
+    } else {
+      // When standalone, always navigate to add exercise
+      Get.toNamed(AppRoutes.addExercise);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.isEmbedded) {
@@ -230,46 +253,52 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   }
 
   Widget _buildEmpty() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _onAddWarmup,
-                icon: const Icon(Icons.whatshot_outlined, size: 22),
-                label: Text('Add Warmup Exercise', style: AppTextStyles.buttonMedium),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
-                  foregroundColor: AppColors.onSecondary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+    return Stack(
+      children: [
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // GR Logo with drop shadow
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 15, offset: Offset(2, 10))],
+                  ),
+                  child: Image.asset('assets/images/logo-04.png', width: 130, height: 130, fit: BoxFit.contain),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _onAddWorkout,
-                icon: const Icon(Icons.fitness_center, size: 22),
-                label: Text('Add Workout Exercise', style: AppTextStyles.buttonMedium),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: AppColors.onAccent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
+              // Instructional text
+              Text(
+                'Build workout with + button',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark, fontSize: 16.sp),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+        // Floating Action Button at bottom center
+        Positioned(
+          bottom: 40,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: GestureDetector(
+              onTap: _onPlusButtonTap,
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGray,
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))],
+                ),
+                child: const Icon(Icons.add, color: AppColors.black, size: 32),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
