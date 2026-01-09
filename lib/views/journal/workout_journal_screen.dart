@@ -398,8 +398,11 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                 ],
               ),
             ),
-          if (_workout!.warmupExercises.isNotEmpty) ...[_buildHeader('Warmup', Icons.local_fire_department), ..._buildExercisesList(_workout!.warmupExercises, true)],
-          if (_workout!.workoutExercises.isNotEmpty) ...[_buildHeader('Workout', Icons.fitness_center), ..._buildExercisesList(_workout!.workoutExercises, false)],
+          if (_workout!.warmupExercises.isNotEmpty) ...[
+            _buildHeader('Warmup', Icons.local_fire_department, isWarmup: true),
+            ..._buildExercisesList(_workout!.warmupExercises, true),
+          ],
+          if (_workout!.workoutExercises.isNotEmpty) ...[_buildHeader('Workout', Icons.fitness_center, isWarmup: false), ..._buildExercisesList(_workout!.workoutExercises, false)],
           const SizedBox(height: 100),
         ],
       ),
@@ -470,11 +473,11 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
     );
   }
 
-  Widget _buildHeader(String title, IconData icon) => Padding(
+  Widget _buildHeader(String title, IconData icon, {bool isWarmup = false}) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
     child: Row(
       children: [
-        Icon(icon, color: AppColors.accent, size: 20),
+        Icon(icon, color: isWarmup ? Colors.red : AppColors.accent, size: 20),
         const SizedBox(width: 8),
         Text(
           title,
@@ -510,8 +513,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
               child: SupersetCard(
                 exercise1: exercise.supersetOrder == 0 ? exercise : otherExercise,
                 exercise2: exercise.supersetOrder == 0 ? otherExercise : exercise,
-                onInfoTap1: () {},
-                onInfoTap2: () {},
                 onMenuTap1: () => _showMenu(exercise.supersetOrder == 0 ? exercise : otherExercise, isWarmup),
                 onMenuTap2: () => _showMenu(exercise.supersetOrder == 0 ? otherExercise : exercise, isWarmup),
                 onTimerTap1: () {
@@ -537,7 +538,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: ExerciseCard(
                 exercise: exercise,
-                onInfoTap: () {},
                 onMenuTap: () => _showMenu(exercise, isWarmup),
                 onTimerTap: () {
                   if (exercise.hasTimedSets) {
@@ -555,7 +555,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ExerciseCard(
               exercise: exercise,
-              onInfoTap: () {},
               onMenuTap: () => _showMenu(exercise, isWarmup),
               onTimerTap: () {
                 if (exercise.hasTimedSets) {

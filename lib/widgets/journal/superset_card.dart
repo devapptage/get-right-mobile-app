@@ -9,24 +9,12 @@ import 'package:get_right/widgets/journal/exercise_card.dart';
 class SupersetCard extends StatelessWidget {
   final WorkoutExerciseModel exercise1;
   final WorkoutExerciseModel exercise2;
-  final VoidCallback? onInfoTap1;
-  final VoidCallback? onInfoTap2;
   final VoidCallback? onMenuTap1;
   final VoidCallback? onMenuTap2;
   final VoidCallback? onTimerTap1;
   final VoidCallback? onTimerTap2;
 
-  const SupersetCard({
-    super.key,
-    required this.exercise1,
-    required this.exercise2,
-    this.onInfoTap1,
-    this.onInfoTap2,
-    this.onMenuTap1,
-    this.onMenuTap2,
-    this.onTimerTap1,
-    this.onTimerTap2,
-  });
+  const SupersetCard({super.key, required this.exercise1, required this.exercise2, this.onMenuTap1, this.onMenuTap2, this.onTimerTap1, this.onTimerTap2});
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +23,7 @@ class SupersetCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.accent.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,30 +33,20 @@ class SupersetCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: AppColors.accent.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(14),
-                topRight: Radius.circular(14),
-              ),
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(14), topRight: Radius.circular(14)),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(20)),
                   child: Row(
                     children: [
                       const Icon(Icons.compare_arrows, color: AppColors.onAccent, size: 16),
                       const SizedBox(width: 6),
                       Text(
                         'SUPERSET',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.onAccent,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
                       ),
                     ],
                   ),
@@ -82,10 +54,7 @@ class SupersetCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   '2 exercises',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.primaryGrayDark,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -110,21 +79,13 @@ class SupersetCard extends StatelessWidget {
                       child: Center(
                         child: Text(
                           'A',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     const SizedBox(width: 4),
                     Expanded(
-                      child: ExerciseCard(
-                        exercise: exercise1,
-                        onInfoTap: onInfoTap1,
-                        onMenuTap: onMenuTap1,
-                        onTimerTap: onTimerTap1,
-                      ),
+                      child: ExerciseCard(exercise: exercise1, onMenuTap: onMenuTap1, onTimerTap: onTimerTap1),
                     ),
                   ],
                 ),
@@ -140,15 +101,7 @@ class SupersetCard extends StatelessWidget {
                 Expanded(
                   child: Container(
                     height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          AppColors.accent.withOpacity(0.3),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
+                    decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AppColors.accent.withOpacity(0.3), Colors.transparent])),
                   ),
                 ),
               ],
@@ -174,21 +127,13 @@ class SupersetCard extends StatelessWidget {
                       child: Center(
                         child: Text(
                           'B',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     const SizedBox(width: 4),
                     Expanded(
-                      child: ExerciseCard(
-                        exercise: exercise2,
-                        onInfoTap: onInfoTap2,
-                        onMenuTap: onMenuTap2,
-                        onTimerTap: onTimerTap2,
-                      ),
+                      child: ExerciseCard(exercise: exercise2, onMenuTap: onMenuTap2, onTimerTap: onTimerTap2),
                     ),
                   ],
                 ),
@@ -200,4 +145,3 @@ class SupersetCard extends StatelessWidget {
     );
   }
 }
-
