@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/run_tracking_controller.dart';
@@ -33,11 +34,6 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     if (args != null && args['activityType'] != null) {
       _controller.activityType.value = args['activityType'];
     }
-
-    // Start tracking automatically
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _controller.startTracking(activity: _controller.activityType.value);
-    });
   }
 
   @override
@@ -74,14 +70,14 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
             // Map Layer
             _buildMap(),
 
-            // Overlay with stats (hidden when locked)
-            if (!_isLocked) _buildStatsOverlay(),
-
-            // Control buttons at bottom (hidden when locked)
-            if (!_isLocked) _buildControlButtons(),
+            // Overlay with stats (hidden when locked, only shown when tracking)
+            // if (!_isLocked) Obx(() => _controller.isTracking.value ? _buildStatsOverlay() : const SizedBox.shrink()),
 
             // Top safe area with back button (hidden when locked)
             if (!_isLocked) _buildTopBar(),
+
+            // Bottom sheet with controls (hidden when locked)
+            if (!_isLocked) _buildBottomSheet(),
 
             // Lock overlay (shown when locked)
             if (_isLocked) _buildLockOverlay(),
@@ -305,53 +301,174 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     );
   }
 
-  /// Build control buttons
-  Widget _buildControlButtons() {
-    return Positioned(
-      bottom: MediaQuery.of(context).padding.bottom + 24,
-      left: 0,
-      right: 0,
-      child: Obx(() {
-        final isPaused = _controller.isPaused.value;
+  /// Build bottom sheet with controls
+  Widget _buildBottomSheet() {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.25,
+      minChildSize: 0.25,
+      maxChildSize: 0.4,
+      builder: (context, scrollController) {
+        return Obx(() {
+          final isTracking = _controller.isTracking.value;
+          final isPaused = _controller.isPaused.value;
+          final activityType = _controller.activityType.value;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, -5))],
+            ),
+            child: Column(
+              children: [
+                // Drag handle
+                Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.5), borderRadius: BorderRadius.circular(2)),
+                ),
+
+                // Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Column(
+                        children: [
+                          // Activity type and status
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      activityType,
+                                      style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(isTracking ? 'Active workout' : 'Tap to start your workout', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
+                                  ],
+                                ),
+                              ),
+                              if (isTracking)
+                                Obx(() {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(12)),
+                                    child: Text(
+                                      _controller.formatDuration(_controller.elapsedTime.value),
+                                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                                    ),
+                                  );
+                                }),
+                            ],
+                          ),
+                          10.h.verticalSpace,
+                          // Control buttons
+                          if (!isTracking)
+                            _buildStartButton()
+                          else ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Stop button
+                                _buildControlButton(icon: Icons.stop_rounded, label: 'Stop', color: AppColors.error, onPressed: _showStopDialog),
+                                const SizedBox(width: 20),
+                                // Pause/Resume button
+                                _buildControlButton(
+                                  icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                                  label: isPaused ? 'Resume' : 'Pause',
+                                  color: isPaused ? AppColors.accent : AppColors.upcoming,
+                                  onPressed: () {
+                                    if (isPaused) {
+                                      _controller.resumeTracking();
+                                    } else {
+                                      _controller.pauseTracking();
+                                    }
+                                  },
+                                  isLarge: true,
+                                ),
+                                const SizedBox(width: 20),
+                                // Lock button
+                                _buildControlButton(
+                                  icon: _isLocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                                  label: _isLocked ? 'Unlock' : 'Lock',
+                                  color: _isLocked ? AppColors.accent : AppColors.primaryGray,
+                                  onPressed: () {
+                                    setState(() {
+                                      _isLocked = !_isLocked;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            _buildStatsOverlay(),
+                          ],
+
+                          SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  Widget _buildBottomSheetStat(String label, String value, {bool showHeart = false}) {
+    return Column(
+      children: [
+        if (showHeart)
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Stop button
-              _buildControlButton(icon: Icons.stop_rounded, label: 'End', color: AppColors.error, onPressed: _showStopDialog),
-              const SizedBox(width: 20),
-              // Pause/Resume button
-              _buildControlButton(
-                icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
-                label: isPaused ? 'Resume' : 'Pause',
-                color: isPaused ? AppColors.accent : AppColors.upcoming,
-                onPressed: () {
-                  if (isPaused) {
-                    _controller.resumeTracking();
-                  } else {
-                    _controller.pauseTracking();
-                  }
-                },
-                isLarge: true,
-              ),
-              const SizedBox(width: 20),
-              // Lock button
-              _buildControlButton(
-                icon: _isLocked ? Icons.lock_open_rounded : Icons.lock_rounded,
-                label: _isLocked ? 'Unlock' : 'Lock',
-                color: _isLocked ? AppColors.accent : AppColors.primaryGray,
-                onPressed: () {
-                  setState(() {
-                    _isLocked = !_isLocked;
-                  });
-                },
-              ),
+              Icon(Icons.favorite, color: Colors.red, size: 16),
+              const SizedBox(width: 4),
             ],
           ),
-        );
-      }),
+        Text(
+          value,
+          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11)),
+      ],
+    );
+  }
+
+  /// Build Start button
+  Widget _buildStartButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          final success = await _controller.startTracking(activity: _controller.activityType.value);
+          if (!success) {
+            Get.snackbar('Error', 'Failed to start tracking', snackPosition: SnackPosition.BOTTOM);
+          }
+        },
+        icon: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(color: AppColors.onAccent, shape: BoxShape.circle),
+          child: Icon(Icons.play_arrow, color: AppColors.accent, size: 18),
+        ),
+        label: Text('Start', style: AppTextStyles.buttonLarge),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.accent,
+          foregroundColor: AppColors.onAccent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+        ),
+      ),
     );
   }
 
