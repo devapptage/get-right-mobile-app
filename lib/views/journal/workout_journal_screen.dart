@@ -24,6 +24,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   bool _isLoading = true;
   bool _isStarted = false;
   bool _isPaused = false;
+  bool _showAddExerciseContent = false;
   Timer? _timer;
   int _seconds = 0;
   int _calories = 0;
@@ -144,11 +145,17 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
 
   void _onAddWarmup() => Get.toNamed(AppRoutes.exerciseSelection, arguments: {'isWarmup': true})?.then((r) {
     if (r != null && r['exercises'] != null)
-      setState(() => _workout = _workout!.copyWith(warmupExercises: [..._workout!.warmupExercises, ...r['exercises'] as List<WorkoutExerciseModel>]));
+      setState(() {
+        _workout = _workout!.copyWith(warmupExercises: [..._workout!.warmupExercises, ...r['exercises'] as List<WorkoutExerciseModel>]);
+        _showAddExerciseContent = false;
+      });
   });
   void _onAddWorkout() => Get.toNamed(AppRoutes.exerciseSelection, arguments: {'isWarmup': false})?.then((r) {
     if (r != null && r['exercises'] != null)
-      setState(() => _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, ...r['exercises'] as List<WorkoutExerciseModel>]));
+      setState(() {
+        _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, ...r['exercises'] as List<WorkoutExerciseModel>]);
+        _showAddExerciseContent = false;
+      });
   });
   void _onAddExercise() => Get.toNamed(AppRoutes.addExercise);
 
@@ -161,27 +168,11 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
         child: Column(
           children: [
             // Actions bar
-            _workout == null || _workout!.isEmpty
-                ? const SizedBox.shrink()
-                : Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                            child: const Icon(Icons.add, color: AppColors.onAccent, size: 20),
-                          ),
-                          onPressed: _onAddExercise,
-                        ),
-                      ],
-                    ),
-                  ),
             Expanded(
               child: _isLoading
                   ? Center(child: CircularProgressIndicator(color: AppColors.accent))
+                  : _showAddExerciseContent
+                  ? _buildAddExerciseContent()
                   : _workout == null || _workout!.isEmpty
                   ? _buildEmpty()
                   : _buildContent(),
@@ -223,6 +214,8 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: AppColors.accent))
+          : _showAddExerciseContent
+          ? _buildAddExerciseContent()
           : _workout == null || _workout!.isEmpty
           ? _buildEmpty()
           : _buildContent(),
@@ -261,7 +254,11 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
           right: 0,
           child: Center(
             child: GestureDetector(
-              onTap: _buildAddExerciseContent,
+              onTap: () {
+                setState(() {
+                  _showAddExerciseContent = true;
+                });
+              },
               child: Container(
                 width: 80,
                 height: 80,
@@ -302,46 +299,52 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   }
 
   Widget _buildAddExerciseContent() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _onAddWarmup,
-                icon: const Icon(Icons.whatshot_outlined, size: 22),
-                label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
-                  foregroundColor: AppColors.onSecondary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+    return Stack(
+      children: [
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: _onAddWarmup,
+                    icon: const Icon(Icons.whatshot_outlined, size: 22),
+                    label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: AppColors.onSecondary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _onAddWorkout,
-                icon: const Icon(Icons.fitness_center, size: 22),
-                label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: AppColors.onAccent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: _onAddWorkout,
+                    icon: const Icon(Icons.fitness_center, size: 22),
+                    label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: AppColors.onAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+
+        // Back button at top left
+      ],
     );
   }
 
@@ -354,25 +357,45 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
           if (!_isStarted && !_workout!.isEmpty)
             Padding(
               padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: _startWorkout,
-                  icon: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(color: AppColors.onAccent, shape: BoxShape.circle),
-                    child: Icon(Icons.play_arrow, color: AppColors.accent, size: 18),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _startWorkout,
+                    icon: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(color: AppColors.onAccent, shape: BoxShape.circle),
+                      child: Icon(Icons.play_arrow, color: AppColors.accent, size: 18),
+                    ),
+                    label: Text('Start Workout', style: AppTextStyles.buttonMedium),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: AppColors.onAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 2,
+                    ),
                   ),
-                  label: Text('Start Workout', style: AppTextStyles.buttonLarge),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
-                    foregroundColor: AppColors.onAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 2,
-                  ),
-                ),
+                  _workout == null || _workout!.isEmpty
+                      ? const SizedBox.shrink()
+                      : Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                                  child: const Icon(Icons.add, color: AppColors.onAccent, size: 20),
+                                ),
+                                onPressed: _onAddExercise,
+                              ),
+                            ],
+                          ),
+                        ),
+                ],
               ),
             ),
           if (_workout!.warmupExercises.isNotEmpty) ...[_buildHeader('Warmup', Icons.local_fire_department), ..._buildExercisesList(_workout!.warmupExercises, true)],
