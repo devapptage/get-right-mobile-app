@@ -78,8 +78,11 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final showButtons = (!_isSuperset && _selected.isNotEmpty) || (_isSuperset && _selected.length == 2);
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
@@ -94,103 +97,113 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
         title: Text('Select Exercise', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
         centerTitle: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchCtrl,
-              decoration: InputDecoration(
-                hintText: 'Search exercises...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryGrayDark),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                filled: true,
-                fillColor: AppColors.surface,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-              ),
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
-            ),
-          ),
-          if (!_isWarmup)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Checkbox(
-                    value: _isSuperset,
-                    onChanged: (v) => setState(() {
-                      _isSuperset = v ?? false;
-                      if (!_isSuperset && _selected.length > 1) {
-                        final first = _selected.first;
-                        _selected.clear();
-                        _selected.add(first);
-                      }
-                    }),
-                    activeColor: AppColors.accent,
-                  ),
-                  Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
-                ],
-              ),
-            ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filtered.length,
-              itemBuilder: (ctx, i) {
-                final ex = _filtered[i];
-                final sel = _selected.contains(ex);
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  elevation: sel ? 4 : 1,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: sel ? AppColors.accent : Colors.transparent, width: 2),
-                  ),
-                  child: InkWell(
-                    onTap: () => _toggleSelect(ex),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          if (sel)
-                            Container(
-                              width: 24,
-                              height: 24,
-                              margin: const EdgeInsets.only(right: 12),
-                              decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                              child: const Icon(Icons.check, color: AppColors.onAccent, size: 16),
-                            ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ex.name,
-                                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(ex.primaryMuscle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark)),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.info_outline, color: AppColors.primaryGrayDark),
-                            onPressed: () => Get.toNamed(AppRoutes.exerciseLibraryDetail, arguments: {'exercise': ex}),
-                          ),
-                          const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primaryGray),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          // Only show buttons when appropriate selections are made
-          if ((!_isSuperset && _selected.isNotEmpty) || (_isSuperset && _selected.length == 2))
-            SafeArea(
-              child: Padding(
+          Column(
+            children: [
+              Padding(
                 padding: const EdgeInsets.all(16),
+                child: TextField(
+                  controller: _searchCtrl,
+                  decoration: InputDecoration(
+                    hintText: 'Search exercises...',
+                    prefixIcon: const Icon(Icons.search, color: AppColors.primaryGrayDark),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    filled: true,
+                    fillColor: AppColors.surface,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+                ),
+              ),
+              if (!_isWarmup)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: _isSuperset,
+                        onChanged: (v) => setState(() {
+                          _isSuperset = v ?? false;
+                          if (!_isSuperset && _selected.length > 1) {
+                            final first = _selected.first;
+                            _selected.clear();
+                            _selected.add(first);
+                          }
+                        }),
+                        activeColor: AppColors.accent,
+                      ),
+                      Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: showButtons ? 140 : 0),
+                  itemCount: _filtered.length,
+                  itemBuilder: (ctx, i) {
+                    final ex = _filtered[i];
+                    final sel = _selected.contains(ex);
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      elevation: sel ? 4 : 1,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: sel ? AppColors.accent : Colors.transparent, width: 2),
+                      ),
+                      child: InkWell(
+                        onTap: () => _toggleSelect(ex),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              if (sel)
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  margin: const EdgeInsets.only(right: 12),
+                                  decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                                  child: const Icon(Icons.check, color: AppColors.onAccent, size: 16),
+                                ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      ex.name,
+                                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(ex.primaryMuscle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark)),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.info_outline, color: AppColors.primaryGrayDark),
+                                onPressed: () => Get.toNamed(AppRoutes.exerciseLibraryDetail, arguments: {'exercise': ex}),
+                              ),
+                              const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primaryGray),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          // Fixed buttons at bottom - only show when appropriate selections are made
+          if (showButtons)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                color: AppColors.background,
+                padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom, left: 16, right: 16, top: 16),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
                       width: double.infinity,
