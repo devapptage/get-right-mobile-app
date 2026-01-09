@@ -185,53 +185,47 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
               },
             ),
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _selected.isNotEmpty ? _onContinue : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.onAccent,
-                        disabledBackgroundColor: AppColors.primaryGrayLight,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: _selected.isNotEmpty ? BorderSide.none : const BorderSide(color: AppColors.accent, width: 2),
+          // Only show buttons when appropriate selections are made
+          if ((!_isSuperset && _selected.isNotEmpty) || (_isSuperset && _selected.length == 2))
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _onContinue,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: AppColors.onAccent,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text(
+                          _isSuperset && _selected.length == 2 ? 'Configure Superset' : 'Configure ${_selected.first.name}',
+                          style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onAccent),
                         ),
                       ),
-                      child: Text(
-                        _isSuperset && _selected.length == 2
-                            ? 'Configure Superset'
-                            : _selected.isNotEmpty
-                            ? 'Configure ${_selected.first.name}'
-                            : 'Select an Exercise',
-                        style: AppTextStyles.buttonMedium.copyWith(color: _selected.isNotEmpty ? AppColors.onAccent : AppColors.onBackground),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton(
+                        onPressed: _onManual,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.onBackground,
+                          side: const BorderSide(color: AppColors.primaryGray, width: 2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text("Couldn't find Exercise?", style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton(
-                      onPressed: _onManual,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.onBackground,
-                        side: const BorderSide(color: AppColors.primaryGray, width: 2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text("Couldn't find Exercise?", style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

@@ -277,7 +277,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
             ],
           ),
         ),
-        // Floating Action Button at bottom center
+        // Glass / Frosted Plus Button at bottom center with 3D effect
         Positioned(
           bottom: 40,
           left: 0,
@@ -286,14 +286,36 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
             child: GestureDetector(
               onTap: _onPlusButtonTap,
               child: Container(
-                width: 72,
-                height: 72,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGray,
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))],
+                  color: const Color(0xFFE5E5E5).withOpacity(0.7), // Light grey frosted
+                  boxShadow: [
+                    // Soft diffused shadow beneath and slightly to the right
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 16, offset: const Offset(2, 6), spreadRadius: 0),
+                    // Very subtle ambient shadow
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(1, 3), spreadRadius: 0),
+                  ],
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.8),
+                    width: 0.8, // Very thin border
+                  ),
                 ),
-                child: const Icon(Icons.add, color: AppColors.black, size: 32),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      center: Alignment.topLeft,
+                      radius: 1.5,
+                      colors: [
+                        Colors.white.withOpacity(0.4), // Subtle highlight at top-left
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                  child: const Center(child: Icon(Icons.add, size: 40, color: Colors.black87)),
+                ),
               ),
             ),
           ),
