@@ -624,6 +624,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       controller: TextEditingController(text: cfg.mainType == 'Time' ? (data.time > 0 ? data.time.toString() : '') : (data.reps > 0 ? data.reps.toString() : '')),
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: cfg.mainType == 'Time' ? '30' : '10',
@@ -640,6 +641,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             data.reps = n;
                         });
                       },
+                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
                     ),
                   ),
                 ),
@@ -694,6 +696,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             controller: TextEditingController(text: data.distance > 0 ? data.distance.toString() : ''),
                             textAlign: TextAlign.center,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: '0.0',
@@ -702,6 +705,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             ),
                             style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
                             onChanged: (v) => setState(() => data.distance = double.tryParse(v) ?? 0),
+                            onSubmitted: (_) => FocusScope.of(context).unfocus(),
                           ),
                         ),
                       ),
@@ -751,6 +755,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             controller: TextEditingController(text: data.weight > 0 ? data.weight.toInt().toString() : ''),
                             textAlign: TextAlign.center,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: '0',
@@ -759,6 +764,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             ),
                             style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
                             onChanged: (v) => setState(() => data.weight = double.tryParse(v) ?? 0),
+                            onSubmitted: (_) => FocusScope.of(context).unfocus(),
                           ),
                         ),
                       ),

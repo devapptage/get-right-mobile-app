@@ -366,7 +366,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
                                 }),
                             ],
                           ),
-                          10.h.verticalSpace,
+                          15.h.verticalSpace,
                           // Control buttons
                           if (!isTracking)
                             _buildStartButton()
@@ -405,7 +405,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
                                 ),
                               ],
                             ),
-                            10.h.verticalSpace,
+                            15.h.verticalSpace,
                             _buildStatsContent(),
                           ],
 
