@@ -186,7 +186,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: AppColors.accent),

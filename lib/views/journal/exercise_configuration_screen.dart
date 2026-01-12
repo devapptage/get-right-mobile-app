@@ -16,6 +16,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   bool _isWarmup = false;
   bool _isManual = false;
   bool _isSuperset = false;
+  bool _isEditing = false;
   final TextEditingController _nameController = TextEditingController();
   List<_Config> _configs = [];
 
@@ -27,10 +28,59 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
       _isWarmup = args['isWarmup'] ?? false;
       _isManual = args['isManual'] ?? false;
       _isSuperset = args['isSuperset'] ?? false;
-      if (_isSuperset && args['exercises'] != null) {
+
+      // Handle editing existing exercise
+      if (args['existingExercise'] != null) {
+        _isEditing = true;
+        final existingEx = args['existingExercise'] as WorkoutExerciseModel;
+        _nameController.text = existingEx.exerciseName;
+
+        // Determine mainType (Reps vs Time) from sets
+        String mainType = 'Reps';
+        if (existingEx.sets.isNotEmpty && existingEx.sets.any((s) => s.isTimed)) {
+          mainType = 'Time';
+        }
+
+        // Determine extraType (Weight vs Distance) from sets
+        String extraType = 'Weight';
+        if (existingEx.sets.isNotEmpty && existingEx.sets.any((s) => s.isDistanceBased)) {
+          extraType = 'Distance';
+        }
+
+        // Create config with existing data
+        final cfg = _Config(name: existingEx.exerciseName, id: existingEx.exerciseId);
+        cfg.mainType = mainType;
+        cfg.extraType = extraType;
+
+        // Populate sets from existing exercise
+        cfg.sets.clear();
+        for (var set in existingEx.sets) {
+          final setData = _SetData();
+          if (mainType == 'Time') {
+            setData.time = set.timeSeconds ?? 0;
+          } else {
+            setData.reps = set.reps ?? 0;
+          }
+          if (extraType == 'Distance') {
+            setData.distance = set.distance ?? 0;
+            setData.distanceUnit = set.distanceUnit ?? 'miles';
+          } else {
+            setData.weight = set.weight ?? 0;
+          }
+          cfg.sets.add(setData);
+        }
+
+        // If no sets, add default sets
+        if (cfg.sets.isEmpty) {
+          cfg.sets.addAll([_SetData(), _SetData(), _SetData()]);
+        }
+
+        _configs.add(cfg);
+      } else if (_isSuperset && args['exercises'] != null) {
         for (var ex in args['exercises'] as List<ExerciseLibraryModel>) _configs.add(_Config(name: ex.name, id: ex.id));
       } else if (args['exercise'] != null) {
         final ex = args['exercise'] as ExerciseLibraryModel;
+        _nameController.text = ex.name; // Pre-fill name for library exercises
         _configs.add(_Config(name: ex.name, id: ex.id));
       } else if (_isManual) {
         _configs.add(_Config(name: '', id: 'manual_${DateTime.now().millisecondsSinceEpoch}'));
@@ -313,7 +363,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   }
 
   Widget _buildCard(_Config cfg, int idx) {
-    final isMan = cfg.name.isEmpty;
+    final isMan = cfg.name.isEmpty || _isEditing;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -529,7 +579,10 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   }
 
   Widget _buildSetRow(_Config cfg, int cfgIdx, int setIdx, _SetData data) {
+    // Create unique key for this set row to maintain TextField state
+    final rowKey = ValueKey('set_${cfgIdx}_$setIdx');
     return Padding(
+      key: rowKey,
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
@@ -568,6 +621,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
                     ),
                     child: TextField(
+                      controller: TextEditingController(text: cfg.mainType == 'Time' ? (data.time > 0 ? data.time.toString() : '') : (data.reps > 0 ? data.reps.toString() : '')),
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -637,6 +691,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
                           ),
                           child: TextField(
+                            controller: TextEditingController(text: data.distance > 0 ? data.distance.toString() : ''),
                             textAlign: TextAlign.center,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
@@ -693,6 +748,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
                           ),
                           child: TextField(
+                            controller: TextEditingController(text: data.weight > 0 ? data.weight.toInt().toString() : ''),
                             textAlign: TextAlign.center,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
@@ -752,7 +808,7 @@ class _Config {
 }
 
 class _SetData {
-  int reps = 10;
+  int reps = 0;
   int time = 0;
   double weight = 0;
   double distance = 0;

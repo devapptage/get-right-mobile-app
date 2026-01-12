@@ -306,7 +306,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     return DraggableScrollableSheet(
       initialChildSize: 0.25,
       minChildSize: 0.25,
-      maxChildSize: 0.4,
+      maxChildSize: 0.6,
       builder: (context, scrollController) {
         return Obx(() {
           final isTracking = _controller.isTracking.value;
@@ -405,6 +405,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
                                 ),
                               ],
                             ),
+                            10.h.verticalSpace,
                             _buildStatsContent(),
                           ],
 

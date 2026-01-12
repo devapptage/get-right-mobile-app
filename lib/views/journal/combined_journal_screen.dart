@@ -63,7 +63,7 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.background,
           elevation: 0,
           toolbarHeight: 56,
           systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark, statusBarBrightness: Brightness.light),
