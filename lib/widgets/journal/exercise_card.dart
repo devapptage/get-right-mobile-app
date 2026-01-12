@@ -93,15 +93,27 @@ class _ExerciseCardState extends State<ExerciseCard> {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Text('Set', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11)),
+                  child: Text(
+                    'Set',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text(widget.exercise.hasTimedSets ? 'Time' : 'Reps', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11)),
+                  child: Text(
+                    widget.exercise.hasTimedSets ? 'Time' : 'Reps',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Weight', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11)),
+                  child: Text(
+                    'Weight',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11),
+                  ),
                 ),
               ],
             ),
@@ -123,7 +135,11 @@ class _ExerciseCardState extends State<ExerciseCard> {
         children: [
           Expanded(
             flex: 1,
-            child: Text('${set.setNumber}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12)),
+            child: Text(
+              '${set.setNumber}',
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12),
+            ),
           ),
           Expanded(flex: 2, child: _buildRepsOrTime(set)),
           Expanded(flex: 2, child: _buildWeight(set)),
@@ -137,6 +153,7 @@ class _ExerciseCardState extends State<ExerciseCard> {
       final m = (set.timeSeconds! / 60).floor();
       final s = set.timeSeconds! % 60;
       return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.timer_outlined, size: 12, color: AppColors.accent),
           const SizedBox(width: 4),
@@ -147,15 +164,34 @@ class _ExerciseCardState extends State<ExerciseCard> {
     if (set.isAMRAP)
       return Text(
         'AMRAP',
+        textAlign: TextAlign.center,
         style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600, fontSize: 12),
       );
-    return Text('${set.reps ?? '-'}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12));
+    return Text(
+      '${set.reps ?? '-'}',
+      textAlign: TextAlign.center,
+      style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12),
+    );
   }
 
   Widget _buildWeight(ExerciseSetModel set) {
-    if (set.isBodyweight) return Text('BW', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12));
-    if (set.weight != null && set.weight! > 0) return Text('${set.weight!.toInt()}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12));
-    return Text('-', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 12));
+    if (set.isBodyweight)
+      return Text(
+        'BW',
+        textAlign: TextAlign.center,
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12),
+      );
+    if (set.weight != null && set.weight! > 0)
+      return Text(
+        '${set.weight!.toInt()}',
+        textAlign: TextAlign.center,
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12),
+      );
+    return Text(
+      '-',
+      textAlign: TextAlign.center,
+      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 12),
+    );
   }
 
   Widget _buildNotesSection() {
