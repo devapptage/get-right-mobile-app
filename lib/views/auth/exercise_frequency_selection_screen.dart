@@ -17,6 +17,11 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
 
   final List<String> _frequencies = ['Daily (7x/week)', '5 times per week', '3 times per week', '2 times per week', 'Once per week'];
 
+  int get _currentIndex {
+    final args = Get.arguments as Map<String, dynamic>?;
+    return args?['index'] as int? ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,13 +37,15 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                   icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 28),
                   onPressed: () => Get.back(),
                 ),
-                TextButton(
-                  onPressed: () => Get.offAllNamed(AppRoutes.home),
-                  child: Text(
-                    'Skip',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
-                  ),
-                ),
+                _currentIndex == 3
+                    ? const SizedBox.shrink()
+                    : TextButton(
+                        onPressed: () => Get.offAllNamed(AppRoutes.home),
+                        child: Text(
+                          'Skip',
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                        ),
+                      ),
               ],
             ),
 

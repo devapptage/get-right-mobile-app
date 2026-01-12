@@ -103,7 +103,7 @@ class _FitnessLevelSelectionScreenState extends State<FitnessLevelSelectionScree
               padding: const EdgeInsets.all(24),
               child: CustomButton(
                 text: 'Continue',
-                onPressed: _selectedLevel != null ? () => Get.toNamed(AppRoutes.exerciseFrequencySelection) : null,
+                onPressed: _selectedLevel != null ? () => Get.toNamed(AppRoutes.exerciseFrequencySelection, arguments: {'index': 3}) : null,
                 backgroundColor: _selectedLevel != null ? AppColors.accent : AppColors.primaryGray,
                 textColor: Colors.white,
               ),
