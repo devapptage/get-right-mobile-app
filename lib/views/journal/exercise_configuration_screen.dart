@@ -295,69 +295,72 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-          ),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          'Configure Exercise',
-          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w600),
-        ),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 140),
-            child: Column(
-              children: _configs
-                  .asMap()
-                  .entries
-                  .map(
-                    (e) => Padding(
-                      padding: EdgeInsets.only(bottom: e.key < _configs.length - 1 ? 20 : 0),
-                      child: _buildCard(e.value, e.key),
-                    ),
-                  )
-                  .toList(),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          elevation: 0,
+          leading: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
             ),
+            onPressed: () => Get.back(),
           ),
-          // Fixed button at bottom
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _onSave,
-                  icon: const Icon(Icons.check_circle_rounded, size: 24),
-                  label: Text('Save Exercise', style: AppTextStyles.buttonLarge.copyWith(fontWeight: FontWeight.w700)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
-                    foregroundColor: AppColors.onAccent,
-                    elevation: 4,
-                    shadowColor: AppColors.accent.withOpacity(0.4),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                  ),
-                ).paddingSymmetric(horizontal: 16),
+          title: Text(
+            'Configure Exercise',
+            style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w600),
+          ),
+        ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 140),
+              child: Column(
+                children: _configs
+                    .asMap()
+                    .entries
+                    .map(
+                      (e) => Padding(
+                        padding: EdgeInsets.only(bottom: e.key < _configs.length - 1 ? 20 : 0),
+                        child: _buildCard(e.value, e.key),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
-          ),
-        ],
+            // Fixed button at bottom
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SafeArea(
+                top: false,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _onSave,
+                    icon: const Icon(Icons.check_circle_rounded, size: 24),
+                    label: Text('Save Exercise', style: AppTextStyles.buttonLarge.copyWith(fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: AppColors.onAccent,
+                      elevation: 4,
+                      shadowColor: AppColors.accent.withOpacity(0.4),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                    ),
+                  ).paddingSymmetric(horizontal: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

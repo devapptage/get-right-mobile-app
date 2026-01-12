@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:get/get.dart';
 import 'package:get_right/controllers/favorites_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -37,283 +38,288 @@ class _BundleDetailScreenState extends State<BundleDetailScreen> {
       ...bundle, // Keep any additional fields
     };
 
-    return SafeArea(
-      child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            // App Bar with Bundle Header
-            SliverAppBar(
-              expandedHeight: 250,
-              pinned: true,
-              automaticallyImplyLeading: false,
-              actions: [
-                // Favorite Icon
-                Obx(() {
-                  final isFavorite = _favoritesController.isFavorite(bundleId);
-                  return IconButton(
-                    onPressed: () {
-                      _favoritesController.toggleFavorite(bundleId, {...safeBundle, 'type': 'bundle'});
-                      Get.snackbar(
-                        isFavorite ? 'Removed' : 'Added',
-                        isFavorite ? 'Removed from favorites' : 'Added to favorites',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: isFavorite ? AppColors.primaryGray : AppColors.completed,
-                        colorText: Colors.white,
-                        duration: const Duration(seconds: 2),
-                      );
-                    },
-                    icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.completed),
-                  );
-                }),
-              ],
-              flexibleSpace: FlexibleSpaceBar(
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // Bundle Thumbnail Image
-                    Image.network(
-                      bundle['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=400&fit=crop',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.inventory_2, size: 80, color: AppColors.onAccent.withOpacity(0.3)),
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(color: AppColors.onAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-                                child: Text(
-                                  '$discount% OFF',
-                                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Dark overlay for better text visibility
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
-                      ),
-                    ),
-                    // Discount badge overlay
-                    Positioned(
-                      top: 10,
-                      right: 40,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3D060),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4, offset: const Offset(0, 2))],
-                        ),
-                        child: Text(
-                          '$discount% OFF',
-                          style: AppTextStyles.titleSmall.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      child: SafeArea(
-                        child: Container(
-                          margin: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 60,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, AppColors.background]),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
 
-            // Content
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Bundle Title
-                    Text(
-                      safeBundle['title'] ?? 'Bundle',
-                      style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(safeBundle['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
-                    const SizedBox(height: 24),
-
-                    // Pricing Card
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.1), AppColors.accentVariant.withOpacity(0.05)]),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.accent, width: 2),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Total Value', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
-                                  Text(
-                                    '\$${totalValue.toStringAsFixed(2)}',
-                                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text('Bundle Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
-                                  Text(
-                                    '\$${bundlePrice.toStringAsFixed(2)}',
-                                    style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ],
+      child: SafeArea(
+        bottom: false,
+        child: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              // App Bar with Bundle Header
+              SliverAppBar(
+                expandedHeight: 250,
+                pinned: true,
+                automaticallyImplyLeading: false,
+                actions: [
+                  // Favorite Icon
+                  Obx(() {
+                    final isFavorite = _favoritesController.isFavorite(bundleId);
+                    return IconButton(
+                      onPressed: () {
+                        _favoritesController.toggleFavorite(bundleId, {...safeBundle, 'type': 'bundle'});
+                        Get.snackbar(
+                          isFavorite ? 'Removed' : 'Added',
+                          isFavorite ? 'Removed from favorites' : 'Added to favorites',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: isFavorite ? AppColors.primaryGray : AppColors.completed,
+                          colorText: Colors.white,
+                          duration: const Duration(seconds: 2),
+                        );
+                      },
+                      icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? Colors.red : AppColors.completed),
+                    );
+                  }),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Bundle Thumbnail Image
+                      Image.network(
+                        bundle['imageUrl'] ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=400&fit=crop',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.8), AppColors.accentVariant], begin: Alignment.topLeft, end: Alignment.bottomRight),
                           ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                            child: Row(
+                          child: Center(
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.savings, color: AppColors.completed, size: 20),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Save \$${(totalValue - bundlePrice).toStringAsFixed(2)} (${discount}% OFF)',
-                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.completed, fontWeight: FontWeight.bold),
+                                Icon(Icons.inventory_2, size: 80, color: AppColors.onAccent.withOpacity(0.3)),
+                                const SizedBox(height: 16),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(color: AppColors.onAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                                  child: Text(
+                                    '$discount% OFF',
+                                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Included Programs Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Included Programs',
-                          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                      ),
+                      // Dark overlay for better text visibility
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
+                        ),
+                      ),
+                      // Discount badge overlay
+                      Positioned(
+                        top: 10,
+                        right: 40,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3D060),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4, offset: const Offset(0, 2))],
+                          ),
                           child: Text(
-                            '${programs.length} Programs',
-                            style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                            '$discount% OFF',
+                            style: AppTextStyles.titleSmall.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    ...programs.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final program = entry.value;
-                      return _buildProgramCard(program, index + 1);
-                    }),
-                    const SizedBox(height: 24),
-
-                    // What's Included
-                    Text(
-                      'What\'s Included',
-                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildFeatureItem(Icons.fitness_center, 'Access to all ${programs.length} programs'),
-                    _buildFeatureItem(Icons.video_library, 'Video demonstrations for all exercises'),
-                    _buildFeatureItem(Icons.track_changes, 'Progress tracking and analytics'),
-                    _buildFeatureItem(Icons.chat, 'Direct messaging with all trainers'),
-                    _buildFeatureItem(Icons.library_books, 'Comprehensive nutrition guides'),
-                    _buildFeatureItem(Icons.calendar_today, 'Lifetime access to all programs'),
-                    _buildFeatureItem(Icons.savings, 'Special bundle discount (${discount}% OFF)'),
-                    const SizedBox(height: 20), // Space for bottom bar
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        // Bottom Purchase Bar
-        bottomNavigationBar: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
-          ),
-          child: SafeArea(
-            child: Row(
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Bundle Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
-                    Row(
-                      children: [
-                        Text(
-                          '\$${totalValue.toStringAsFixed(2)}',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        child: SafeArea(
+                          child: Container(
+                            margin: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '\$${bundlePrice.toStringAsFixed(2)}',
-                          style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, AppColors.background]),
+                          ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.purchaseDetails, arguments: {'isBundle': true});
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    icon: const Icon(Icons.shopping_cart, size: 20),
-                    label: Text('Enroll Bundle', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
+
+              // Content
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Bundle Title
+                      Text(
+                        safeBundle['title'] ?? 'Bundle',
+                        style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(safeBundle['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
+                      const SizedBox(height: 24),
+
+                      // Pricing Card
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.1), AppColors.accentVariant.withOpacity(0.05)]),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.accent, width: 2),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Total Value', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+                                    Text(
+                                      '\$${totalValue.toStringAsFixed(2)}',
+                                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text('Bundle Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
+                                    Text(
+                                      '\$${bundlePrice.toStringAsFixed(2)}',
+                                      style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(color: AppColors.completed.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.savings, color: AppColors.completed, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Save \$${(totalValue - bundlePrice).toStringAsFixed(2)} (${discount}% OFF)',
+                                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.completed, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Included Programs Section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Included Programs',
+                            style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                            child: Text(
+                              '${programs.length} Programs',
+                              style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ...programs.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final program = entry.value;
+                        return _buildProgramCard(program, index + 1);
+                      }),
+                      const SizedBox(height: 24),
+
+                      // What's Included
+                      Text(
+                        'What\'s Included',
+                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildFeatureItem(Icons.fitness_center, 'Access to all ${programs.length} programs'),
+                      _buildFeatureItem(Icons.video_library, 'Video demonstrations for all exercises'),
+                      _buildFeatureItem(Icons.track_changes, 'Progress tracking and analytics'),
+                      _buildFeatureItem(Icons.chat, 'Direct messaging with all trainers'),
+                      _buildFeatureItem(Icons.library_books, 'Comprehensive nutrition guides'),
+                      _buildFeatureItem(Icons.calendar_today, 'Lifetime access to all programs'),
+                      _buildFeatureItem(Icons.savings, 'Special bundle discount (${discount}% OFF)'),
+                      const SizedBox(height: 20), // Space for bottom bar
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Bottom Purchase Bar
+          bottomNavigationBar: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2))],
+            ),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Bundle Price', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+                      Row(
+                        children: [
+                          Text(
+                            '\$${totalValue.toStringAsFixed(2)}',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, decoration: TextDecoration.lineThrough),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '\$${bundlePrice.toStringAsFixed(2)}',
+                            style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Get.toNamed(AppRoutes.purchaseDetails, arguments: {'isBundle': true});
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.shopping_cart, size: 20),
+                      label: Text('Enroll Bundle', style: AppTextStyles.labelLarge.copyWith(color: AppColors.onAccent)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
