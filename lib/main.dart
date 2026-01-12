@@ -63,10 +63,9 @@ Future<void> initServices() async {
 
 class GetRightApp extends StatelessWidget {
   const GetRightApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    // 2. WRAP the entire app in AnnotatedRegion
+    // 2. WRAP the entire app in AnnotatedRegio
     // Updated for Steel Grey background with dark icons
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: lightSystemOverlay,

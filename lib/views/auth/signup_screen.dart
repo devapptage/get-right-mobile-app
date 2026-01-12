@@ -155,7 +155,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                               );
                             },
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 31),
 
                           // Divider with "or"
                           Row(
