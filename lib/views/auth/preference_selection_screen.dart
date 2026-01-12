@@ -27,7 +27,7 @@ class _PreferenceSelectionScreenState extends State<PreferenceSelectionScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 28),
+                  icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
                   onPressed: () => Get.back(),
                 ),
                 TextButton(

@@ -71,7 +71,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 28),
+          icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
           onPressed: () => Get.back(),
         ),
         centerTitle: true,

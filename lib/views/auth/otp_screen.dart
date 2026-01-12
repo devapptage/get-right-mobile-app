@@ -136,7 +136,6 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
         child: SafeArea(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: SlideTransition(
@@ -148,15 +147,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         IconButton(
-                          icon: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
-                            ),
-                            child: const Icon(Icons.arrow_back_rounded, size: 20),
-                          ),
+                          icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
                           onPressed: () => Get.back(),
                         ),
                       ],
@@ -178,50 +169,58 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                     const SizedBox(height: 40),
 
                     // Title
-                    Text(
-                      'Verify Your Email',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Description
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        email != null
-                            ? 'We\'ve sent a ${AppConstants.otpLength}-digit verification code to\n$email'
-                            : 'We\'ve sent a ${AppConstants.otpLength}-digit verification code to your email.\nPlease enter it below.',
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 15, height: 1.5),
-                        textAlign: TextAlign.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Verify Your Email',
+                            style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Description
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              email != null
+                                  ? 'We\'ve sent a ${AppConstants.otpLength}-digit verification code to\n$email'
+                                  : 'We\'ve sent a ${AppConstants.otpLength}-digit verification code to your email.\nPlease enter it below.',
+                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 15, height: 1.5),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 48),
+
+                          // OTP input fields
+                          AnimatedBuilder(
+                            animation: _shakeAnimation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(_shakeAnimation.value * (_shakeController.isAnimating ? ((_shakeController.value * 4).floor() % 2 == 0 ? 1 : -1) : 0), 0),
+                                child: child,
+                              );
+                            },
+                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(AppConstants.otpLength, (index) => _buildOtpField(index))),
+                          ),
+                          const SizedBox(height: 48),
+
+                          // Verify button
+                          GetBuilder<AuthController>(
+                            builder: (controller) {
+                              return CustomButton(text: 'Verify Code', onPressed: () => Get.offAllNamed(AppRoutes.profileSetup), isLoading: controller.isLoading);
+                            },
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Timer and resend
+                          _buildResendSection(),
+                          const SizedBox(height: 24),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 48),
-
-                    // OTP input fields
-                    AnimatedBuilder(
-                      animation: _shakeAnimation,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(_shakeAnimation.value * (_shakeController.isAnimating ? ((_shakeController.value * 4).floor() % 2 == 0 ? 1 : -1) : 0), 0),
-                          child: child,
-                        );
-                      },
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: List.generate(AppConstants.otpLength, (index) => _buildOtpField(index))),
-                    ),
-                    const SizedBox(height: 48),
-
-                    // Verify button
-                    GetBuilder<AuthController>(
-                      builder: (controller) {
-                        return CustomButton(text: 'Verify Code', onPressed: () => Get.offAllNamed(AppRoutes.profileSetup), isLoading: controller.isLoading);
-                      },
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Timer and resend
-                    _buildResendSection(),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),

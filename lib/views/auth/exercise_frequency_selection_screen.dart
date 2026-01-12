@@ -50,7 +50,7 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   width: 8,
                   height: 8,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: index < 3 ? AppColors.accent : AppColors.accent.withOpacity(0.3)),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: index < 4 ? AppColors.accent : AppColors.accent.withOpacity(0.3)),
                 );
               }),
             ),
