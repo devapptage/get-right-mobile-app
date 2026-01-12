@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -196,16 +196,19 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             },
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        // Expanded(
-                        //   child: _buildSocialButton(
-                        //     icon: Icons.apple_rounded,
-                        //     label: 'Apple',
-                        //     onPressed: () {
-                        //       // TODO: Implement Apple login
-                        //     },
-                        //   ),
-                        // ),
+                        if (Platform.isIOS || Platform.isMacOS) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildSocialButton(
+                              icon: Icons.apple_rounded,
+                              label: 'Apple',
+                              onPressed: () {
+                                final authController = Get.find<AuthController>();
+                                authController.signInWithApple();
+                              },
+                            ),
+                          ),
+                        ],
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildSocialButton(

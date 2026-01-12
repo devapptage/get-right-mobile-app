@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:get/get.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 
@@ -187,5 +189,92 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await _storageService.logout();
     Get.offAllNamed(AppRoutes.login);
+  }
+
+  /// Sign in with Apple - DEMO VERSION
+  /// Works for both login and signup (Apple handles both cases)
+  Future<void> signInWithApple() async {
+    try {
+      // Check if Apple Sign-In is available (iOS 13+ or macOS 10.15+)
+      if (!Platform.isIOS && !Platform.isMacOS) {
+        Get.snackbar(
+          'Not Available',
+          'Apple Sign-In is only available on iOS and macOS devices',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      _isLoading = true;
+      update();
+
+      // Check if Apple Sign-In is available
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        _isLoading = false;
+        update();
+        Get.snackbar(
+          'Not Available',
+          'Apple Sign-In is not available on this device',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      // Request Apple Sign-In
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Extract user information
+      final email = credential.email ?? credential.userIdentifier;
+      final firstName = credential.givenName ?? '';
+      final lastName = credential.familyName ?? '';
+      final displayName = '${firstName} ${lastName}'.trim();
+      final userName = displayName.isNotEmpty ? displayName : 'Apple User';
+
+      // Save demo user data locally
+      await _storageService.saveToken('apple_token_${DateTime.now().millisecondsSinceEpoch}');
+      await _storageService.saveUserId('apple_user_${credential.userIdentifier}');
+      await _storageService.saveEmail(email ?? 'apple_user@example.com');
+      await _storageService.saveName(userName);
+      await _storageService.saveLoginStatus(true);
+
+      _isLoading = false;
+      update();
+
+      // Navigate to home
+      Get.offAllNamed(AppRoutes.home);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      _isLoading = false;
+      update();
+
+      // Handle user cancellation
+      if (e.code == AuthorizationErrorCode.canceled) {
+        // User canceled, do nothing
+        return;
+      }
+
+      // Handle other errors
+      Get.snackbar(
+        'Sign-In Failed',
+        e.message.isNotEmpty ? e.message : 'An error occurred during Apple Sign-In',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      _isLoading = false;
+      update();
+      Get.snackbar(
+        'Error',
+        'Failed to sign in with Apple: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

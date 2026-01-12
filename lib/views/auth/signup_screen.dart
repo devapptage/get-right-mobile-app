@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/auth_controller.dart';
@@ -66,115 +67,148 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
-          onPressed: () => Get.back(),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(center: Alignment.topCenter, radius: 1.0, colors: [AppColors.accent.withOpacity(0.05), AppColors.background]),
         ),
-        centerTitle: true,
-        title: Text(
-          'Create Account',
-          style: AppTextStyles.headlineMedium.copyWith(color: AppColors.accent, fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-
-                  // Email
-                  _buildLabelWithAsterisk('Email'),
-                  const SizedBox(height: 8),
-                  CustomTextField(
-                    controller: _emailController,
-                    labelText: null,
-                    hintText: 'Enter your email address',
-                    keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    onChanged: (value) => setState(() {}),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Password
-                  _buildLabelWithAsterisk('Password'),
-                  const SizedBox(height: 8),
-                  PasswordTextField(controller: _passwordController, labelText: null, hintText: 'Enter your password', onChanged: (value) => setState(() {})),
-                  const SizedBox(height: 24),
-
-                  // Confirm Password
-                  _buildLabelWithAsterisk('Confirm Password'),
-                  const SizedBox(height: 8),
-                  PasswordTextField(controller: _confirmPasswordController, labelText: null, hintText: 'Confirm your password', onChanged: (value) => setState(() {})),
-                  const SizedBox(height: 16),
-
-                  // Instructions
-                  Text(
-                    'Password must be at least 8 characters long and include uppercase and lowercase letters.',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400, height: 1.4),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'After creating your account, check your email (including spam folder) for verification.',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400, height: 1.4),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Create Account button
-                  GetBuilder<AuthController>(
-                    builder: (controller) {
-                      final isValid = _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty && _confirmPasswordController.text.isNotEmpty;
-                      return CustomButton(text: 'Create Account', onPressed: _signup, isLoading: controller.isLoading, backgroundColor: AppColors.accent, textColor: Colors.white);
-                    },
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Divider with "or"
-                  Row(
-                    children: [
-                      Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'or',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
+                          onPressed: () => Get.back(),
                         ),
-                      ),
-                      Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
+                      ],
+                    ),
+                    const SizedBox(height: 25),
+                    // Title
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Create Account',
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
+                          ),
 
-                  // Social signup buttons
-                  _buildSocialButton(
-                    icon: Icons.g_mobiledata_rounded,
-                    label: 'Continue with Google',
-                    onPressed: () {
-                      // TODO: Implement Google sign up
-                    },
-                    isFullWidth: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSocialButton(
-                    icon: Icons.apple_rounded,
-                    label: 'Continue with Apple',
-                    onPressed: () {
-                      // TODO: Implement Apple sign up
-                    },
-                    isFullWidth: true,
-                  ),
-                  const SizedBox(height: 32),
-                ],
+                          const SizedBox(height: 25),
+
+                          // Email
+                          _buildLabelWithAsterisk('Email'),
+                          const SizedBox(height: 8),
+                          CustomTextField(
+                            controller: _emailController,
+                            labelText: null,
+                            hintText: 'Enter your email address',
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            onChanged: (value) => setState(() {}),
+                          ),
+                          const SizedBox(height: 15),
+
+                          // Password
+                          _buildLabelWithAsterisk('Password'),
+                          const SizedBox(height: 8),
+                          PasswordTextField(controller: _passwordController, labelText: null, hintText: 'Enter your password', onChanged: (value) => setState(() {})),
+                          const SizedBox(height: 15),
+
+                          // Confirm Password
+                          _buildLabelWithAsterisk('Confirm Password'),
+                          const SizedBox(height: 8),
+                          PasswordTextField(controller: _confirmPasswordController, labelText: null, hintText: 'Confirm your password', onChanged: (value) => setState(() {})),
+                          const SizedBox(height: 15),
+
+                          // Instructions
+                          Text(
+                            'Password must be at least 8 characters long and include uppercase and lowercase letters.',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400, height: 1.4),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'After creating your account, check your email (including spam folder) for verification.',
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400, height: 1.4),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Create Account button
+                          GetBuilder<AuthController>(
+                            builder: (controller) {
+                              return CustomButton(
+                                text: 'Create Account',
+                                onPressed: _signup,
+                                isLoading: controller.isLoading,
+                                backgroundColor: AppColors.accent,
+                                textColor: Colors.white,
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Divider with "or"
+                          Row(
+                            children: [
+                              Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  'or',
+                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
+                                ),
+                              ),
+                              Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Social signup buttons
+                          _buildSocialButton(
+                            icon: Icons.g_mobiledata_rounded,
+                            label: 'Continue with Google',
+                            onPressed: () {
+                              // TODO: Implement Google sign up
+                            },
+                            isFullWidth: true,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildSocialButton(
+                            icon: Icons.facebook_rounded,
+                            label: 'Continue with Facebook',
+                            onPressed: () {
+                              // TODO: Implement Facebook sign up
+                            },
+                            isFullWidth: true,
+                          ),
+                          if (Platform.isIOS || Platform.isMacOS) ...[
+                            const SizedBox(height: 12),
+                            _buildSocialButton(
+                              icon: Icons.apple_rounded,
+                              label: 'Continue with Apple',
+                              onPressed: () {
+                                final authController = Get.find<AuthController>();
+                                authController.signInWithApple();
+                              },
+                              isFullWidth: true,
+                            ),
+                          ],
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
