@@ -1956,8 +1956,35 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
-                    // Trainer
-                    Text(program['trainer'], style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9))),
+                    // Trainer with Certification
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(program['trainer'], style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9))),
+                        ),
+                        if (program['certified'])
+                          Container(
+                            margin: EdgeInsets.only(left: 8.w),
+                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.completed.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.completed, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.verified, color: Colors.white, size: 12),
+                                SizedBox(width: 3.w),
+                                Text(
+                                  'Certified',
+                                  style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                     SizedBox(height: 8.h),
                     // Stats Row
                     Row(
@@ -2148,11 +2175,40 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4.h),
-                    Text(
-                      program['trainer'],
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11.sp),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            program['trainer'],
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 11.sp),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (program['certified'])
+                          Padding(
+                            padding: EdgeInsets.only(left: 4.w),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                              decoration: BoxDecoration(
+                                color: AppColors.completed.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: AppColors.completed, width: 0.5),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.verified, color: AppColors.completed, size: 10),
+                                  SizedBox(width: 2.w),
+                                  Text(
+                                    'Certified',
+                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.completed, fontSize: 9.sp, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     SizedBox(height: 6.h),
                     Row(
@@ -2267,12 +2323,42 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   ),
                   const SizedBox(height: 4),
 
-                  // Instructor
-                  Text(
-                    primaryTrainer,
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12.sp),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  // Instructor with Certification
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          primaryTrainer,
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12.sp),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Show certified badge if all programs in bundle are certified
+                      if (programs.isNotEmpty && programs.every((p) => p['certified'] == true))
+                        Padding(
+                          padding: EdgeInsets.only(left: 6.w),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.completed.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.completed, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.verified, color: AppColors.completed, size: 12),
+                                SizedBox(width: 3.w),
+                                Text(
+                                  'Certified',
+                                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.completed, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 6),
 
@@ -2454,12 +2540,41 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   ),
                   SizedBox(height: 4.h),
 
-                  // Instructor
-                  Text(
-                    program['trainer'],
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12.sp),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  // Instructor with Certification Badge
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          program['trainer'],
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray, fontSize: 12.sp),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (program['certified'])
+                        Padding(
+                          padding: EdgeInsets.only(left: 6.w),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.completed.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.completed, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.verified, color: AppColors.completed, size: 12),
+                                SizedBox(width: 3.w),
+                                Text(
+                                  'Certified',
+                                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.completed, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   SizedBox(height: 6.h),
 

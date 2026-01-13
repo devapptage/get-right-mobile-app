@@ -114,7 +114,6 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
             inputFormatters: widget.inputFormatters,
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 15, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
-              labelText: widget.labelText,
               hintText: widget.hintText,
               errorText: widget.errorText,
               prefixIcon: widget.prefixIcon != null
