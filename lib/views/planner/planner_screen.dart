@@ -851,7 +851,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.photo_library_outlined, color: AppColors.onPrimary),
+            icon: const Icon(Icons.photo_library_outlined, color: AppColors.green),
             onPressed: () {
               _addProgressPhoto();
             },
@@ -1082,11 +1082,25 @@ class _PlannerScreenState extends State<PlannerScreen> {
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.calendar_today_outlined, size: 60, color: AppColors.primaryGray.withOpacity(0.5)),
+              Icon(Icons.calendar_month_outlined, size: 60, color: AppColors.green),
               const SizedBox(height: 16),
-              Text('No data for this day', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+              Text('No data for this day', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.green)),
               const SizedBox(height: 8),
-              TextButton(onPressed: _showAddWorkoutDialog, child: const Text('Add Data')),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Data'),
+                  onPressed: _showAddWorkoutDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: AppColors.onAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    textStyle: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -92,20 +92,15 @@ class _CustomTab extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         final isActive = controller.index == index;
-        // Calculate animation value based on offset
-        // This makes the animation smooth as you drag between tabs
-        final double offset = controller.offset;
-        final double value = (offset + controller.index) - index;
-        final double animationValue = 1.0 - value.abs().clamp(0.0, 1.0);
 
-        // Use either the direct index comparison or the calculated animation value
-        // The animation value is non-zero when transitioning towards or away from this tab
-        final bool isSelected = isActive || animationValue > 0.5;
+        // Only use isActive for final selection state to avoid glitches
+        final bool isSelected = isActive;
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 100),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
               gradient: isSelected ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
@@ -117,19 +112,19 @@ class _CustomTab extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: isSelected ? Colors.white : AppColors.mediumGray, size: 20),
-                // Only show text when selected or transitioning to selected
+                Icon(icon, color: isSelected ? Colors.white : AppColors.green, size: 20),
+                isSelected ? const SizedBox.shrink() : SizedBox(width: 8),
                 AnimatedSize(
-                  duration: const Duration(milliseconds: 100),
+                  duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
-                  child: SizedBox(width: isSelected ? 8 : 8),
+                  child: SizedBox(width: isSelected ? 8 : 0),
                 ),
                 AnimatedSize(
-                  duration: const Duration(milliseconds: 100),
+                  duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
                   child: Text(
                     label,
-                    style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? Colors.white : AppColors.mediumGray, fontWeight: FontWeight.bold, fontSize: 15),
+                    style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? Colors.white : AppColors.green, fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ),
               ],
