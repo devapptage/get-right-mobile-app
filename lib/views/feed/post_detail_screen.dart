@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -108,39 +109,21 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          // Modern App Bar with smooth transitions
-          SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height * 0.5,
-            pinned: true,
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 2))],
-                ),
-                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-              ),
-              onPressed: () => Get.back(),
-            ),
-            title: AnimatedOpacity(
-              opacity: _showAppBarTitle ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                _post['creator'] ?? '',
-                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-              ),
-            ),
-            actions: [
-              IconButton(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            // Modern App Bar with smooth transitions
+            SliverAppBar(
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+              expandedHeight: MediaQuery.of(context).size.height * 0.5,
+              pinned: true,
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              leading: IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -148,258 +131,272 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
                     shape: BoxShape.circle,
                     boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 2))],
                   ),
-                  child: const Icon(Icons.more_vert, color: Colors.white),
+                  child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
                 ),
-                onPressed: _showPostOptions,
+                onPressed: () => Get.back(),
               ),
-              const SizedBox(width: 8),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: GestureDetector(
-                onDoubleTap: _handleDoubleTap,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // Post Image/Video Thumbnail
-                    Hero(
-                      tag: 'post_${_post['id']}',
-                      child: Image.network(
-                        _post['thumbnail'] ?? '',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.accent, AppColors.accent.withOpacity(0.6)]),
+              title: AnimatedOpacity(
+                opacity: _showAppBarTitle ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Text(
+                  _post['creator'] ?? '',
+                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 2))],
+                    ),
+                    child: const Icon(Icons.more_vert, color: Colors.white),
+                  ),
+                  onPressed: _showPostOptions,
+                ),
+                const SizedBox(width: 8),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                background: GestureDetector(
+                  onDoubleTap: _handleDoubleTap,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Post Image/Video Thumbnail
+                      Hero(
+                        tag: 'post_${_post['id']}',
+                        child: Image.network(
+                          _post['thumbnail'] ?? '',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.accent, AppColors.accent.withOpacity(0.6)]),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    // Subtle gradient overlay
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.black.withOpacity(0.3), Colors.transparent, Colors.black.withOpacity(0.5)],
-                          stops: const [0.0, 0.5, 1.0],
+                      // Subtle gradient overlay
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.black.withOpacity(0.3), Colors.transparent, Colors.black.withOpacity(0.5)],
+                            stops: const [0.0, 0.5, 1.0],
+                          ),
                         ),
                       ),
-                    ),
-                    // Play button for videos
-                    if (_post['isVideo'] == true)
+                      // Play button for videos
+                      if (_post['isVideo'] == true)
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 20, spreadRadius: 2)],
+                            ),
+                            child: const Icon(Icons.play_arrow, color: Colors.white, size: 56),
+                          ),
+                        ),
+                      // Duration badge
+                      if (_post['duration'] != null)
+                        Positioned(
+                          bottom: 10,
+                          right: 16,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white.withOpacity(0.2)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.play_circle_outline, color: Colors.white, size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _post['duration'],
+                                  style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // Double-tap heart animation
                       Center(
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
-                            shape: BoxShape.circle,
-                            boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 20, spreadRadius: 2)],
-                          ),
-                          child: const Icon(Icons.play_arrow, color: Colors.white, size: 56),
+                        child: AnimatedBuilder(
+                          animation: _likeAnimation,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: _likeAnimation.value,
+                              child: Opacity(
+                                opacity: _likeAnimationController.isAnimating ? 1.0 : 0.0,
+                                child: Icon(
+                                  Icons.favorite,
+                                  color: Colors.white,
+                                  size: 120,
+                                  shadows: [Shadow(color: AppColors.error.withOpacity(0.5), blurRadius: 30)],
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    // Duration badge
-                    if (_post['duration'] != null)
-                      Positioned(
-                        top: 60,
-                        right: 16,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Post Content
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Instagram-style Action Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        // Like button
+                        ScaleTransition(
+                          scale: _likeAnimation,
+                          child: IconButton(
+                            icon: Icon(_isLiked ? Icons.favorite : Icons.favorite_border, size: 25),
+                            color: _isLiked ? AppColors.error : AppColors.onBackground,
+                            onPressed: _handleLike,
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                        ),
+                        // Comment button
+                        IconButton(
+                          icon: const Icon(Icons.mode_comment_outlined, size: 25),
+                          color: AppColors.onBackground,
+                          onPressed: () {
+                            _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+                          },
+                        ),
+                        // Share button
+                        const Spacer(),
+                        IconButton(icon: const Icon(Icons.send_outlined, size: 28), color: AppColors.onBackground, onPressed: _showShareOptions),
+
+                        // Save button
+                      ],
+                    ),
+                  ),
+
+                  // Likes count
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      '${_formatCount(_likes)} likes',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Creator Info & Caption
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: AppColors.accent.withOpacity(0.2),
+                          child: Text(
+                            _post['creatorInitials'] ?? 'U',
+                            style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.play_circle_outline, color: Colors.white, size: 14),
-                              const SizedBox(width: 4),
-                              Text(
-                                _post['duration'],
-                                style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                              Row(
+                                children: [
+                                  Text(
+                                    _post['creator'] ?? 'Unknown',
+                                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(_post['timestamp'] ?? '', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              // Title as bold caption
+                              RichText(
+                                text: TextSpan(
+                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, height: 1.4),
+                                  children: [
+                                    TextSpan(
+                                      text: '${_post['title'] ?? ''}\n',
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(text: _post['description'] ?? ''),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              // Tags
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: (_post['tags'] as List<String>? ?? []).map((tag) {
+                                  return Text(
+                                    tag,
+                                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                                  );
+                                }).toList(),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    // Double-tap heart animation
-                    Center(
-                      child: AnimatedBuilder(
-                        animation: _likeAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _likeAnimation.value,
-                            child: Opacity(
-                              opacity: _likeAnimationController.isAnimating ? 1.0 : 0.0,
-                              child: Icon(
-                                Icons.favorite,
-                                color: Colors.white,
-                                size: 120,
-                                shadows: [Shadow(color: AppColors.error.withOpacity(0.5), blurRadius: 30)],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // View all comments link
+                  GestureDetector(
+                    onTap: () {
+                      _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text('View all ${_comments.length} comments', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Divider(height: 1, thickness: 1, color: AppColors.primaryGray.withOpacity(0.2)),
+                  const SizedBox(height: 16),
+
+                  // Comments Section Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Comments',
+                      style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Comments List
+                  ..._comments.map((comment) => _buildCommentItem(comment)).toList(),
+
+                  const SizedBox(height: 80), // Space for bottom input
+                ],
               ),
             ),
-          ),
-
-          // Post Content
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Instagram-style Action Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      // Like button
-                      ScaleTransition(
-                        scale: _likeAnimation,
-                        child: IconButton(
-                          icon: Icon(_isLiked ? Icons.favorite : Icons.favorite_border, size: 32),
-                          color: _isLiked ? AppColors.error : AppColors.onBackground,
-                          onPressed: _handleLike,
-                        ),
-                      ),
-                      // Comment button
-                      IconButton(
-                        icon: const Icon(Icons.mode_comment_outlined, size: 30),
-                        color: AppColors.onBackground,
-                        onPressed: () {
-                          _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
-                        },
-                      ),
-                      // Share button
-                      IconButton(icon: const Icon(Icons.send_outlined, size: 28), color: AppColors.onBackground, onPressed: _showShareOptions),
-                      const Spacer(),
-                      // Save button
-                      IconButton(
-                        icon: Icon(_isSaved ? Icons.bookmark : Icons.bookmark_border, size: 32),
-                        color: _isSaved ? AppColors.accent : AppColors.onBackground,
-                        onPressed: () {
-                          setState(() {
-                            _isSaved = !_isSaved;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Likes count
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    '${_formatCount(_likes)} likes',
-                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Creator Info & Caption
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 18,
-                        backgroundColor: AppColors.accent.withOpacity(0.2),
-                        child: Text(
-                          _post['creatorInitials'] ?? 'U',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  _post['creator'] ?? 'Unknown',
-                                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(_post['timestamp'] ?? '', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            // Title as bold caption
-                            RichText(
-                              text: TextSpan(
-                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, height: 1.4),
-                                children: [
-                                  TextSpan(
-                                    text: '${_post['title'] ?? ''}\n',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  TextSpan(text: _post['description'] ?? ''),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Tags
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
-                              children: (_post['tags'] as List<String>? ?? []).map((tag) {
-                                return Text(
-                                  tag,
-                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // View all comments link
-                GestureDetector(
-                  onTap: () {
-                    _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('View all ${_comments.length} comments', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                Divider(height: 1, thickness: 1, color: AppColors.primaryGray.withOpacity(0.2)),
-                const SizedBox(height: 16),
-
-                // Comments Section Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Comments',
-                    style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Comments List
-                ..._comments.map((comment) => _buildCommentItem(comment)).toList(),
-
-                const SizedBox(height: 80), // Space for bottom input
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
+        bottomNavigationBar: _buildCommentInput(),
       ),
-      bottomNavigationBar: _buildCommentInput(),
     );
   }
 

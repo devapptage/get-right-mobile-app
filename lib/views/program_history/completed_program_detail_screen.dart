@@ -192,10 +192,10 @@ class _CompletedProgramDetailScreenState extends State<CompletedProgramDetailScr
             _buildProgressReportCard(program),
             const SizedBox(height: 24),
 
-            // Review Section
-            _buildSectionTitle(_hasReview ? 'Your Review' : 'Write a Review'),
+            // Trainer Rating Section
+            _buildSectionTitle(_hasReview ? 'Your Trainer Rating' : 'Rate Your Trainer'),
             const SizedBox(height: 12),
-            if (_hasReview) _buildExistingReviewCard(_existingReview!) else _buildReviewForm(program),
+            if (_hasReview) _buildExistingReviewCard(_existingReview!, program) else _buildReviewForm(program),
             const SizedBox(height: 24),
           ],
         ),
@@ -341,7 +341,7 @@ class _CompletedProgramDetailScreenState extends State<CompletedProgramDetailScr
     );
   }
 
-  Widget _buildExistingReviewCard(Review review) {
+  Widget _buildExistingReviewCard(Review review, EnrolledProgramModel program) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -352,19 +352,49 @@ class _CompletedProgramDetailScreenState extends State<CompletedProgramDetailScr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Trainer Info
           Row(
             children: [
-              ...List.generate(5, (index) {
-                return Icon(index < review.rating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 24);
-              }),
-              const SizedBox(width: 8),
-              Text(
-                review.rating.toStringAsFixed(1),
-                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.accent,
+                child: Text(
+                  program.trainerImage ?? program.trainerName[0],
+                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.onAccent),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rating for ${program.trainerName}',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        ...List.generate(5, (index) {
+                          return Icon(index < review.rating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 20);
+                        }),
+                        const SizedBox(width: 8),
+                        Text(
+                          review.rating.toStringAsFixed(1),
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
+          const Divider(color: AppColors.primaryGray, height: 1),
+          const SizedBox(height: 12),
+          Text('Your Comment', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+          const SizedBox(height: 4),
           Text(review.comment, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
           if (review.mediaUrls.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -390,8 +420,41 @@ class _CompletedProgramDetailScreenState extends State<CompletedProgramDetailScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Trainer Info Header
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.accent,
+                  child: Text(
+                    program.trainerImage ?? program.trainerName[0],
+                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Rate ${program.trainerName}',
+                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Share your experience with this trainer',
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Divider(color: AppColors.primaryGray, height: 1),
+            const SizedBox(height: 20),
+            
             // Rating
-            Text('Rating', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
+            Text('Your Rating', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Row(
               children: List.generate(5, (index) {
@@ -401,14 +464,34 @@ class _CompletedProgramDetailScreenState extends State<CompletedProgramDetailScr
                       _rating = (index + 1).toDouble();
                     });
                   },
-                  child: Icon(index < _rating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 32),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Icon(index < _rating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 36),
+                  ),
                 );
               }),
             ),
+            if (_rating > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                _rating == 1
+                    ? 'Poor'
+                    : _rating == 2
+                        ? 'Fair'
+                        : _rating == 3
+                            ? 'Good'
+                            : _rating == 4
+                                ? 'Very Good'
+                                : 'Excellent',
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+              ),
+            ],
             const SizedBox(height: 24),
 
             // Comment
-            Text('Comment', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface)),
+            Text('Your Review Comment', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            Text('Tell others about your experience with ${program.trainerName}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _commentController,
