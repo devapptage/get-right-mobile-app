@@ -48,8 +48,8 @@ class TransactionDetailScreen extends StatelessWidget {
               const SizedBox(height: 24),
             ],
 
-            // Refund Info (if applicable)
-            if (isRefund && transaction.refundReason != null) ...[
+            // Refund Info (if applicable and has reason)
+            if (isRefund && transaction.refundReason != null && transaction.refundReason!.isNotEmpty) ...[
               _buildSectionTitle('Refund Information'),
               const SizedBox(height: 12),
               _buildRefundInfoCard(transaction),
@@ -198,10 +198,6 @@ class TransactionDetailScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(transaction.refundReason ?? 'No reason provided', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-          if (transaction.refundedAt != null) ...[
-            const SizedBox(height: 16),
-            Text('Refunded on ${DateFormat('MMM dd, yyyy').format(transaction.refundedAt!)}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
-          ],
         ],
       ),
     );
