@@ -14,7 +14,7 @@ class ExerciseDetailScreen extends StatefulWidget {
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   late Map<String, dynamic> exercise;
-  final FavoritesController _favoritesController = Get.find<FavoritesController>();
+  final FavoritesController _favoritesController = Get.put(FavoritesController());
   late String exerciseId;
 
   @override

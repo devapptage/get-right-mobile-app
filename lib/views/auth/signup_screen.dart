@@ -83,18 +83,11 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
                           onPressed: () => Get.back(),
                         ),
-                        Text(
-                          'Create Account',
-                          textAlign: TextAlign.center,
-                          style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
-                        ),
-                        SizedBox(width: 70.w),
                       ],
                     ),
                     // Title
@@ -104,6 +97,13 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Center(
+                            child: Text(
+                              'Create Account',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 30.sp, fontWeight: FontWeight.w800, letterSpacing: -1),
+                            ),
+                          ),
                           SizedBox(height: 30.h),
 
                           // Email

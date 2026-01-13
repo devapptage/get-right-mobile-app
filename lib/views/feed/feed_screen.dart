@@ -670,15 +670,15 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             const SizedBox(height: 24),
             _buildCreateOption(Icons.videocam, 'Record Video', 'Capture a new video', () {
               Navigator.pop(context);
-              // TODO: Open camera
+              Get.toNamed(AppRoutes.createPost, arguments: {'type': 'record'});
             }),
             _buildCreateOption(Icons.video_library, 'Upload Video', 'Choose from gallery', () {
               Navigator.pop(context);
-              // TODO: Open gallery
+              Get.toNamed(AppRoutes.createPost, arguments: {'type': 'video'});
             }),
             _buildCreateOption(Icons.image, 'Upload Photo', 'Share a static image', () {
               Navigator.pop(context);
-              // TODO: Open photo picker
+              Get.toNamed(AppRoutes.createPost, arguments: {'type': 'image'});
             }),
             const SizedBox(height: 16),
           ],

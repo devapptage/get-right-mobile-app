@@ -11,6 +11,7 @@ class AddNotesScreen extends StatefulWidget {
 
 class _AddNotesScreenState extends State<AddNotesScreen> {
   final TextEditingController _notesController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   String _exerciseName = '';
 
   @override
@@ -26,6 +27,7 @@ class _AddNotesScreenState extends State<AddNotesScreen> {
   @override
   void dispose() {
     _notesController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -51,7 +53,7 @@ class _AddNotesScreenState extends State<AddNotesScreen> {
         actions: [
           TextButton(
             onPressed: _onSave,
-            child: Text('Save', style: AppTextStyles.labelMedium.copyWith(color: Colors.blue)),
+            child: Text('Save', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accent)),
           ),
         ],
       ),
@@ -68,9 +70,14 @@ class _AddNotesScreenState extends State<AddNotesScreen> {
                 decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
                 child: TextField(
                   controller: _notesController,
+                  focusNode: _focusNode,
                   maxLines: null,
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) {
+                    _focusNode.unfocus();
+                  },
                   decoration: InputDecoration(
                     hintText: 'Add your notes here...',
                     hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark),

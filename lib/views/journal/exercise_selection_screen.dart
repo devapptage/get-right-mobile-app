@@ -182,7 +182,7 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                                 icon: const Icon(Icons.info_outline, color: AppColors.primaryGrayDark),
                                 onPressed: () => Get.toNamed(AppRoutes.exerciseLibraryDetail, arguments: {'exercise': ex}),
                               ),
-                              const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primaryGray),
+                              const Icon(Icons.add_circle_outline, size: 25, color: AppColors.accent),
                             ],
                           ),
                         ),
