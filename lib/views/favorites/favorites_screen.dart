@@ -5,7 +5,7 @@ import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
-/// Favorites Screen - Shows all favorite programs and workouts
+/// Favorites Screen - Shows all favorite programs and exercises
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 
@@ -33,8 +33,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     final type = item['type'] ?? 'program';
     if (type == 'program') {
       Get.toNamed(AppRoutes.programDetail, arguments: item);
-    } else if (type == 'workout') {
-      Get.toNamed(AppRoutes.workoutDetail, arguments: item);
+    } else if (type == 'exercise') {
+      Get.toNamed(AppRoutes.exerciseDetail, arguments: item);
     }
   }
 
@@ -82,7 +82,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
           labelStyle: AppTextStyles.titleSmall,
           tabs: const [
             Tab(text: 'Programs'),
-            Tab(text: 'Workouts'),
+            Tab(text: 'Exercises'),
           ],
         ),
       ),
@@ -92,8 +92,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
           // Programs Tab
           Obx(() => _buildFavoritesList(_favoritesController.getFavoritesByType('program'), 'program')),
 
-          // Workouts Tab
-          Obx(() => _buildFavoritesList(_favoritesController.getFavoritesByType('workout'), 'workout')),
+          // Exercises Tab
+          Obx(() => _buildFavoritesList(_favoritesController.getFavoritesByType('exercise'), 'exercise')),
         ],
       ),
     );
@@ -124,7 +124,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
               ),
               const SizedBox(height: 12),
               Text(
-                type == 'program' ? 'Mark programs as favorites to see them here' : 'Mark workouts as favorites to see them here',
+                type == 'program' ? 'Mark programs as favorites to see them here' : 'Mark exercises as favorites to see them here',
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
                 textAlign: TextAlign.center,
               ),
@@ -133,8 +133,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                 onPressed: () {
                   if (type == 'program') {
                     Get.toNamed(AppRoutes.marketplace);
-                  } else {
-                    Get.toNamed(AppRoutes.journal);
+                  } else if (type == 'exercise') {
+                    Get.toNamed(AppRoutes.library);
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -143,9 +143,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 2,
                 ),
-                icon: Icon(type == 'program' ? Icons.explore : Icons.fitness_center, color: AppColors.onAccent),
+                icon: Icon(type == 'program' ? Icons.explore : Icons.library_books, color: AppColors.onAccent),
                 label: Text(
-                  type == 'program' ? 'Browse Programs' : 'View Workouts',
+                  type == 'program' ? 'Browse Programs' : 'Browse Exercises',
                   style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -205,7 +205,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
                     ),
-                    child: Icon(type == 'program' ? Icons.school : Icons.fitness_center, color: AppColors.onAccent, size: 28),
+                    child: Icon(type == 'program' ? Icons.school : Icons.sports_gymnastics, color: AppColors.onAccent, size: 28),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

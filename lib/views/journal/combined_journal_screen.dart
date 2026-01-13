@@ -129,7 +129,7 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
                     Text(
                       'Workout Journal',
                       style: AppTextStyles.titleMedium.copyWith(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                         color: _tabController.index == 0 ? AppColors.accent : const Color(0xFF000000),
                         fontWeight: _tabController.index == 0 ? FontWeight.w900 : FontWeight.w600,
                       ),
@@ -147,7 +147,7 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
                     Text(
                       'Runner Log',
                       style: AppTextStyles.titleMedium.copyWith(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                         color: _tabController.index == 1 ? AppColors.accent : const Color(0xFF000000),
                         fontWeight: _tabController.index == 1 ? FontWeight.w900 : FontWeight.w600,
                       ),

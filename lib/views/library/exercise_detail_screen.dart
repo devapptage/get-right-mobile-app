@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/controllers/favorites_controller.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
@@ -13,14 +14,17 @@ class ExerciseDetailScreen extends StatefulWidget {
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   late Map<String, dynamic> exercise;
-  bool isFavorite = false;
+  final FavoritesController _favoritesController = Get.find<FavoritesController>();
+  late String exerciseId;
 
   @override
   void initState() {
     super.initState();
     exercise = Get.arguments as Map<String, dynamic>;
-    isFavorite = exercise['isFavorite'] ?? false;
+    exerciseId = exercise['id']?.toString() ?? exercise['name']?.toString() ?? '';
   }
+
+  bool get isFavorite => _favoritesController.isFavorite(exerciseId);
 
   Color _getDifficultyColor(String difficulty) {
     switch (difficulty.toLowerCase()) {
@@ -94,22 +98,30 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         title: Text(exercise['name'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: isFavorite ? AppColors.error : AppColors.onPrimary),
-            onPressed: () {
-              setState(() {
-                isFavorite = !isFavorite;
-              });
-              Get.snackbar(
-                isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-                exercise['name'],
-                backgroundColor: AppColors.completed,
-                colorText: AppColors.onError,
-                snackPosition: SnackPosition.BOTTOM,
-                duration: const Duration(seconds: 2),
-              );
-            },
-          ),
+          Obx(() {
+            final favoriteStatus = _favoritesController.isFavorite(exerciseId);
+            return IconButton(
+              icon: Icon(favoriteStatus ? Icons.favorite : Icons.favorite_border, color: favoriteStatus ? AppColors.error : AppColors.onPrimary),
+              onPressed: () {
+                _favoritesController.toggleFavorite(
+                  exerciseId,
+                  {
+                    ...exercise,
+                    'type': 'exercise',
+                    'id': exerciseId,
+                  },
+                );
+                Get.snackbar(
+                  favoriteStatus ? 'Removed from Favorites' : 'Added to Favorites',
+                  exercise['name'],
+                  backgroundColor: favoriteStatus ? AppColors.primaryGray : AppColors.completed,
+                  colorText: Colors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                  duration: const Duration(seconds: 2),
+                );
+              },
+            );
+          }),
           IconButton(
             icon: const Icon(Icons.share, color: AppColors.onPrimary),
             onPressed: () {
