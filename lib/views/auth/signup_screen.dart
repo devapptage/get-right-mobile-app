@@ -203,7 +203,34 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                               isFullWidth: true,
                             ),
                           ],
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 20),
+
+                          // Login link
+                          Center(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Already have an account? ',
+                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15),
+                                ).paddingOnly(top: 4),
+                                TextButton(
+                                  onPressed: () => Get.toNamed(AppRoutes.login),
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'Log In',
+                                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700, fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
