@@ -71,36 +71,42 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    Text(
-                      'How often do you plan to exercise?',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                    Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        'How often do you plan to exercise?',
+                        style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                      ),
                     ),
                     const SizedBox(height: 12),
 
                     // Subtitle
-                    Text(
-                      'This helps us create realistic goals for you',
-                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                    Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        'This helps us create realistic goals for you',
+                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                      ),
                     ),
                     const SizedBox(height: 40),
 
                     // Options
                     ..._frequencies.map((frequency) => Padding(padding: const EdgeInsets.only(bottom: 12), child: _buildFrequencyButton(frequency))),
+
+                    const SizedBox(height: 25),
+                    CustomButton(
+                      text: 'Get Started',
+                      onPressed: _selectedFrequency != null ? () => Get.offAllNamed(AppRoutes.home) : null,
+                      backgroundColor: _selectedFrequency != null ? AppColors.accent : AppColors.primaryGray,
+                      textColor: Colors.white,
+                    ),
                   ],
                 ),
               ),
             ),
 
             // Get Started button
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: CustomButton(
-                text: 'Get Started',
-                onPressed: _selectedFrequency != null ? () => Get.offAllNamed(AppRoutes.home) : null,
-                backgroundColor: _selectedFrequency != null ? AppColors.accent : AppColors.primaryGray,
-                textColor: Colors.white,
-              ),
-            ),
+            const SizedBox(height: 25),
           ],
         ),
       ),

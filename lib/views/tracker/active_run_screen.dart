@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
@@ -64,24 +65,27 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
         _showExitDialog();
         return false;
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            // Map Layer
-            _buildMap(),
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Scaffold(
+          body: Stack(
+            children: [
+              // Map Layer
+              _buildMap(),
 
-            // Overlay with stats (hidden when locked, only shown when tracking)
-            // if (!_isLocked) Obx(() => _controller.isTracking.value ? _buildStatsOverlay() : const SizedBox.shrink()),
+              // Overlay with stats (hidden when locked, only shown when tracking)
+              // if (!_isLocked) Obx(() => _controller.isTracking.value ? _buildStatsOverlay() : const SizedBox.shrink()),
 
-            // Top safe area with back button (hidden when locked)
-            if (!_isLocked) _buildTopBar(),
+              // Top safe area with back button (hidden when locked)
+              if (!_isLocked) _buildTopBar(),
 
-            // Bottom sheet with controls (hidden when locked)
-            if (!_isLocked) _buildBottomSheet(),
+              // Bottom sheet with controls (hidden when locked)
+              if (!_isLocked) _buildBottomSheet(),
 
-            // Lock overlay (shown when locked)
-            if (_isLocked) _buildLockOverlay(),
-          ],
+              // Lock overlay (shown when locked)
+              if (_isLocked) _buildLockOverlay(),
+            ],
+          ),
         ),
       ),
     );

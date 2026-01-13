@@ -68,16 +68,21 @@ class _FitnessLevelSelectionScreenState extends State<FitnessLevelSelectionScree
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    Text(
-                      'What\'s your fitness level?',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                    Center(
+                      child: Text(
+                        'What\'s your fitness level?',
+                        style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                      ),
                     ),
                     const SizedBox(height: 12),
 
                     // Subtitle
-                    Text(
-                      'We\'ll adjust recommendations based on your experience',
-                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                    Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        'We\'ll adjust recommendations based on your experience',
+                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                      ),
                     ),
                     const SizedBox(height: 40),
 
@@ -93,21 +98,19 @@ class _FitnessLevelSelectionScreenState extends State<FitnessLevelSelectionScree
                         ),
                       ),
                     ),
+                    const SizedBox(height: 25),
+                    CustomButton(
+                      text: 'Continue',
+                      onPressed: _selectedLevel != null ? () => Get.toNamed(AppRoutes.exerciseFrequencySelection, arguments: {'index': 3}) : null,
+                      backgroundColor: _selectedLevel != null ? AppColors.accent : AppColors.primaryGray,
+                      textColor: Colors.white,
+                    ),
                   ],
                 ),
               ),
             ),
 
             // Continue button
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: CustomButton(
-                text: 'Continue',
-                onPressed: _selectedLevel != null ? () => Get.toNamed(AppRoutes.exerciseFrequencySelection, arguments: {'index': 3}) : null,
-                backgroundColor: _selectedLevel != null ? AppColors.accent : AppColors.primaryGray,
-                textColor: Colors.white,
-              ),
-            ),
           ],
         ),
       ),

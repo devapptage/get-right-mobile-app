@@ -62,16 +62,21 @@ class _PreferenceSelectionScreenState extends State<PreferenceSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    Text(
-                      'What\'s your preference?',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                    Center(
+                      child: Text(
+                        'What\'s your preference?',
+                        style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                      ),
                     ),
                     const SizedBox(height: 12),
 
                     // Subtitle
-                    Text(
-                      'Choose your primary focus to personalize your experience',
-                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                    Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        'Choose your primary focus to personalize your experience',
+                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                      ),
                     ),
                     const SizedBox(height: 40),
 
@@ -89,21 +94,19 @@ class _PreferenceSelectionScreenState extends State<PreferenceSelectionScreen> {
                       isSelected: _selectedPreference == 'Running & Cardio',
                       onTap: () => setState(() => _selectedPreference = 'Running & Cardio'),
                     ),
+                    const SizedBox(height: 35),
+                    CustomButton(
+                      text: 'Continue',
+                      onPressed: _selectedPreference != null ? () => Get.toNamed(AppRoutes.goalSelection) : null,
+                      backgroundColor: _selectedPreference != null ? AppColors.accent : AppColors.primaryGray,
+                      textColor: Colors.white,
+                    ),
                   ],
                 ),
               ),
             ),
 
             // Continue button
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: CustomButton(
-                text: 'Continue',
-                onPressed: _selectedPreference != null ? () => Get.toNamed(AppRoutes.goalSelection) : null,
-                backgroundColor: _selectedPreference != null ? AppColors.accent : AppColors.primaryGray,
-                textColor: Colors.white,
-              ),
-            ),
           ],
         ),
       ),

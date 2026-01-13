@@ -64,41 +64,40 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    Text(
-                      'What\'s your main goal?',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                    Center(
+                      child: Text(
+                        'What\'s your main goal?',
+                        style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                      ),
                     ),
                     const SizedBox(height: 12),
 
                     // Subtitle
-                    Text(
-                      'This helps us recommend the best features for you',
-                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                    Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        'This helps us recommend the best features for you \n Select all that apply',
+                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Select all that apply',
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
-                    ),
+
                     const SizedBox(height: 32),
 
                     // Options
                     ..._goals.map((goal) => Padding(padding: const EdgeInsets.only(bottom: 12), child: _buildGoalButton(goal))),
+                    const SizedBox(height: 25),
+                    CustomButton(
+                      text: 'Continue',
+                      onPressed: _selectedGoals.isNotEmpty ? () => Get.toNamed(AppRoutes.fitnessLevelSelection) : null,
+                      backgroundColor: _selectedGoals.isNotEmpty ? AppColors.accent : AppColors.primaryGray,
+                      textColor: Colors.white,
+                    ),
                   ],
                 ),
               ),
             ),
 
             // Continue button
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: CustomButton(
-                text: 'Continue',
-                onPressed: _selectedGoals.isNotEmpty ? () => Get.toNamed(AppRoutes.fitnessLevelSelection) : null,
-                backgroundColor: _selectedGoals.isNotEmpty ? AppColors.accent : AppColors.primaryGray,
-                textColor: Colors.white,
-              ),
-            ),
           ],
         ),
       ),

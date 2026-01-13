@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -82,15 +83,20 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 35),
                           onPressed: () => Get.back(),
                         ),
+                        Text(
+                          'Create Account',
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
+                        ),
+                        SizedBox(width: 70.w),
                       ],
                     ),
-                    const SizedBox(height: 25),
                     // Title
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -98,13 +104,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Create Account',
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
-                          ),
-
-                          const SizedBox(height: 25),
+                          SizedBox(height: 30.h),
 
                           // Email
                           _buildLabelWithAsterisk('Email'),
@@ -155,7 +155,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                               );
                             },
                           ),
-                          const SizedBox(height: 31),
+                          const SizedBox(height: 10),
 
                           // Divider with "or"
                           Row(
@@ -171,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                               Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
                             ],
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 10),
 
                           // Social signup buttons
                           _buildSocialButton(
