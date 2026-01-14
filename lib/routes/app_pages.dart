@@ -19,7 +19,7 @@ import 'package:get_right/views/home/home_screen.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/views/profile/edit_profile_screen.dart';
-import 'package:get_right/views/journal/journal_screen.dart';
+import 'package:get_right/views/journal/My_work_screen.dart';
 import 'package:get_right/views/journal/workout_journal_screen.dart';
 import 'package:get_right/views/journal/workout_timer_screen.dart';
 import 'package:get_right/views/journal/add_workout_screen.dart';
@@ -114,7 +114,7 @@ class AppPages {
     GetPage(name: AppRoutes.editProfile, page: () => const EditProfileScreen(), transition: Transition.rightToLeft),
 
     // Journal Pages
-    GetPage(name: AppRoutes.journal, page: () => const JournalScreen(), transition: Transition.fade),
+    GetPage(name: AppRoutes.journal, page: () => const WorkoutScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.workoutJournal, page: () => const WorkoutJournalScreen(), transition: Transition.fade),
     GetPage(name: AppRoutes.workoutTimer, page: () => const WorkoutTimerScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.addWorkout, page: () => const AddWorkoutScreen(), transition: Transition.downToUp),

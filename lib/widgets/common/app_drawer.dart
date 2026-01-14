@@ -7,6 +7,7 @@ import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
+import 'package:get_right/views/journal/My_work_screen.dart';
 import 'package:get_right/views/planner/planner_screen.dart';
 
 /// Professional App Drawer
@@ -48,59 +49,11 @@ class AppDrawer extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                // Main Section
-                // _buildSectionLabel('MAIN'),
-                // // _buildDrawerItem(
-                // //   icon: Icons.dashboard_outlined,
-                // //   activeIcon: Icons.dashboard,
-                // //   title: 'Dashboard',
-                // //   onTap: () {
-                // //     Get.back(); // Close drawer
-                // //     Get.offAllNamed(AppRoutes.home);
-                // //   },
-                // // ),
-                // _buildDrawerItem(
-                //   icon: Icons.person_outline,
-                //   activeIcon: Icons.person,
-                //   title: 'Profile',
-                //   onTap: () {
-                //     Get.back();
-                //     Get.toNamed(AppRoutes.profile);
-                //   },
-                // ),
-                // _buildDrawerItem(
-                //   icon: Icons.settings_outlined,
-                //   activeIcon: Icons.settings,
-                //   title: 'Settings',
-                //   onTap: () {
-                //     Get.back();
-                //     Get.toNamed(AppRoutes.settings);
-                //   },
-                // ),
-
-                // const SizedBox(height: 16),
-                // const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
                 const SizedBox(height: 16),
 
                 // Fitness Section
                 _buildSectionLabel('FITNESS'),
-                // _buildDrawerItem(
-                //   icon: Icons.book_outlined,
-                //   activeIcon: Icons.book,
-                //   title: 'Journal',
-                //   onTap: () {
-                //     navController.changeTab(1);
-                //     Get.back();
-                //   },
-                // ),
-                _buildDrawerItem(
-                  icon: Icons.calendar_today_outlined,
-                  activeIcon: Icons.calendar_today,
-                  title: 'Planner',
-                  onTap: () {
-                    Get.to(() => const PlannerScreen());
-                  },
-                ),
+
                 _buildDrawerItem(
                   icon: Icons.restaurant_menu_outlined,
                   activeIcon: Icons.restaurant_menu,
@@ -110,15 +63,7 @@ class AppDrawer extends StatelessWidget {
                     Get.toNamed(AppRoutes.nutrition);
                   },
                 ),
-                // _buildDrawerItem(
-                //   icon: Icons.directions_run_outlined,
-                //   activeIcon: Icons.directions_run,
-                //   title: 'Run Tracker',
-                //   onTap: () {
-                //     navController.changeTab(3);
-                //     Get.back();
-                //   },
-                // ),
+
                 _buildDrawerItem(
                   icon: Icons.trending_up,
                   activeIcon: Icons.trending_up,
@@ -129,15 +74,24 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
-                // _buildDrawerItem(
-                //   icon: Icons.track_changes_outlined,
-                //   activeIcon: Icons.track_changes,
-                //   title: 'Marketplace',
-                //   onTap: () {
-                //     navController.changeTab(4);
-                //     Get.back();
-                //   },
-                // ),
+                _buildDrawerItem(
+                  icon: Icons.sports_gymnastics_rounded,
+                  activeIcon: Icons.work,
+                  title: 'My Workouts',
+                  onTap: () {
+                    Get.to(() => const WorkoutScreen());
+                  },
+                ),
+
+                _buildDrawerItem(
+                  icon: Icons.track_changes_outlined,
+                  activeIcon: Icons.track_changes,
+                  title: 'My Programs',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.myPrograms);
+                  },
+                ),
+
                 const SizedBox(height: 16),
                 const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
                 const SizedBox(height: 16),

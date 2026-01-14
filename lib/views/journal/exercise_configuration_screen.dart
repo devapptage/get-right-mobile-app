@@ -334,31 +334,8 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                     .toList(),
               ),
             ),
+
             // Fixed button at bottom
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: SafeArea(
-                top: false,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _onSave,
-                    icon: const Icon(Icons.check_circle_rounded, size: 24),
-                    label: Text('Save Exercise', style: AppTextStyles.buttonLarge.copyWith(fontWeight: FontWeight.w700)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: AppColors.onAccent,
-                      elevation: 4,
-                      shadowColor: AppColors.accent.withOpacity(0.4),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                  ).paddingSymmetric(horizontal: 16),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -366,218 +343,203 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   }
 
   Widget _buildCard(_Config cfg, int idx) {
-    final isMan = cfg.name.isEmpty || _isEditing;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 8), spreadRadius: 0),
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2), spreadRadius: 0),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.2), AppColors.accent.withOpacity(0.1)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(12),
+    // final isMan = cfg.name.isEmpty || _isEditing;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  hintText: 'Enter exercise name',
+                  hintStyle: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.6)),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
                 ),
-                child: Icon(Icons.fitness_center_rounded, color: AppColors.accent, size: 22),
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 17),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: isMan
-                    ? TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          hintText: 'Enter exercise name',
-                          hintStyle: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.6)),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
-                      )
-                    : Text(
-                        cfg.name,
-                        style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
-                      ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          // "Two tabs" selector (like the screenshot): main metric (Reps/Time) + extra metric (Weight/Distance)
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
-                  child: Row(
-                    children: ['Reps', 'Time'].map((t) {
-                      final sel = cfg.mainType == t;
-                      final icons = {'Reps': Icons.repeat_rounded, 'Time': Icons.timer_outlined};
-                      return Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() => cfg.mainType = t),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.symmetric(vertical: 7),
-                            margin: const EdgeInsets.symmetric(horizontal: 2),
-                            decoration: BoxDecoration(
-                              gradient: sel
-                                  ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
-                                  : null,
-                              color: sel ? null : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: sel ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(icons[t], size: 16, color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.6)),
-                                const SizedBox(height: 2),
-                                Text(
-                                  t,
-                                  style: AppTextStyles.labelSmall.copyWith(
-                                    color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
-                                    fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-                  decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
-                  child: Row(
-                    children: ['Weight', 'Distance'].map((t) {
-                      final sel = cfg.extraType == t;
-                      final icons = {'Weight': Icons.fitness_center, 'Distance': Icons.straighten_rounded};
-                      return Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() => cfg.extraType = t),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.symmetric(vertical: 7),
-                            margin: const EdgeInsets.symmetric(horizontal: 2),
-                            decoration: BoxDecoration(
-                              gradient: sel
-                                  ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
-                                  : null,
-                              color: sel ? null : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: sel ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(icons[t], size: 14, color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.6)),
-                                const SizedBox(height: 2),
-                                Text(
-                                  t,
-                                  style: AppTextStyles.labelSmall.copyWith(
-                                    color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
-                                    fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    'SET',
-                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.w700, letterSpacing: 0.5),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    (cfg.mainType == 'Time' ? 'TIME (s)' : 'REPS').toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.w700, letterSpacing: 0.5),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    (cfg.extraType == 'Distance' ? 'DISTANCE (mi)' : 'WEIGHT (lbs)').toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.w700, letterSpacing: 0.5),
-                  ),
-                ),
-              ],
             ),
-          ),
-          const SizedBox(height: 12),
-          ...cfg.sets.asMap().entries.map((e) => _buildSetRow(cfg, idx, e.key, e.value)),
-          const SizedBox(height: 24),
-          Row(
+            IconButton(
+              onPressed: _onSave,
+              icon: Icon(Icons.check_rounded, color: AppColors.accent, size: 30),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        // "Two tabs" selector (like the screenshot): main metric (Reps/Time) + extra metric (Weight/Distance)
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(color: const Color.fromARGB(255, 149, 151, 155).withOpacity(0.3), borderRadius: BorderRadius.circular(10)),
+                child: Row(
+                  children: ['Reps', 'Time'].map((t) {
+                    final sel = cfg.mainType == t;
+                    final icons = {'Reps': Icons.repeat_rounded, 'Time': Icons.timer_outlined};
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => cfg.mainType = t),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.symmetric(vertical: 7),
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            gradient: sel
+                                ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                                : null,
+                            color: sel ? null : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: sel ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                          ),
+                          child: Center(
+                            child: Text(
+                              t,
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
+                                fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(color: const Color.fromARGB(255, 149, 151, 155).withOpacity(0.3), borderRadius: BorderRadius.circular(10)),
+                child: Row(
+                  children: ['Weight', 'Distance'].map((t) {
+                    final sel = cfg.extraType == t;
+                    final icons = {'Weight': Icons.fitness_center, 'Distance': Icons.straighten_rounded};
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => cfg.extraType = t),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.symmetric(vertical: 7),
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            gradient: sel
+                                ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                                : null,
+                            color: sel ? null : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: sel ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                          ),
+                          child: Center(
+                            child: Text(
+                              t,
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
+                                fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Column(
             children: [
-              Expanded(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        'SET',
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        (cfg.mainType == 'Time' ? 'TIME (s)' : 'REPS').toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        (cfg.extraType == 'Distance' ? 'DISTANCE (mi)' : 'WEIGHT (lbs)').toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+              ...cfg.sets.asMap().entries.map((e) => _buildSetRow(cfg, idx, e.key, e.value)),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 36,
                 child: ElevatedButton.icon(
                   onPressed: cfg.sets.length > 1 ? () => setState(() => cfg.sets.removeLast()) : null,
-                  icon: const Icon(Icons.remove_rounded, size: 20),
-                  label: Text('Remove Set', style: AppTextStyles.buttonMedium),
+                  icon: const Icon(Icons.remove_rounded, size: 18),
+                  label: Text('Set', style: AppTextStyles.buttonSmall),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cfg.sets.length > 1 ? Colors.red.shade400 : Colors.grey.shade300,
                     foregroundColor: cfg.sets.length > 1 ? Colors.white : Colors.grey.shade500,
                     elevation: cfg.sets.length > 1 ? 2 : 0,
                     shadowColor: Colors.red.withOpacity(0.3),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    minimumSize: const Size(0, 36),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: SizedBox(
+                height: 36,
                 child: ElevatedButton.icon(
                   onPressed: () => setState(() => cfg.sets.add(_SetData())),
-                  icon: const Icon(Icons.add_rounded, size: 20),
-                  label: Text('Add Set', style: AppTextStyles.buttonMedium),
+                  icon: Icon(Icons.add_rounded, size: 18),
+                  label: Text('Set', style: AppTextStyles.buttonSmall),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     foregroundColor: AppColors.onAccent,
                     elevation: 2,
                     shadowColor: AppColors.accent.withOpacity(0.3),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    minimumSize: const Size(0, 36),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -593,21 +555,10 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
             flex: 1,
             child: Container(
               height: 48,
-              alignment: Alignment.center,
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.2), AppColors.accent.withOpacity(0.15)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    '${setIdx + 1}',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
+              child: Text(
+                '${setIdx + 1}',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700),
+              ).paddingSymmetric(horizontal: 12, vertical: 12),
             ),
           ),
           const SizedBox(width: 8),
@@ -619,7 +570,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                   child: Container(
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryGrayLight.withOpacity(0.2),
+                      color: const Color.fromARGB(255, 149, 151, 155),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
                     ),
@@ -648,36 +599,6 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                cfg.mainType == 'Time'
-                    ? Container(
-                        width: 44,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppColors.accent.withOpacity(0.15), AppColors.accent.withOpacity(0.1)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
-                        ),
-                        child: Icon(Icons.timer_outlined, size: 20, color: AppColors.accent),
-                      )
-                    : Container(
-                        width: 44,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppColors.accent.withOpacity(0.15), AppColors.accent.withOpacity(0.1)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
-                        ),
-                        child: Icon(Icons.repeat_rounded, size: 20, color: AppColors.accent),
-                      ),
               ],
             ),
           ),
@@ -712,36 +633,6 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      cfg.extraType == 'Distance'
-                          ? Container(
-                              width: 44,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [AppColors.accent.withOpacity(0.15), AppColors.accent.withOpacity(0.1)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
-                              ),
-                              child: Icon(Icons.straighten_rounded, size: 20, color: AppColors.accent),
-                            )
-                          : Container(
-                              width: 44,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [AppColors.accent.withOpacity(0.15), AppColors.accent.withOpacity(0.1)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
-                              ),
-                              child: Icon(Icons.straighten_rounded, size: 20, color: AppColors.accent),
-                            ),
                     ],
                   )
                 : Row(
@@ -771,34 +662,6 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      cfg.extraType == 'Rep'
-                          ? Container(
-                              width: 44,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [AppColors.accent.withOpacity(0.15), AppColors.accent.withOpacity(0.1)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: Icon(Icons.straighten_rounded, size: 20, color: AppColors.accent),
-                            )
-                          : Container(
-                              width: 44,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [AppColors.accent.withOpacity(0.15), AppColors.accent.withOpacity(0.1)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
-                              ),
-                              child: Icon(Icons.fitness_center, size: 20, color: AppColors.accent),
-                            ),
                     ],
                   ),
           ),

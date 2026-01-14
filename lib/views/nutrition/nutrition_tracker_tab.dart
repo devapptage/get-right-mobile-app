@@ -27,19 +27,7 @@ class NutritionTrackerTab extends StatelessWidget {
                   // Calories Overview Card
                   _buildCaloriesCard(currentDay.totalCalories, currentDay.calorieGoal, currentDay.calorieProgress),
 
-                  const SizedBox(height: 16),
-
                   // Macros Overview
-                  Row(
-                    children: [
-                      Expanded(child: _buildMacroCard('Protein', currentDay.totalProtein, currentDay.proteinGoal, currentDay.proteinProgress, const Color(0xFF4A90E2))),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildMacroCard('Carbs', currentDay.totalCarbs, currentDay.carbsGoal, currentDay.carbsProgress, const Color(0xFFFFA726))),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildMacroCard('Fats', currentDay.totalFats, currentDay.fatsGoal, currentDay.fatsProgress, const Color(0xFF9C27B0))),
-                    ],
-                  ),
-
                   const SizedBox(height: 24),
 
                   // Daily Progress Section
@@ -231,59 +219,6 @@ class NutritionTrackerTab extends StatelessWidget {
           Text(
             remaining > 0 ? '${remaining.toStringAsFixed(0)} kcal remaining' : '${(-remaining).toStringAsFixed(0)} kcal over',
             style: AppTextStyles.bodyMedium.copyWith(color: remaining > 0 ? AppColors.mediumGray : Colors.red, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMacroCard(String label, double consumed, double goal, double progress, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.lightGray.withOpacity(0.5)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  label,
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mediumGray, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            consumed.toStringAsFixed(0),
-            style: const TextStyle(fontSize: 28, color: AppColors.onSurface, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '/ ${goal.toStringAsFixed(0)} g',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.mediumGray, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: progress.clamp(0.0, 1.0),
-              backgroundColor: color.withOpacity(0.15),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 6,
-            ),
           ),
         ],
       ),

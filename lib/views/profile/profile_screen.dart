@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/auth_controller.dart';
+import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -33,14 +34,57 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-          ),
-          onPressed: () => Get.back(),
-        ),
+        leading: Obx(() {
+          final notificationController = Get.find<NotificationController>();
+          final unreadCount = notificationController.unreadCount;
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                icon: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 3,
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                    ),
+                    Container(
+                      width: 25,
+                      height: 3,
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                    ),
+                    Container(
+                      width: 20,
+                      height: 3,
+                      decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                    ),
+                  ],
+                ),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ).paddingOnly(left: 10),
+              if (unreadCount > 0)
+                Positioned(
+                  right: 0,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                    child: Text(
+                      unreadCount > 99 ? '99+' : '$unreadCount',
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, height: 1.0),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }),
         title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
         actions: [
@@ -365,48 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           // Menu Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Account', style: AppTextStyles.titleSmall.copyWith(color: AppColors.primaryGray)),
-                const SizedBox(height: 12),
-                _buildMenuCard(
-                  icon: Icons.fitness_center,
-                  title: 'My Workouts',
-                  subtitle: 'View workout history',
-                  color: AppColors.accent,
-                  onTap: () => Get.toNamed(AppRoutes.journal),
-                ),
-                _buildMenuCard(
-                  icon: Icons.school_outlined,
-                  title: 'My Programs',
-                  subtitle: 'Purchased programs',
-                  color: AppColors.upcoming,
-                  onTap: () => Get.toNamed(AppRoutes.myPrograms),
-                ),
-                _buildMenuCard(icon: Icons.chat_outlined, title: 'Messages', subtitle: 'Chat with trainers', color: AppColors.accent, onTap: () => Get.toNamed(AppRoutes.chatList)),
-                const SizedBox(height: 24),
-                Text('Settings', style: AppTextStyles.titleSmall.copyWith(color: AppColors.primaryGray)),
-                const SizedBox(height: 12),
-                _buildMenuCard(
-                  icon: Icons.notifications_outlined,
-                  title: 'Notifications',
-                  subtitle: 'Manage notifications',
-                  color: AppColors.accent,
-                  onTap: () => Get.toNamed(AppRoutes.notifications),
-                ),
-                _buildMenuCard(
-                  icon: Icons.help_outline,
-                  title: 'Help & Feedback',
-                  subtitle: 'Get support',
-                  color: AppColors.primaryGray,
-                  onTap: () => Get.toNamed(AppRoutes.helpFeedback),
-                ),
-                const SizedBox(height: 16),
-                _buildLogoutCard(),
-                const SizedBox(height: 24),
-              ],
-            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SizedBox(height: 16), _buildLogoutCard(), const SizedBox(height: 24)]),
           ),
         ],
       ),
@@ -658,43 +661,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       child: Text(
         label,
         style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildMenuCard({required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primaryGray, width: 1),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: AppColors.primaryGray, size: 24),
-          ],
-        ),
       ),
     );
   }

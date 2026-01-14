@@ -146,6 +146,14 @@ class AppTextStyles {
     letterSpacing: 0.5, // Clear spacing
     color: AppColors.onAccent, // White on green
   );
+  static const TextStyle buttonSmall = TextStyle(
+    fontFamily: primaryFont,
+    fontSize: 12,
+    fontWeight: FontWeight.w600, // Semibold
+    height: 0.8,
+    letterSpacing: 0.5, // Clear spacing
+    color: AppColors.onAccent, // White on green
+  );
 
   // Specialized Styles
   static const TextStyle caption = TextStyle(fontFamily: primaryFont, fontSize: 12, fontWeight: FontWeight.normal, height: 1.3, letterSpacing: 0.4, color: AppColors.darkGray);
