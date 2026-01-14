@@ -89,7 +89,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
           child: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: SlideTransition(
@@ -98,148 +97,149 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 24),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.start,
-                      //   children: [
-                      //     IconButton(
-                      //       icon: Container(
-                      //         padding: const EdgeInsets.all(8),
-                      //         decoration: BoxDecoration(
-                      //           color: AppColors.surface,
-                      //           borderRadius: BorderRadius.circular(12),
-                      //           border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
-                      //         ),
-                      //         child: const Icon(Icons.arrow_back_rounded, size: 20),
-                      //       ),
-                      //       onPressed: () => Get.offNamed(AppRoutes.otp),
-                      //     ),
-                      //   ],
-                      // ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Get.offNamed(AppRoutes.otp))],
+                      ),
 
                       // Header
-                      Column(
-                        children: [
-                          const SizedBox(height: 16),
-                          Text(
-                            'Welcome to GetRight',
-                            style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.5),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'Create an account to access your personal fitness journal, workout programs, and more.',
-                              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400, height: 1.5),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Full Name
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildLabelWithAsterisk('Full name'),
-
-                          const SizedBox(height: 8),
-                          CustomTextField(controller: _fullNameController, labelText: null, hintText: 'Full name', prefixIcon: null),
-                          const SizedBox(height: 10),
-
-                          // Date of Birth
-                          _buildLabelWithAsterisk('Date of Birth'),
-                          const SizedBox(height: 8),
-                          _buildDateOfBirthField(),
-                          const SizedBox(height: 10),
-
-                          // Phone Number (Optional)
-                          _buildLabelWithOptional('Phone Number'),
-                          const SizedBox(height: 8),
-                          CustomTextField(controller: _phoneController, labelText: null, hintText: 'Enter your phone number', keyboardType: TextInputType.phone, prefixIcon: null),
-                          const SizedBox(height: 10),
-
-                          // Gender dropdown
-                          _buildLabelWithAsterisk('Gender'),
-                          const SizedBox(height: 8),
-                          _buildDropdownField(
-                            label: null,
-                            value: _selectedGender,
-                            items: AppConstants.genderOptions,
-                            icon: null,
-                            onChanged: (value) => setState(() => _selectedGender = value),
-                          ),
-                          const SizedBox(height: 18),
-                        ],
-                      ),
-                      // Terms and Conditions
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text.rich(
-                          TextSpan(
-                            text: 'By continuing, you agree to GetRight\'s ',
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w400),
-                            children: [
-                              TextSpan(
-                                text: 'Terms & Conditions',
-                                style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          children: [
+                            Column(
+                              children: [
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Welcome to GetRight',
+                                  style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 10),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    'Create an account to access your personal fitness journal, workout programs, and more.',
+                                    style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400, height: 1.5),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Full Name
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildLabelWithAsterisk('Full name'),
+
+                                const SizedBox(height: 8),
+                                CustomTextField(controller: _fullNameController, labelText: null, hintText: 'Full name', prefixIcon: null),
+                                const SizedBox(height: 10),
+
+                                // Date of Birth
+                                _buildLabelWithAsterisk('Date of Birth'),
+                                const SizedBox(height: 8),
+                                _buildDateOfBirthField(),
+                                const SizedBox(height: 10),
+
+                                // Phone Number (Optional)
+                                _buildLabelWithOptional('Phone Number'),
+                                const SizedBox(height: 8),
+                                CustomTextField(
+                                  controller: _phoneController,
+                                  labelText: null,
+                                  hintText: 'Enter your phone number',
+                                  keyboardType: TextInputType.phone,
+                                  prefixIcon: null,
+                                ),
+                                const SizedBox(height: 10),
+
+                                // Gender dropdown
+                                _buildLabelWithAsterisk('Gender'),
+                                const SizedBox(height: 8),
+                                _buildDropdownField(
+                                  label: null,
+                                  value: _selectedGender,
+                                  items: AppConstants.genderOptions,
+                                  icon: null,
+                                  onChanged: (value) => setState(() => _selectedGender = value),
+                                ),
+                                const SizedBox(height: 18),
+                              ],
+                            ),
+                            // Terms and Conditions
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text.rich(
+                                TextSpan(
+                                  text: 'By continuing, you agree to GetRight\'s ',
+                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w400),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Terms & Conditions',
+                                      style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                                    ),
+                                    const TextSpan(text: ' and '),
+                                    TextSpan(
+                                      text: 'Privacy Policy',
+                                      style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                                    ),
+                                    const TextSpan(text: '.'),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              const TextSpan(text: ' and '),
-                              TextSpan(
-                                text: 'Privacy Policy',
-                                style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
-                              ),
-                              const TextSpan(text: '.'),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Continue button
+                            GetBuilder<AuthController>(
+                              builder: (controller) {
+                                return CustomButton(
+                                  text: 'Continue',
+                                  onPressed: _continue,
+                                  isLoading: controller.isLoading,
+                                  backgroundColor: AppColors.accent,
+                                  textColor: AppColors.onAccent,
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Divider with "or"
+                            Row(
+                              children: [
+                                Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    'or',
+                                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
+                                  ),
+                                ),
+                                Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Social login icons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildSocialIcon(Icons.apple_rounded, Colors.black, () {}),
+                                const SizedBox(width: 20),
+                                _buildSocialIcon(Icons.facebook_rounded, const Color(0xFF1877F2), () {}),
+                                const SizedBox(width: 20),
+                                _buildSocialIcon(Icons.g_mobiledata_rounded, Colors.white, () {}),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 20),
-
-                      // Continue button
-                      GetBuilder<AuthController>(
-                        builder: (controller) {
-                          return CustomButton(
-                            text: 'Continue',
-                            onPressed: _continue,
-                            isLoading: controller.isLoading,
-                            backgroundColor: AppColors.accent,
-                            textColor: AppColors.onAccent,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Divider with "or"
-                      Row(
-                        children: [
-                          Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'or',
-                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
-                            ),
-                          ),
-                          Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Social login icons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildSocialIcon(Icons.apple_rounded, Colors.black, () {}),
-                          const SizedBox(width: 20),
-                          _buildSocialIcon(Icons.facebook_rounded, const Color(0xFF1877F2), () {}),
-                          const SizedBox(width: 20),
-                          _buildSocialIcon(Icons.g_mobiledata_rounded, Colors.white, () {}),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
                     ],
                   ),
                 ),

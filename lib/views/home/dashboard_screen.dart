@@ -776,7 +776,7 @@ class _UltraPremium3DRingPainter extends CustomPainter {
 }
 
 class HomeNavigationController extends GetxController {
-  final _currentIndex = 0.obs;
+  final _currentIndex = 2.obs;
   final journalTabIndex = 0.obs; // 0 = Workout Journal, 1 = Runner Log
   GlobalKey<ScaffoldState>? scaffoldKey;
 

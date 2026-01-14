@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/models/workout_journal_model.dart';
 import 'package:get_right/models/workout_exercise_model.dart';
+import 'package:get_right/models/exercise_set_model.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -159,6 +161,206 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   });
   void _onAddExercise() => Get.toNamed(AppRoutes.addExercise);
 
+  void _onQuickAddSetsReps() {
+    _showQuickAddDialog(isTimer: false);
+  }
+
+  void _onQuickAddTimer() {
+    _showQuickAddDialog(isTimer: true);
+  }
+
+  void _showQuickAddDialog({required bool isTimer}) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController setsController = TextEditingController(text: '3');
+    final TextEditingController repsController = TextEditingController(text: '10');
+    final TextEditingController timeController = TextEditingController(text: '60');
+    bool isWarmup = false;
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+          child: StatefulBuilder(
+            builder: (context, setDialogState) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isTimer ? 'Quick Add Timer Exercise' : 'Quick Add Exercise',
+                          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: AppColors.primaryGray),
+                          onPressed: () => Get.back(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Exercise Name',
+                        hintText: 'Enter exercise name',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: const Icon(Icons.fitness_center, color: AppColors.accent),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Checkbox(value: isWarmup, onChanged: (v) => setDialogState(() => isWarmup = v ?? false), activeColor: AppColors.accent),
+                        Text('Add as Warmup', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    if (isTimer) ...[
+                      TextField(
+                        controller: setsController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        decoration: InputDecoration(
+                          labelText: 'Number of Sets',
+                          hintText: '3',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          prefixIcon: const Icon(Icons.repeat, color: AppColors.accent),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: timeController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        decoration: InputDecoration(
+                          labelText: 'Time per Set (seconds)',
+                          hintText: '60',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          prefixIcon: const Icon(Icons.timer, color: AppColors.accent),
+                        ),
+                      ),
+                    ] else ...[
+                      TextField(
+                        controller: setsController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        decoration: InputDecoration(
+                          labelText: 'Number of Sets',
+                          hintText: '3',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          prefixIcon: const Icon(Icons.repeat, color: AppColors.accent),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: repsController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        decoration: InputDecoration(
+                          labelText: 'Reps per Set',
+                          hintText: '10',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          prefixIcon: const Icon(Icons.numbers, color: AppColors.accent),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              nameController.dispose();
+                              setsController.dispose();
+                              repsController.dispose();
+                              timeController.dispose();
+                              Get.back();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              side: const BorderSide(color: AppColors.primaryGray),
+                            ),
+                            child: Text('Cancel', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.primaryGray)),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 2,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final name = nameController.text.trim();
+                              if (name.isEmpty) {
+                                Get.snackbar('Error', 'Please enter exercise name', backgroundColor: AppColors.error, colorText: Colors.white);
+                                return;
+                              }
+
+                              final sets = int.tryParse(setsController.text) ?? 3;
+                              final now = DateTime.now();
+                              final List<ExerciseSetModel> exerciseSets = [];
+
+                              for (int i = 0; i < sets; i++) {
+                                exerciseSets.add(
+                                  ExerciseSetModel(
+                                    id: 'set_${i + 1}_${now.millisecondsSinceEpoch}',
+                                    setNumber: i + 1,
+                                    reps: isTimer ? null : (int.tryParse(repsController.text) ?? 10),
+                                    repsType: isTimer ? null : 'standard',
+                                    timeSeconds: isTimer ? (int.tryParse(timeController.text) ?? 60) : null,
+                                  ),
+                                );
+                              }
+
+                              final exercise = WorkoutExerciseModel(
+                                id: 'ex_${now.millisecondsSinceEpoch}',
+                                exerciseName: name,
+                                exerciseId: 'quick_${now.millisecondsSinceEpoch}',
+                                sets: exerciseSets,
+                                date: now,
+                                createdAt: now,
+                              );
+
+                              setState(() {
+                                if (isWarmup) {
+                                  _workout = _workout!.copyWith(warmupExercises: [..._workout!.warmupExercises, exercise]);
+                                } else {
+                                  _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, exercise]);
+                                }
+                                _showAddExerciseContent = false;
+                              });
+
+                              nameController.dispose();
+                              setsController.dispose();
+                              repsController.dispose();
+                              timeController.dispose();
+                              Get.back();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accent,
+                              foregroundColor: AppColors.onAccent,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text('Add Exercise', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onAccent)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.isEmbedded) {
@@ -302,48 +504,97 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
     return Stack(
       children: [
         Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _onAddWarmup,
-                    icon: const Icon(Icons.whatshot_outlined, size: 22),
-                    label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.secondary,
-                      foregroundColor: AppColors.onSecondary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _onAddWarmup,
+                      icon: const Icon(Icons.whatshot_outlined, size: 22),
+                      label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.secondary,
+                        foregroundColor: AppColors.onSecondary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _onAddWorkout,
-                    icon: const Icon(Icons.fitness_center, size: 22),
-                    label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: AppColors.onAccent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _onAddWorkout,
+                      icon: const Icon(Icons.fitness_center, size: 22),
+                      label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _onQuickAddSetsReps,
+                      icon: const Icon(Icons.add_circle_outline, size: 22),
+                      label: Text('Quick Add (Sets & Reps)', style: AppTextStyles.buttonLarge),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.completed,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _onQuickAddTimer,
+                      icon: const Icon(Icons.timer_outlined, size: 22),
+                      label: Text('Quick Add (Timer-Based)', style: AppTextStyles.buttonLarge),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.upcoming,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-
         // Back button at top left
+        Positioned(
+          top: 16,
+          left: 16,
+          child: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+            ),
+            onPressed: () {
+              setState(() {
+                _showAddExerciseContent = false;
+              });
+            },
+          ),
+        ),
       ],
     );
   }
