@@ -96,7 +96,13 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                     const SizedBox(height: 25),
                     CustomButton(
                       text: 'Get Started',
-                      onPressed: _selectedFrequency != null ? () => Get.offAllNamed(AppRoutes.home) : null,
+                      onPressed: _selectedFrequency != null
+                          ? () {
+                              final args = Get.arguments as Map<String, dynamic>?;
+                              final preference = args?['preference'] as String?;
+                              Get.offAllNamed(AppRoutes.home, arguments: {'preference': preference});
+                            }
+                          : null,
                       backgroundColor: _selectedFrequency != null ? AppColors.accent : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),

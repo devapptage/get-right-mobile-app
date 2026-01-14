@@ -101,7 +101,13 @@ class _FitnessLevelSelectionScreenState extends State<FitnessLevelSelectionScree
                     const SizedBox(height: 25),
                     CustomButton(
                       text: 'Continue',
-                      onPressed: _selectedLevel != null ? () => Get.toNamed(AppRoutes.exerciseFrequencySelection, arguments: {'index': 3}) : null,
+                      onPressed: _selectedLevel != null
+                          ? () {
+                              final existingArgs = Get.arguments as Map<String, dynamic>?;
+                              final args = <String, dynamic>{...?existingArgs, 'index': 3};
+                              Get.toNamed(AppRoutes.exerciseFrequencySelection, arguments: args);
+                            }
+                          : null,
                       backgroundColor: _selectedLevel != null ? AppColors.accent : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),

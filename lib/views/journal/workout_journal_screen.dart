@@ -542,59 +542,44 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: _onQuickAddSetsReps,
-                      icon: const Icon(Icons.add_circle_outline, size: 22),
-                      label: Text('Quick Add (Sets & Reps)', style: AppTextStyles.buttonLarge),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.completed,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: _onQuickAddTimer,
-                      icon: const Icon(Icons.timer_outlined, size: 22),
-                      label: Text('Quick Add (Timer-Based)', style: AppTextStyles.buttonLarge),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.upcoming,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 56,
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: _onQuickAddSetsReps,
+                  //     icon: const Icon(Icons.add_circle_outline, size: 22),
+                  //     label: Text('Quick Add (Sets & Reps)', style: AppTextStyles.buttonLarge),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: AppColors.completed,
+                  //       foregroundColor: Colors.white,
+                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  //       elevation: 0,
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 16),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 56,
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: _onQuickAddTimer,
+                  //     icon: const Icon(Icons.timer_outlined, size: 22),
+                  //     label: Text('Quick Add (Timer-Based)', style: AppTextStyles.buttonLarge),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: AppColors.upcoming,
+                  //       foregroundColor: Colors.white,
+                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  //       elevation: 0,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
           ),
         ),
+
         // Back button at top left
-        Positioned(
-          top: 16,
-          left: 16,
-          child: IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-            ),
-            onPressed: () {
-              setState(() {
-                _showAddExerciseContent = false;
-              });
-            },
-          ),
-        ),
       ],
     );
   }

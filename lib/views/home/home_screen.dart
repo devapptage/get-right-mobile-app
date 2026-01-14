@@ -39,6 +39,18 @@ class _HomeScreenState extends State<HomeScreen> {
     _navController.scaffoldKey = _scaffoldKey;
     // Initialize notification controller
     Get.put(NotificationController());
+
+    // Check if we should redirect based on preference from auth questionnaire
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = Get.arguments as Map<String, dynamic>?;
+      final preference = args?['preference'] as String?;
+      if (preference != null) {
+        // Navigate to journal tab (index 2)
+        // Set journal tab index: 0 for Strength Training (Workout Journal), 1 for Running & Cardio (Runner Log)
+        final journalTabIndex = preference == 'Strength Training' ? 0 : 1;
+        _navController.changeTab(2, journalTab: journalTabIndex);
+      }
+    });
   }
 
   @override

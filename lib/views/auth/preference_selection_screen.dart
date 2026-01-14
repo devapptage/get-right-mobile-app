@@ -97,7 +97,9 @@ class _PreferenceSelectionScreenState extends State<PreferenceSelectionScreen> {
                     const SizedBox(height: 35),
                     CustomButton(
                       text: 'Continue',
-                      onPressed: _selectedPreference != null ? () => Get.toNamed(AppRoutes.goalSelection) : null,
+                      onPressed: _selectedPreference != null
+                          ? () => Get.toNamed(AppRoutes.goalSelection, arguments: {'preference': _selectedPreference})
+                          : null,
                       backgroundColor: _selectedPreference != null ? AppColors.accent : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),

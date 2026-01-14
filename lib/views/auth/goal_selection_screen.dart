@@ -88,7 +88,12 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                     const SizedBox(height: 25),
                     CustomButton(
                       text: 'Continue',
-                      onPressed: _selectedGoals.isNotEmpty ? () => Get.toNamed(AppRoutes.fitnessLevelSelection) : null,
+                      onPressed: _selectedGoals.isNotEmpty
+                          ? () {
+                              final args = Get.arguments as Map<String, dynamic>?;
+                              Get.toNamed(AppRoutes.fitnessLevelSelection, arguments: args);
+                            }
+                          : null,
                       backgroundColor: _selectedGoals.isNotEmpty ? AppColors.accent : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),
