@@ -71,8 +71,6 @@ class AuthController extends GetxController {
 
       // Save email temporarily for OTP verification
       _tempEmail = email;
-
-      Get.toNamed(AppRoutes.otp);
     } catch (e) {
     } finally {
       _isLoading = false;
@@ -197,11 +195,7 @@ class AuthController extends GetxController {
     try {
       // Check if Apple Sign-In is available (iOS 13+ or macOS 10.15+)
       if (!Platform.isIOS && !Platform.isMacOS) {
-        Get.snackbar(
-          'Not Available',
-          'Apple Sign-In is only available on iOS and macOS devices',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        Get.snackbar('Not Available', 'Apple Sign-In is only available on iOS and macOS devices', snackPosition: SnackPosition.BOTTOM);
         return;
       }
 
@@ -213,21 +207,12 @@ class AuthController extends GetxController {
       if (!isAvailable) {
         _isLoading = false;
         update();
-        Get.snackbar(
-          'Not Available',
-          'Apple Sign-In is not available on this device',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        Get.snackbar('Not Available', 'Apple Sign-In is not available on this device', snackPosition: SnackPosition.BOTTOM);
         return;
       }
 
       // Request Apple Sign-In
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+      final credential = await SignInWithApple.getAppleIDCredential(scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName]);
 
       // Simulate network delay
       await Future.delayed(const Duration(seconds: 1));
@@ -262,19 +247,11 @@ class AuthController extends GetxController {
       }
 
       // Handle other errors
-      Get.snackbar(
-        'Sign-In Failed',
-        e.message.isNotEmpty ? e.message : 'An error occurred during Apple Sign-In',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Sign-In Failed', e.message.isNotEmpty ? e.message : 'An error occurred during Apple Sign-In', snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
       _isLoading = false;
       update();
-      Get.snackbar(
-        'Error',
-        'Failed to sign in with Apple: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Failed to sign in with Apple: ${e.toString()}', snackPosition: SnackPosition.BOTTOM);
     }
   }
 }
