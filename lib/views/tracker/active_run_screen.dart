@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/run_tracking_controller.dart';
+import 'package:get_right/models/planned_route_model.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -23,6 +24,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
   late AnimationController _pulseController;
   Timer? _mapUpdateTimer;
   bool _isLocked = false;
+  PlannedRouteModel? _plannedRoute;
 
   @override
   void initState() {
@@ -30,10 +32,15 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
     _pulseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat(reverse: true);
     _startMapUpdates();
 
-    // Get activity type from arguments if provided
+    // Get activity type and planned route from arguments if provided
     final args = Get.arguments as Map<String, dynamic>?;
-    if (args != null && args['activityType'] != null) {
-      _controller.activityType.value = args['activityType'];
+    if (args != null) {
+      if (args['activityType'] != null) {
+        _controller.activityType.value = args['activityType'];
+      }
+      if (args['plannedRoute'] != null) {
+        _plannedRoute = args['plannedRoute'] as PlannedRouteModel;
+      }
     }
   }
 
@@ -104,8 +111,23 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
         );
       }
 
-      // Create polyline from route points
+      // Create polylines from route points and planned route
       final Set<Polyline> polylines = {};
+
+      // Add planned route polyline (dashed line to show the planned path)
+      if (_plannedRoute != null && _plannedRoute!.routePoints.isNotEmpty) {
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('planned_route'),
+            points: _plannedRoute!.routePoints,
+            color: AppColors.accent.withOpacity(0.6),
+            width: 4,
+            patterns: [PatternItem.dash(20), PatternItem.gap(10)],
+          ),
+        );
+      }
+
+      // Add actual run route polyline (solid line for the path traveled)
       if (routePoints.length > 1) {
         polylines.add(
           Polyline(
@@ -118,11 +140,54 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
         );
       }
 
+      // Create markers set
+      final Set<Marker> markers = {};
+
+      // Add current position marker
+      markers.add(
+        Marker(
+          markerId: const MarkerId('current_position'),
+          position: LatLng(position.latitude, position.longitude),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
+
+      // Add planned route start marker
+      if (_plannedRoute != null && _plannedRoute!.routePoints.isNotEmpty) {
+        final startPoint = _plannedRoute!.routePoints.first;
+        markers.add(
+          Marker(
+            markerId: const MarkerId('planned_route_start'),
+            position: startPoint,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            infoWindow: const InfoWindow(title: 'Route Start'),
+          ),
+        );
+
+        // Add planned route end marker (if different from start)
+        if (_plannedRoute!.routePoints.length > 1) {
+          final endPoint = _plannedRoute!.routePoints.last;
+          markers.add(
+            Marker(
+              markerId: const MarkerId('planned_route_end'),
+              position: endPoint,
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              infoWindow: const InfoWindow(title: 'Route End'),
+            ),
+          );
+        }
+      }
+
       return GoogleMap(
         initialCameraPosition: CameraPosition(target: LatLng(position.latitude, position.longitude), zoom: 17),
         onMapCreated: (controller) {
           _mapController = controller;
           _setMapStyle(controller);
+          // Zoom to fit planned route if available
+          if (_plannedRoute != null && _plannedRoute!.routePoints.isNotEmpty) {
+            _fitPlannedRoute();
+          }
         },
         myLocationEnabled: false,
         myLocationButtonEnabled: false,
@@ -130,16 +195,28 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
         mapToolbarEnabled: false,
         compassEnabled: false,
         polylines: polylines,
-        markers: {
-          Marker(
-            markerId: const MarkerId('current_position'),
-            position: LatLng(position.latitude, position.longitude),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-            anchor: const Offset(0.5, 0.5),
-          ),
-        },
+        markers: markers,
       );
     });
+  }
+
+  /// Fit camera to show the planned route
+  void _fitPlannedRoute() {
+    if (_plannedRoute == null || _plannedRoute!.routePoints.isEmpty || _mapController == null) return;
+
+    double minLat = _plannedRoute!.routePoints.first.latitude;
+    double maxLat = _plannedRoute!.routePoints.first.latitude;
+    double minLng = _plannedRoute!.routePoints.first.longitude;
+    double maxLng = _plannedRoute!.routePoints.first.longitude;
+
+    for (final point in _plannedRoute!.routePoints) {
+      minLat = minLat < point.latitude ? minLat : point.latitude;
+      maxLat = maxLat > point.latitude ? maxLat : point.latitude;
+      minLng = minLng < point.longitude ? minLng : point.longitude;
+      maxLng = maxLng > point.longitude ? maxLng : point.longitude;
+    }
+
+    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng)), 100.0));
   }
 
   /// Set custom map style for dark theme

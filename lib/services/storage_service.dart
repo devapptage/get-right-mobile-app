@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_right/constants/app_constants.dart';
 import 'package:get_right/models/run_model.dart';
 import 'package:get_right/models/workout_model.dart';
+import 'package:get_right/models/planned_route_model.dart';
 
 /// Local storage service using SharedPreferences
 class StorageService {
@@ -288,6 +289,45 @@ class StorageService {
     if (index != -1) {
       workouts[index] = updatedWorkout;
       return await saveWorkouts(workouts);
+    }
+    return false;
+  }
+
+  // Planned Route storage methods
+
+  /// Save planned routes list
+  Future<bool> savePlannedRoutes(List<PlannedRouteModel> routes) async {
+    final jsonList = routes.map((route) => json.encode(route.toJson())).toList();
+    return await saveStringList('user_planned_routes', jsonList);
+  }
+
+  /// Get planned routes list
+  Future<List<PlannedRouteModel>> getPlannedRoutes() async {
+    final jsonList = getStringList('user_planned_routes') ?? [];
+    return jsonList.map((jsonStr) => PlannedRouteModel.fromJson(json.decode(jsonStr))).toList();
+  }
+
+  /// Add a single planned route
+  Future<bool> addPlannedRoute(PlannedRouteModel route) async {
+    final routes = await getPlannedRoutes();
+    routes.add(route);
+    return await savePlannedRoutes(routes);
+  }
+
+  /// Delete planned route by ID
+  Future<bool> deletePlannedRoute(String routeId) async {
+    final routes = await getPlannedRoutes();
+    routes.removeWhere((route) => route.id == routeId);
+    return await savePlannedRoutes(routes);
+  }
+
+  /// Update planned route
+  Future<bool> updatePlannedRoute(PlannedRouteModel updatedRoute) async {
+    final routes = await getPlannedRoutes();
+    final index = routes.indexWhere((route) => route.id == updatedRoute.id);
+    if (index != -1) {
+      routes[index] = updatedRoute;
+      return await savePlannedRoutes(routes);
     }
     return false;
   }

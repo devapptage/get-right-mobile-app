@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/models/planned_route_model.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -15,6 +16,7 @@ class ActivityTypeSelectionScreen extends StatefulWidget {
 
 class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScreen> {
   String? _selectedActivity;
+  PlannedRouteModel? _plannedRoute;
 
   final List<Map<String, dynamic>> _activities = [
     {'type': 'Walk', 'icon': Icons.directions_walk, 'color': const Color(0xFF4CAF50), 'description': 'Low intensity cardio'},
@@ -23,14 +25,27 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
     {'type': 'Bike', 'icon': Icons.directions_bike, 'color': const Color(0xFF2196F3), 'description': 'Cycling activity'},
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null && args['plannedRoute'] != null) {
+      _plannedRoute = args['plannedRoute'] as PlannedRouteModel;
+    }
+  }
+
   void _startActivity() {
     if (_selectedActivity == null) {
       Get.snackbar('Select Activity', 'Please choose an activity type', backgroundColor: AppColors.error, colorText: AppColors.onError);
       return;
     }
 
-    // Navigate to live run tracking with activity type
-    Get.toNamed(AppRoutes.runTracking, arguments: {'activityType': _selectedActivity});
+    // Navigate to live run tracking with activity type and planned route
+    final Map<String, dynamic> args = {'activityType': _selectedActivity};
+    if (_plannedRoute != null) {
+      args['plannedRoute'] = _plannedRoute;
+    }
+    Get.toNamed(AppRoutes.runTracking, arguments: args);
   }
 
   @override
@@ -61,6 +76,44 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
                   ),
                   const SizedBox(height: 8),
                   Text('Choose your activity to get accurate tracking', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
+                  if (_plannedRoute != null) ...[
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 1.5),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.route, color: AppColors.accent, size: 24),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Using saved route',
+                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _plannedRoute!.name,
+                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${(_plannedRoute!.estimatedDistance / 1000).toStringAsFixed(2)} km',
+                                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 32),
 
                   // Activity Type Cards
