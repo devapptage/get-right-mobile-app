@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_right/constants/app_constants.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/utils/validators.dart';
@@ -21,9 +22,11 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _storageService = Get.find<StorageService>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _ageController = TextEditingController();
+  final _dobController = TextEditingController();
   final _bioController = TextEditingController();
   final _phoneController = TextEditingController();
   final _heightController = TextEditingController();
@@ -40,11 +43,57 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List<String> _selectedWorkoutTypes = [];
   String? _profileImagePath;
 
+  // Onboarding questionnaire fields
+  String? _selectedPreference; // Question 1: What's your preference?
+  List<String> _selectedGoals = []; // Question 2: What's your main goal? (multi-select)
+  String? _selectedFitnessLevel; // Question 3: What's your fitness level?
+  String? _selectedExerciseFrequency; // Question 4: How often do you plan to exercise?
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedPreferences();
+  }
+
+  Future<void> _loadSavedPreferences() async {
+    setState(() => _isLoading = true);
+
+    // Load personal information
+    final savedName = _storageService.getName();
+    if (savedName != null) {
+      _firstNameController.text = savedName;
+    }
+    final savedDob = _storageService.getString('user_date_of_birth');
+    if (savedDob != null) {
+      _dobController.text = savedDob;
+    }
+    final savedPhone = _storageService.getString('user_phone');
+    if (savedPhone != null) {
+      _phoneController.text = savedPhone;
+    }
+    final savedBio = _storageService.getString('user_bio');
+    if (savedBio != null) {
+      _bioController.text = savedBio;
+    }
+    _selectedGender = _storageService.getString('user_gender');
+
+    // Load onboarding preferences from StorageService
+    _selectedPreference = _storageService.getUserPreference();
+    _selectedGoals = _storageService.getUserGoals();
+    _selectedFitnessLevel = _storageService.getFitnessLevel();
+    _selectedExerciseFrequency = _storageService.getExerciseFrequency();
+
+    setState(() => _isLoading = false);
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _ageController.dispose();
+    _dobController.dispose();
     _bioController.dispose();
     _phoneController.dispose();
     _heightController.dispose();
@@ -56,8 +105,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  void _saveProfile() {
+  Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
+      // Save personal information
+      if (_firstNameController.text.trim().isNotEmpty) {
+        await _storageService.saveName(_firstNameController.text.trim());
+      }
+      if (_dobController.text.trim().isNotEmpty) {
+        await _storageService.saveString('user_date_of_birth', _dobController.text.trim());
+      }
+      if (_phoneController.text.trim().isNotEmpty) {
+        await _storageService.saveString('user_phone', _phoneController.text.trim());
+      }
+      if (_bioController.text.trim().isNotEmpty) {
+        await _storageService.saveString('user_bio', _bioController.text.trim());
+      }
+      if (_selectedGender != null) {
+        await _storageService.saveString('user_gender', _selectedGender!);
+      }
+
+      // Save onboarding preferences
+      if (_selectedPreference != null) {
+        await _storageService.saveUserPreference(_selectedPreference!);
+      }
+      if (_selectedGoals.isNotEmpty) {
+        await _storageService.saveUserGoals(_selectedGoals);
+      }
+      if (_selectedFitnessLevel != null) {
+        await _storageService.saveFitnessLevel(_selectedFitnessLevel!);
+      }
+      if (_selectedExerciseFrequency != null) {
+        await _storageService.saveExerciseFrequency(_selectedExerciseFrequency!);
+      }
+
       // TODO: Save profile to API
       Get.snackbar(
         'Success',
@@ -67,7 +147,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
-      Get.back();
+      Get.back(result: true); // Return true to indicate data was saved
     }
   }
 
@@ -266,268 +346,234 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
+          onPressed: () => Get.back(),
+        ),
         centerTitle: true,
+        title: Text('Edit Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Photo Section
-              Center(child: _buildProfilePicturePicker()),
 
-              const SizedBox(height: 32),
-
-              // Personal Information Section
-              _buildSectionHeader('Personal Information', Icons.person_outline),
-              const SizedBox(height: 16),
-
-              CustomTextField(controller: _firstNameController, labelText: 'First Name', prefixIcon: const Icon(Icons.person_outline), validator: Validators.validateName),
-              const SizedBox(height: 16),
-
-              CustomTextField(controller: _lastNameController, labelText: 'Last Name', prefixIcon: const Icon(Icons.person_outline), validator: Validators.validateName),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                controller: _ageController,
-                labelText: 'Age',
-                hintText: 'Enter your age',
-                keyboardType: TextInputType.number,
-                prefixIcon: const Icon(Icons.cake_outlined),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: Validators.validateAge,
-              ),
-              const SizedBox(height: 16),
-
-              // Phone Number
-              CustomTextField(
-                controller: _phoneController,
-                labelText: 'Contact Number',
-                hintText: '+1 234 567 8900',
-                keyboardType: TextInputType.phone,
-                prefixIcon: const Icon(Icons.phone_outlined),
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(controller: _bioController, labelText: 'Bio (Optional)', hintText: 'Tell us about yourself...', maxLines: 3, prefixIcon: const Icon(Icons.edit_note)),
-              const SizedBox(height: 32),
-
-              // Gender Selection
-              _buildSectionHeader('Gender', Icons.wc_outlined),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Gender',
-                value: _selectedGender,
-                items: AppConstants.genderOptions,
-                icon: Icons.wc_outlined,
-                onChanged: (value) => setState(() => _selectedGender = value),
-              ),
-              const SizedBox(height: 32),
-
-              // Units preference
-              _buildSectionHeader('Measurement System', Icons.straighten_outlined),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Measurement System',
-                value: _selectedUnits,
-                items: AppConstants.unitsOptions,
-                icon: Icons.straighten_outlined,
-                onChanged: (value) => setState(() => _selectedUnits = value),
-              ),
-              const SizedBox(height: 32),
-
-              // Height and Weight
-              _buildSectionHeader('Body Measurements', Icons.monitor_weight_outlined),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      controller: _heightController,
-                      labelText: _selectedUnits == 'Metric' ? 'Height (cm)' : 'Height (ft)',
-                      hintText: _selectedUnits == 'Metric' ? '170' : '5.7',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      prefixIcon: const Icon(Icons.height_outlined),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomTextField(
-                      controller: _weightController,
-                      labelText: _selectedUnits == 'Metric' ? 'Weight (kg)' : 'Weight (lbs)',
-                      hintText: _selectedUnits == 'Metric' ? 'e.g. 70 (kg)' : 'e.g. 154 (lbs)',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      prefixIcon: const Icon(Icons.monitor_weight_outlined),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-
-              // Fitness Goal
-              _buildSectionHeader('Fitness Goal', Icons.flag_outlined),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Fitness Goal',
-                value: _selectedFitnessGoal,
-                items: AppConstants.fitnessGoals,
-                icon: Icons.flag_outlined,
-                onChanged: (value) => setState(() => _selectedFitnessGoal = value),
-              ),
-              const SizedBox(height: 20),
-
-              // Target Weight (optional)
-              if (_selectedFitnessGoal == 'Weight Loss' || _selectedFitnessGoal == 'Muscle Gain')
-                Column(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Profile Photo Section
+                    Center(child: _buildProfilePicturePicker()),
+
+                    const SizedBox(height: 32),
+
+                    // Personal Information Section
+                    _buildSectionHeader('Personal Information', Icons.person_outline),
+                    const SizedBox(height: 16),
+
+                    CustomTextField(controller: _firstNameController, labelText: 'Full Name', hintText: 'Enter your full name', prefixIcon: const Icon(Icons.person_outline)),
+                    const SizedBox(height: 16),
+                    _buildSectionHeader('Date of Birth', Icons.cake_outlined),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: () async {
+                        DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: _dobController.text.isNotEmpty ? DateTime.tryParse(_dobController.text) ?? DateTime(2000) : DateTime(2000),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            _dobController.text = picked.toIso8601String().split('T').first;
+                          });
+                        }
+                      },
+                      child: AbsorbPointer(
+                        child: CustomTextField(
+                          controller: _dobController,
+                          labelText: 'Date of Birth',
+                          hintText: 'Date of Birth',
+                          prefixIcon: const Icon(Icons.cake_outlined),
+                          // validator: (value) {
+                          //   if (value == null || value.isEmpty) {
+                          //     return 'Date of Birth is required';
+                          //   }
+                          //   final date = DateTime.tryParse(value);
+                          //   if (date == null) {
+                          //     return 'Please enter a valid date';
+                          //   }
+                          //   if (date.isAfter(DateTime.now())) {
+                          //     return 'Date of Birth cannot be in the future';
+                          //   }
+                          //   return null;
+                          // },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSectionHeader('Contact Number', Icons.phone_outlined),
+                    const SizedBox(height: 12),
+                    // Phone Number
                     CustomTextField(
-                      controller: _targetWeightController,
-                      labelText: _selectedUnits == 'Metric' ? 'Target Weight (kg)' : 'Target Weight (lbs)',
-                      hintText: _selectedUnits == 'Metric' ? '65' : '143',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      prefixIcon: const Icon(Icons.track_changes_outlined),
+                      controller: _phoneController,
+                      labelText: 'Contact Number',
+                      hintText: '+1 234 567 8900',
+                      keyboardType: TextInputType.phone,
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSectionHeader('Bio', Icons.edit_note),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      controller: _bioController,
+                      labelText: 'Bio (Optional)',
+                      hintText: 'Tell us about yourself...',
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.edit_note),
                     ),
                     const SizedBox(height: 32),
-                  ],
-                )
-              else
-                const SizedBox(height: 32),
 
-              // Activity Level dropdown
-              _buildSectionHeader('Activity Level', Icons.directions_run_outlined),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Activity Level',
-                value: _selectedActivityLevel,
-                items: AppConstants.activityLevels,
-                icon: Icons.directions_run_outlined,
-                onChanged: (value) => setState(() => _selectedActivityLevel = value),
-              ),
-              const SizedBox(height: 32),
+                    // Gender Selection
+                    _buildSectionHeader('Gender', Icons.wc_outlined),
+                    const SizedBox(height: 12),
+                    _buildDropdownField(
+                      label: 'Gender',
+                      value: _selectedGender,
+                      items: AppConstants.genderOptions,
+                      icon: Icons.wc_outlined,
+                      onChanged: (value) => setState(() => _selectedGender = value),
+                    ),
+                    const SizedBox(height: 32),
 
-              // Preferred Workout Types
-              _buildSectionHeader('Preferred Workout Types', Icons.fitness_center),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primaryGray, width: 1),
-                ),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: AppConstants.workoutTypes.map((type) {
-                    final isSelected = _selectedWorkoutTypes.contains(type);
-                    return FilterChip(
-                      label: Text(type),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedWorkoutTypes.add(type);
-                          } else {
-                            _selectedWorkoutTypes.remove(type);
-                          }
-                        });
-                      },
-                      selectedColor: AppColors.accent,
-                      labelStyle: TextStyle(color: isSelected ? AppColors.onAccent : AppColors.onBackground, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
-                      backgroundColor: AppColors.primaryVariant,
-                      checkmarkColor: AppColors.onAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: isSelected ? AppColors.accent : AppColors.accent, width: 2),
+                    // Onboarding Questionnaire Section
+                    _buildSectionHeader('Onboarding Preferences', Icons.quiz_outlined),
+                    const SizedBox(height: 16),
+
+                    // Question 1: What's your preference?
+                    Text(
+                      'What\'s your preference?',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('Choose your primary focus to personalize your experience', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                    const SizedBox(height: 12),
+                    _buildDropdownField(
+                      label: 'Preference',
+                      value: _selectedPreference,
+                      items: const ['Strength Training', 'Running & Cardio'],
+                      icon: Icons.fitness_center,
+                      onChanged: (value) => setState(() => _selectedPreference = value),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Question 2: What's your main goal? (Multi-select)
+                    Text(
+                      'What\'s your main goal?',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('This helps us recommend the best features for you. Select all that apply', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1.5),
                       ),
-                    );
-                  }).toList(),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: ['Lose Weight', 'Build Muscle', 'Stay Healthy', 'Improve Performance', 'Track Progress', 'Build Habits'].map((goal) {
+                          final isSelected = _selectedGoals.contains(goal);
+                          return FilterChip(
+                            label: Text(goal),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              setState(() {
+                                if (selected) {
+                                  _selectedGoals.add(goal);
+                                } else {
+                                  _selectedGoals.remove(goal);
+                                }
+                              });
+                            },
+                            selectedColor: AppColors.accent,
+                            labelStyle: TextStyle(color: isSelected ? AppColors.onAccent : AppColors.onBackground, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                            backgroundColor: AppColors.background,
+                            checkmarkColor: AppColors.onAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(color: isSelected ? AppColors.accent : AppColors.primaryGray.withOpacity(0.3), width: isSelected ? 2 : 1),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Question 3: What's your fitness level?
+                    Text(
+                      'What\'s your fitness level?',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('We\'ll adjust recommendations based on your experience', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                    const SizedBox(height: 12),
+                    _buildDropdownField(
+                      label: 'Fitness Level',
+                      value: _selectedFitnessLevel,
+                      items: const ['Beginner', 'Intermediate', 'Advanced'],
+                      icon: Icons.trending_up,
+                      onChanged: (value) => setState(() => _selectedFitnessLevel = value),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Question 4: How often do you plan to exercise?
+                    Text(
+                      'How often do you plan to exercise?',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('This helps us create realistic goals for you', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                    const SizedBox(height: 12),
+                    _buildDropdownField(
+                      label: 'Exercise Frequency',
+                      value: _selectedExerciseFrequency,
+                      items: const ['Daily (7x/week)', '5 times per week', '3 times per week', '2 times per week', 'Once per week'],
+                      icon: Icons.calendar_today,
+                      onChanged: (value) => setState(() => _selectedExerciseFrequency = value),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Save Button
+                    CustomButton(text: 'Save Changes', onPressed: _saveProfile),
+                    const SizedBox(height: 16),
+
+                    // Cancel Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.primaryGray, width: 2),
+                          foregroundColor: AppColors.onBackground,
+                        ),
+                        child: Text('Cancel', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onBackground)),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // Medical & Emergency Section Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.health_and_safety_outlined, color: AppColors.accent, size: 22),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Health & Safety Information',
-                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Medical Conditions (Optional)
-              CustomTextField(
-                controller: _medicalConditionsController,
-                labelText: 'Medical Conditions (Optional)',
-                hintText: 'e.g., Asthma, Diabetes, Allergies',
-                maxLines: 3,
-                prefixIcon: const Icon(Icons.health_and_safety_outlined),
-              ),
-              const SizedBox(height: 20),
-
-              // Emergency Contact Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.emergency_outlined, color: AppColors.accent, size: 22),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Emergency Contact',
-                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Emergency Contact Name
-              CustomTextField(
-                controller: _emergencyContactNameController,
-                labelText: 'Emergency Contact Name',
-                hintText: 'Enter contact name',
-                prefixIcon: const Icon(Icons.person_outline_rounded),
-              ),
-              const SizedBox(height: 16),
-
-              // Emergency Contact Phone
-              CustomTextField(
-                controller: _emergencyContactPhoneController,
-                labelText: 'Emergency Contact Phone',
-                hintText: '+1 234 567 8900',
-                keyboardType: TextInputType.phone,
-                prefixIcon: const Icon(Icons.phone_in_talk_outlined),
-              ),
-              const SizedBox(height: 40),
-
-              // Save Button
-              CustomButton(text: 'Save Changes', onPressed: _saveProfile),
-              const SizedBox(height: 16),
-
-              // Cancel Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: OutlinedButton(
-                  onPressed: () => Get.back(),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.primaryGray, width: 2),
-                    foregroundColor: AppColors.onBackground,
-                  ),
-                  child: Text('Cancel', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onBackground)),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 

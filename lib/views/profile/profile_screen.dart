@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
@@ -41,7 +42,19 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _storageService = Get.find<StorageService>();
   List<PersonalRecord> _personalRecords = [];
+
+  // Profile data
+  String? _fullName;
+  String? _dateOfBirth;
+  String? _contactNumber;
+  String? _bio;
+  String? _gender;
+  String? _preference;
+  List<String> _goals = [];
+  String? _fitnessLevel;
+  String? _exerciseFrequency;
 
   @override
   void initState() {
@@ -52,6 +65,24 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       PersonalRecord(id: '1', liftName: 'Bench Press', value: '315', unit: 'lbs', date: DateTime(2024, 12, 12), displayPublicly: true),
       PersonalRecord(id: '2', liftName: 'Squat', value: '405', unit: 'lbs', date: DateTime(2024, 12, 10), displayPublicly: true),
     ];
+    _loadProfileData();
+  }
+
+  void _loadProfileData() {
+    // Load profile data from StorageService
+    // Note: Some fields like fullName, dateOfBirth, contactNumber, bio might need to be stored separately
+    // For now, we'll load what's available from StorageService
+    setState(() {
+      _gender = _storageService.getString('user_gender');
+      _preference = _storageService.getUserPreference();
+      _goals = _storageService.getUserGoals();
+      _fitnessLevel = _storageService.getFitnessLevel();
+      _exerciseFrequency = _storageService.getExerciseFrequency();
+      _bio = _storageService.getString('user_bio');
+      _fullName = _storageService.getName();
+      _dateOfBirth = _storageService.getString('user_date_of_birth');
+      _contactNumber = _storageService.getString('user_phone');
+    });
   }
 
   @override
@@ -286,7 +317,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
-                        onTap: () => Get.toNamed(AppRoutes.editProfile),
+                        onTap: () async {
+                          final result = await Get.toNamed(AppRoutes.editProfile);
+                          if (result == true) {
+                            // Reload profile data when returning from edit screen
+                            _loadProfileData();
+                          }
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -301,14 +338,20 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text("John Doe", style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground)),
+                Text(_fullName ?? "User Name", style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground)),
                 const SizedBox(height: 4),
-                Text("john.doe@example.com", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+                Text(_storageService.getEmail() ?? "user@example.com", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: 180,
                   child: ElevatedButton.icon(
-                    onPressed: () => Get.toNamed(AppRoutes.editProfile),
+                    onPressed: () async {
+                      final result = await Get.toNamed(AppRoutes.editProfile);
+                      if (result == true) {
+                        // Reload profile data when returning from edit screen
+                        _loadProfileData();
+                      }
+                    },
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, foregroundColor: AppColors.onAccent, elevation: 0),
                     icon: const Icon(Icons.edit, size: 18),
                     label: const Text('Edit Profile'),
@@ -336,15 +379,15 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow('First Name', 'John', Icons.person_outline),
+                      _buildInfoRow('Full Name', _fullName ?? 'Not set', Icons.person_outline),
                       const Divider(height: 24, color: AppColors.primaryGray),
-                      _buildInfoRow('Last Name', 'Doe', Icons.person_outline),
+
+                      _buildInfoRow('Date of Birth', _dateOfBirth ?? 'Not set', Icons.cake_outlined),
                       const Divider(height: 24, color: AppColors.primaryGray),
-                      _buildInfoRow('Age', '28 years', Icons.cake_outlined),
+                      _buildInfoRow('Contact Number', _contactNumber ?? '52165168', Icons.phone_outlined),
                       const Divider(height: 24, color: AppColors.primaryGray),
-                      _buildInfoRow('Gender', 'Male', Icons.wc),
+                      _buildInfoRow('Gender', _gender ?? 'Male', Icons.wc),
                       const Divider(height: 24, color: AppColors.primaryGray),
-                      _buildInfoRow('Fitness Goal', 'Build Muscle', Icons.flag_outlined),
                     ],
                   ),
                 ),
@@ -370,41 +413,60 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Passionate fitness enthusiast working towards building strength and maintaining a healthy lifestyle. Love outdoor running and strength training!',
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                        _bio ?? 'No bio added yet.',
+                        style: AppTextStyles.bodyMedium.copyWith(color: _bio != null && _bio!.isNotEmpty ? AppColors.onSurface : AppColors.primaryGray),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Workout Preferences Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primaryGray, width: 1),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.fitness_center, color: AppColors.accent, size: 20),
-                          const SizedBox(width: 8),
-                          Text('Workout Preferences', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
+                // Onboarding Preferences Card
+                if (_preference != null || _goals.isNotEmpty || _fitnessLevel != null || _exerciseFrequency != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primaryGray, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.quiz_outlined, color: AppColors.accent, size: 20),
+                            const SizedBox(width: 8),
+                            Text('Onboarding Preferences', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (_preference != null) ...[_buildPreferenceInfoRow('Preference', _preference!, Icons.fitness_center), const SizedBox(height: 12)],
+                        if (_goals.isNotEmpty) ...[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.flag_outlined, color: AppColors.accent, size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Goals', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                                    const SizedBox(height: 8),
+                                    Wrap(spacing: 8, runSpacing: 8, children: _goals.map((goal) => _buildPreferenceChip(goal)).toList()),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [_buildPreferenceChip('Strength'), _buildPreferenceChip('Cardio'), _buildPreferenceChip('HIIT'), _buildPreferenceChip('Running')],
-                      ),
-                    ],
+                        if (_fitnessLevel != null) ...[_buildPreferenceInfoRow('Fitness Level', _fitnessLevel!, Icons.trending_up), const SizedBox(height: 12)],
+                        if (_exerciseFrequency != null) _buildPreferenceInfoRow('Exercise Frequency', _exerciseFrequency!, Icons.calendar_today),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -676,6 +738,28 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
               const SizedBox(height: 4),
               Text(value, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreferenceInfoRow(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.accent, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+              ),
             ],
           ),
         ),

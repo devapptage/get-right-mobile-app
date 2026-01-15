@@ -18,6 +18,10 @@ class AppConstants {
   static const String keyUserEmail = 'user_email';
   static const String keyUserName = 'user_name';
   static const String keyOnboardingComplete = 'onboarding_complete';
+  static const String keyUserPreference = 'user_preference';
+  static const String keyUserGoals = 'user_goals';
+  static const String keyFitnessLevel = 'fitness_level';
+  static const String keyExerciseFrequency = 'exercise_frequency';
 
   // Workout Tags
   static const List<String> workoutTags = ['Leg Day', 'Upper Body', 'Arms', 'Chest', 'Back', 'Shoulders', 'Core', 'Cardio', 'HIIT', 'Yoga', 'Stretching', 'Full Body'];

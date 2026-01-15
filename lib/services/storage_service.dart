@@ -331,4 +331,46 @@ class StorageService {
     }
     return false;
   }
+
+  // Onboarding Preferences methods
+
+  /// Save user preference (Strength Training or Running & Cardio)
+  Future<bool> saveUserPreference(String preference) async {
+    return await saveString(AppConstants.keyUserPreference, preference);
+  }
+
+  /// Get user preference
+  String? getUserPreference() {
+    return getString(AppConstants.keyUserPreference);
+  }
+
+  /// Save user goals (list of selected goals)
+  Future<bool> saveUserGoals(List<String> goals) async {
+    return await saveStringList(AppConstants.keyUserGoals, goals);
+  }
+
+  /// Get user goals
+  List<String> getUserGoals() {
+    return getStringList(AppConstants.keyUserGoals) ?? [];
+  }
+
+  /// Save fitness level
+  Future<bool> saveFitnessLevel(String level) async {
+    return await saveString(AppConstants.keyFitnessLevel, level);
+  }
+
+  /// Get fitness level
+  String? getFitnessLevel() {
+    return getString(AppConstants.keyFitnessLevel);
+  }
+
+  /// Save exercise frequency
+  Future<bool> saveExerciseFrequency(String frequency) async {
+    return await saveString(AppConstants.keyExerciseFrequency, frequency);
+  }
+
+  /// Get exercise frequency
+  String? getExerciseFrequency() {
+    return getString(AppConstants.keyExerciseFrequency);
+  }
 }
