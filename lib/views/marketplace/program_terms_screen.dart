@@ -39,7 +39,7 @@ class _ProgramTermsScreenState extends State<ProgramTermsScreen> {
     Get.back();
 
     // Navigate to My Programs screen with success message
-    Get.offAllNamed(AppRoutes.myPrograms, arguments: {'enrolled': true, 'program': programData});
+    Get.toNamed(AppRoutes.myPrograms, arguments: {'enrolled': true, 'program': programData});
 
     // Show success snackbar
     Future.delayed(const Duration(milliseconds: 500), () {

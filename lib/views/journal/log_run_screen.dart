@@ -261,10 +261,10 @@ class _LogRunScreenState extends State<LogRunScreen> {
                 child: ElevatedButton(
                   onPressed: _saveRun,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.completed,
+                    backgroundColor: AppColors.accent,
                     foregroundColor: AppColors.onAccent,
                     elevation: 4,
-                    shadowColor: AppColors.completed.withOpacity(0.5),
+                    shadowColor: AppColors.accent.withOpacity(0.5),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Row(

@@ -212,7 +212,40 @@ class _AddFoodScreenState extends State<AddFoodScreen> with SingleTickerProvider
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, color: AppColors.mediumGray, size: 16),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: AppColors.mediumGray, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    _showEditFoodDialog(item);
+                  } else if (value == 'delete') {
+                    _showDeleteConfirmationDialog(item);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, color: AppColors.accent, size: 20),
+                        SizedBox(width: 8),
+                        Text('Edit'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red, size: 20),
+                        SizedBox(width: 8),
+                        Text('Delete', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -636,6 +669,254 @@ class _AddFoodScreenState extends State<AddFoodScreen> with SingleTickerProvider
     fatsController.clear();
     servingSizeController.text = '1';
     servingUnitController.text = 'serving';
+  }
+
+  void _showEditFoodDialog(FoodItem item) {
+    // Initialize controllers with current values
+    final editNameController = TextEditingController(text: item.name);
+    final editCaloriesController = TextEditingController(text: item.calories.toStringAsFixed(0));
+    final editProteinController = TextEditingController(text: item.protein.toStringAsFixed(0));
+    final editCarbsController = TextEditingController(text: item.carbs.toStringAsFixed(0));
+    final editFatsController = TextEditingController(text: item.fats.toStringAsFixed(0));
+    final editServingSizeController = TextEditingController(text: item.defaultServingSize.toStringAsFixed(1));
+    final editServingUnitController = TextEditingController(text: item.servingUnit ?? 'serving');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, -5))],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(top: 24, left: 24, right: 24, bottom: MediaQuery.of(context).viewInsets.bottom + 24),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+                    ),
+                  ),
+                  // Title
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Edit Food Item',
+                        style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: AppColors.primaryGray),
+                        onPressed: () => Navigator.pop(context),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Food Name
+                  _buildTextField(
+                    controller: editNameController,
+                    label: 'Food Name',
+                    hint: 'e.g., Chicken Breast',
+                  ),
+                  const SizedBox(height: 16),
+                  // Serving Size and Unit
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          controller: editServingSizeController,
+                          label: 'Serving Size',
+                          hint: '1',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: editServingUnitController,
+                          label: 'Unit',
+                          hint: 'serving',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Calories
+                  _buildTextField(
+                    controller: editCaloriesController,
+                    label: 'Calories',
+                    hint: 'e.g., 200',
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  // Macros
+                  Text(
+                    'Macronutrients',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          controller: editProteinController,
+                          label: 'Protein (g)',
+                          hint: '0',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: editCarbsController,
+                          label: 'Carbs (g)',
+                          hint: '0',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: editFatsController,
+                          label: 'Fats (g)',
+                          hint: '0',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Save Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (editNameController.text.isEmpty) {
+                          Get.snackbar('Error', 'Please enter a food name', snackPosition: SnackPosition.BOTTOM);
+                          return;
+                        }
+                        if (editCaloriesController.text.isEmpty) {
+                          Get.snackbar('Error', 'Please enter calories', snackPosition: SnackPosition.BOTTOM);
+                          return;
+                        }
+
+                        final updatedItem = item.copyWith(
+                          name: editNameController.text.trim(),
+                          calories: double.tryParse(editCaloriesController.text) ?? item.calories,
+                          protein: double.tryParse(editProteinController.text) ?? item.protein,
+                          carbs: double.tryParse(editCarbsController.text) ?? item.carbs,
+                          fats: double.tryParse(editFatsController.text) ?? item.fats,
+                          defaultServingSize: double.tryParse(editServingSizeController.text) ?? item.defaultServingSize,
+                          servingUnit: editServingUnitController.text.trim().isEmpty ? item.servingUnit : editServingUnitController.text.trim(),
+                        );
+
+                        controller.updateSavedFoodItem(updatedItem);
+
+                        Navigator.pop(context);
+                        Get.snackbar(
+                          'Success',
+                          '${updatedItem.name} updated successfully',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.accent,
+                          colorText: Colors.white,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Save Changes',
+                        style: AppTextStyles.buttonLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).then((_) {
+      // Dispose controllers when dialog is closed
+      editNameController.dispose();
+      editCaloriesController.dispose();
+      editProteinController.dispose();
+      editCarbsController.dispose();
+      editFatsController.dispose();
+      editServingSizeController.dispose();
+      editServingUnitController.dispose();
+    });
+  }
+
+  void _showDeleteConfirmationDialog(FoodItem item) {
+    Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Delete Food Item',
+          style: AppTextStyles.titleLarge.copyWith(
+            color: AppColors.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${item.name}"?',
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mediumGray),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(
+              'Cancel',
+              style: AppTextStyles.buttonMedium.copyWith(color: AppColors.mediumGray),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(
+              'Delete',
+              style: AppTextStyles.buttonMedium.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true) {
+        controller.removeSavedFoodItem(item.id);
+        Get.snackbar(
+          'Deleted',
+          '${item.name} removed from saved items',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.accent,
+          colorText: Colors.white,
+        );
+      }
+    });
   }
 }
 

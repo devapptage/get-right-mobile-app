@@ -44,13 +44,7 @@ class NutritionController extends GetxController {
   NutritionDay getNutritionDay(DateTime date) {
     final dateKey = _getDateKey(date);
     if (!nutritionDays.containsKey(dateKey)) {
-      nutritionDays[dateKey] = NutritionDay(
-        date: date,
-        calorieGoal: calorieGoal.value,
-        proteinGoal: proteinGoal.value,
-        carbsGoal: carbsGoal.value,
-        fatsGoal: fatsGoal.value,
-      );
+      nutritionDays[dateKey] = NutritionDay(date: date, calorieGoal: calorieGoal.value, proteinGoal: proteinGoal.value, carbsGoal: carbsGoal.value, fatsGoal: fatsGoal.value);
     }
     return nutritionDays[dateKey]!;
   }
@@ -98,6 +92,15 @@ class NutritionController extends GetxController {
     update();
   }
 
+  // Update saved food item
+  void updateSavedFoodItem(FoodItem updatedItem) {
+    final index = savedFoodItems.indexWhere((item) => item.id == updatedItem.id);
+    if (index != -1) {
+      savedFoodItems[index] = updatedItem.copyWith(isSaved: true);
+      update();
+    }
+  }
+
   // Add recipe serving to tracker
   void addRecipeToTracker(Recipe recipe, double servings, MealType mealType) {
     final nutrition = recipe.calculateForServings(servings);
@@ -126,12 +129,7 @@ class NutritionController extends GetxController {
   }
 
   // Update goals
-  void updateGoals({
-    double? calories,
-    double? protein,
-    double? carbs,
-    double? fats,
-  }) {
+  void updateGoals({double? calories, double? protein, double? carbs, double? fats}) {
     if (calories != null) calorieGoal.value = calories;
     if (protein != null) proteinGoal.value = protein;
     if (carbs != null) carbsGoal.value = carbs;
@@ -182,50 +180,10 @@ class NutritionController extends GetxController {
   void _initializeDemoData() {
     // Demo saved food items
     savedFoodItems.addAll([
-      FoodItem(
-        id: '1',
-        name: 'Oatmeal with Berries',
-        calories: 320,
-        protein: 12,
-        carbs: 54,
-        fats: 6,
-        defaultServingSize: 1,
-        servingUnit: 'bowl',
-        isSaved: true,
-      ),
-      FoodItem(
-        id: '2',
-        name: 'Grilled Chicken Breast',
-        calories: 231,
-        protein: 43,
-        carbs: 0,
-        fats: 5,
-        defaultServingSize: 200,
-        servingUnit: 'g',
-        isSaved: true,
-      ),
-      FoodItem(
-        id: '3',
-        name: 'Brown Rice',
-        calories: 216,
-        protein: 5,
-        carbs: 45,
-        fats: 2,
-        defaultServingSize: 1,
-        servingUnit: 'cup',
-        isSaved: true,
-      ),
-      FoodItem(
-        id: '4',
-        name: 'Protein Shake',
-        calories: 120,
-        protein: 24,
-        carbs: 3,
-        fats: 1,
-        defaultServingSize: 1,
-        servingUnit: 'scoop',
-        isSaved: true,
-      ),
+      FoodItem(id: '1', name: 'Oatmeal with Berries', calories: 320, protein: 12, carbs: 54, fats: 6, defaultServingSize: 1, servingUnit: 'bowl', isSaved: true),
+      FoodItem(id: '2', name: 'Grilled Chicken Breast', calories: 231, protein: 43, carbs: 0, fats: 5, defaultServingSize: 200, servingUnit: 'g', isSaved: true),
+      FoodItem(id: '3', name: 'Brown Rice', calories: 216, protein: 5, carbs: 45, fats: 2, defaultServingSize: 1, servingUnit: 'cup', isSaved: true),
+      FoodItem(id: '4', name: 'Protein Shake', calories: 120, protein: 24, carbs: 3, fats: 1, defaultServingSize: 1, servingUnit: 'scoop', isSaved: true),
     ]);
 
     // Demo recipes
@@ -370,15 +328,6 @@ class NutritionController extends GetxController {
 
     // Add demo data for today
     final today = DateTime.now();
-    addMealEntry(
-      MealEntry(
-        id: '1',
-        foodItem: savedFoodItems[0],
-        quantity: 1,
-        mealType: MealType.breakfast,
-        timestamp: today,
-      ),
-    );
+    addMealEntry(MealEntry(id: '1', foodItem: savedFoodItems[0], quantity: 1, mealType: MealType.breakfast, timestamp: today));
   }
 }
-

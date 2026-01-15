@@ -495,7 +495,7 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
                 Expanded(
                   child: SizedBox(
                     height: 52,
-                    child: OutlinedButton.icon(
+                    child: OutlinedButton(
                       onPressed: () {
                         Get.toNamed(AppRoutes.runHistory);
                       },
@@ -503,12 +503,20 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
                         side: BorderSide(color: AppColors.primaryGray.withOpacity(0.5), width: 2),
                         foregroundColor: AppColors.onSurface,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 8), // minimize horizontal padding
                       ),
-                      icon: const Icon(Icons.history_rounded, size: 20),
-                      label: Text(
-                        'View History',
-                        style: AppTextStyles.labelLarge.copyWith(color: AppColors.onSurface),
-                        textAlign: TextAlign.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.history_rounded, size: 20),
+                          const SizedBox(width: 6), // Minimal spacing
+                          Text(
+                            'View History',
+                            style: AppTextStyles.labelLarge.copyWith(color: AppColors.onSurface),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
                   ),

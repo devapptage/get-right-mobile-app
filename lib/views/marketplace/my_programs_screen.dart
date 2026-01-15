@@ -74,10 +74,45 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
     },
   ];
 
+  final List<Map<String, dynamic>> _completedPrograms = [
+    {
+      'id': '5',
+      'title': 'Beginner Strength Training',
+      'trainer': 'John Smith',
+      'trainerImage': 'JS',
+      'price': 45.99,
+      'duration': '8 weeks',
+      'category': 'Strength',
+      'startDate': DateTime.now().subtract(const Duration(days: 80)),
+      'endDate': DateTime.now().subtract(const Duration(days: 24)),
+      'progress': 100,
+      'status': 'completed',
+      'completedDate': DateTime.now().subtract(const Duration(days: 24)),
+      'hasRating': false,
+    },
+    {
+      'id': '6',
+      'title': 'HIIT Workout Challenge',
+      'trainer': 'Maria Garcia',
+      'trainerImage': 'MG',
+      'price': 35.99,
+      'duration': '4 weeks',
+      'category': 'Cardio',
+      'startDate': DateTime.now().subtract(const Duration(days: 60)),
+      'endDate': DateTime.now().subtract(const Duration(days: 32)),
+      'progress': 100,
+      'status': 'completed',
+      'completedDate': DateTime.now().subtract(const Duration(days: 32)),
+      'hasRating': true,
+      'rating': 5.0,
+      'review': 'Amazing program! Really helped me improve my cardio endurance.',
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     // Check if user just enrolled
     final args = Get.arguments;
@@ -209,52 +244,74 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+            ),
+            onPressed: () => Get.back(),
           ),
-          onPressed: () => Get.back(),
+          title: Text('My Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+          centerTitle: true,
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: AppColors.accent,
+            labelColor: AppColors.onPrimary,
+            unselectedLabelColor: AppColors.onPrimary.withOpacity(0.6),
+            labelStyle: AppTextStyles.titleSmall,
+            tabs: const [
+              Tab(text: 'Active'),
+              Tab(text: 'Scheduled'),
+              Tab(text: 'Completed'),
+            ],
+          ),
         ),
-        title: Text('My Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
-        centerTitle: true,
-        bottom: TabBar(
+        body: TabBarView(
           controller: _tabController,
-          indicatorColor: AppColors.accent,
-          labelColor: AppColors.onPrimary,
-          unselectedLabelColor: AppColors.onPrimary.withOpacity(0.6),
-          labelStyle: AppTextStyles.titleSmall,
-          tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'Scheduled'),
+          children: [
+            // Active Programs Tab
+            _buildProgramsList(_activePrograms, isActive: true),
+
+            // Scheduled Programs Tab
+            _buildProgramsList(_scheduledPrograms, isActive: false),
+
+            // Completed Programs Tab
+            _buildProgramsList(_completedPrograms, isActive: false, isCompleted: true),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // Active Programs Tab
-          _buildProgramsList(_activePrograms, isActive: true),
-
-          // Scheduled Programs Tab
-          _buildProgramsList(_scheduledPrograms, isActive: false),
-        ],
       ),
     );
   }
 
-  Widget _buildProgramsList(List<Map<String, dynamic>> programs, {required bool isActive}) {
+  Widget _buildProgramsList(List<Map<String, dynamic>> programs, {required bool isActive, bool isCompleted = false}) {
     if (programs.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(isActive ? Icons.fitness_center : Icons.event_available, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
+            Icon(
+              isCompleted
+                  ? Icons.check_circle_outline
+                  : isActive
+                  ? Icons.fitness_center
+                  : Icons.event_available,
+              size: 80,
+              color: AppColors.primaryGray.withOpacity(0.5),
+            ),
             const SizedBox(height: 16),
-            Text(isActive ? 'No Active Programs' : 'No Scheduled Programs', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
+            Text(
+              isCompleted
+                  ? 'No Completed Programs'
+                  : isActive
+                  ? 'No Active Programs'
+                  : 'No Scheduled Programs',
+              style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray),
+            ),
             const SizedBox(height: 8),
             Text('Explore the marketplace to find programs', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
             const SizedBox(height: 24),
@@ -274,12 +331,12 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
       itemCount: programs.length,
       itemBuilder: (context, index) {
         final program = programs[index];
-        return _buildProgramCard(program, isActive: isActive);
+        return _buildProgramCard(program, isActive: isActive, isCompleted: isCompleted);
       },
     );
   }
 
-  Widget _buildProgramCard(Map<String, dynamic> program, {required bool isActive}) {
+  Widget _buildProgramCard(Map<String, dynamic> program, {required bool isActive, bool isCompleted = false}) {
     // Handle null dates safely
     final startDate = program['startDate'] is DateTime
         ? program['startDate'] as DateTime
@@ -330,18 +387,36 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
               // Status Badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: isActive ? AppColors.completed.withOpacity(0.1) : AppColors.upcoming.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? AppColors.completed.withOpacity(0.1)
+                      : isActive
+                      ? AppColors.completed.withOpacity(0.1)
+                      : AppColors.upcoming.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Text(
-                  isActive ? 'Active' : 'Scheduled',
-                  style: AppTextStyles.labelSmall.copyWith(color: isActive ? AppColors.completed : AppColors.upcoming, fontWeight: FontWeight.bold),
+                  isCompleted
+                      ? 'Completed'
+                      : isActive
+                      ? 'Active'
+                      : 'Scheduled',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: isCompleted
+                        ? AppColors.completed
+                        : isActive
+                        ? AppColors.completed
+                        : AppColors.upcoming,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // Progress Bar (for active programs)
-          if (isActive) ...[
+          // Progress Bar (for active or completed programs)
+          if (isActive || isCompleted) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -353,7 +428,34 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
               ],
             ),
             const SizedBox(height: 8),
-            LinearProgressIndicator(value: progress / 100, backgroundColor: AppColors.primaryGray.withOpacity(0.2), valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent)),
+            LinearProgressIndicator(
+              value: progress / 100,
+              backgroundColor: AppColors.primaryGray.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(isCompleted ? AppColors.completed : AppColors.accent),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Rating badge for completed programs
+          if (isCompleted && program['hasRating'] == true) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ...List.generate(5, (index) {
+                    final rating = (program['rating'] ?? 0.0) as double;
+                    return Icon(index < rating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 16);
+                  }),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Rated',
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
           ],
 
@@ -368,32 +470,54 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
           const SizedBox(height: 16),
 
           // Action Buttons
-          Row(
+          Column(
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _viewProgramDetails(program),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: AppColors.accent, width: 2),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              // First Row: View Details and Cancel buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _viewProgramDetails(program),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: AppColors.accent, width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: Icon(Icons.visibility, size: 18, color: AppColors.accent),
+                      label: Text('View Details', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
+                    ),
                   ),
-                  icon: Icon(Icons.visibility, size: 18, color: AppColors.accent),
-                  label: Text('View Details', style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
-                ),
+                  if (canCancel) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showCancelDialog(program),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(color: Colors.red, width: 2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: Icon(Icons.cancel_outlined, size: 18, color: Colors.red),
+                        label: Text('Cancel', style: AppTextStyles.labelMedium.copyWith(color: Colors.red)),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              if (canCancel) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showCancelDialog(program),
-                    style: OutlinedButton.styleFrom(
+              // Second Row: Rate Trainer button (only for completed programs without rating)
+              if (isCompleted && program['hasRating'] != true) ...[
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _viewProgramDetails(program),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.red, width: 2),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    icon: Icon(Icons.cancel_outlined, size: 18, color: Colors.red),
-                    label: Text('Cancel', style: AppTextStyles.labelMedium.copyWith(color: Colors.red)),
+                    icon: const Icon(Icons.star, size: 18, color: Colors.white),
+                    label: Text('Rate Trainer', style: AppTextStyles.labelMedium.copyWith(color: Colors.white)),
                   ),
                 ),
               ],

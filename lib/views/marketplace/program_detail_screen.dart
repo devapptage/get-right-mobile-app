@@ -16,23 +16,37 @@ class ProgramDetailScreen extends StatefulWidget {
 
 class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
   final FavoritesController _favoritesController = Get.put(FavoritesController());
+  final _reviewFormKey = GlobalKey<FormState>();
+  final _reviewCommentController = TextEditingController();
   bool _isEnrolled = false; // Mock enrollment status - in real app, check from enrolled programs
   late Map<String, dynamic> _safeProgram; // Store program data for use in methods
+  double _rating = 0.0;
+  bool _hasSubmittedRating = false;
 
   // Mock enrolled content URLs
   final String _enrolledVideoUrl = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
   final String _pdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
 
   @override
+  void dispose() {
+    _reviewCommentController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> program = Get.arguments ?? _getMockProgramData();
     final programId = (program['id']?.toString() ?? program['title']?.toString() ?? 'unknown_program').replaceAll(' ', '_');
 
-    // Check if user is enrolled (mock - in real app, check from enrolled programs list)
-    _isEnrolled = program['isEnrolled'] ?? false;
-
     // Check if program is completed (from trainer profile)
     final bool isCompletedProgram = program['status'] == 'completed';
+    
+    // Check if user is enrolled (mock - in real app, check from enrolled programs list)
+    // For programs from My Programs (active, scheduled, or completed), user is enrolled
+    _isEnrolled = program['isEnrolled'] ?? 
+                  program['status'] == 'completed' || 
+                  program['status'] == 'active' || 
+                  program['status'] == 'scheduled';
 
     // Ensure required fields have defaults
     _safeProgram = {
@@ -50,8 +64,19 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
       'reviews': program['reviews'] ?? 0,
       'description': program['description'] ?? 'No description available',
       'status': program['status'],
+      'hasRating': program['hasRating'] ?? false,
+      'review': program['review'],
       ...program, // Keep any additional fields
     };
+    
+    // Initialize rating state if program has existing rating
+    if (_safeProgram['hasRating'] == true && _rating == 0.0) {
+      _rating = (_safeProgram['rating'] ?? 0.0) as double;
+      _hasSubmittedRating = true;
+      if (_safeProgram['review'] != null) {
+        _reviewCommentController.text = _safeProgram['review'].toString();
+      }
+    }
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -269,6 +294,20 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                         const SizedBox(height: 24),
                       ],
 
+                      // Trainer Rating Section (for completed programs)
+                      if (isCompletedProgram && _isEnrolled) ...[
+                        Text(
+                          _hasSubmittedRating || _safeProgram['hasRating'] == true ? 'Your Trainer Rating' : 'Rate Your Trainer',
+                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        if (_hasSubmittedRating || _safeProgram['hasRating'] == true)
+                          _buildExistingRatingCard()
+                        else
+                          _buildRatingForm(),
+                        const SizedBox(height: 24),
+                      ],
+
                       // Student Reviews
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -295,8 +334,8 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
               ),
             ],
           ),
-          // Bottom Purchase Bar (hidden for completed programs)
-          bottomNavigationBar: isCompletedProgram
+          // Bottom Purchase Bar (hidden for enrolled programs: completed, active, or scheduled)
+          bottomNavigationBar: _isEnrolled
               ? null
               : Container(
                   padding: const EdgeInsets.all(16),
@@ -695,6 +734,239 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildRatingForm() {
+    return Form(
+      key: _reviewFormKey,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.accent.withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Trainer Info Header
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.accent,
+                  child: Text(
+                    _safeProgram['trainerImage'] ?? 'UT',
+                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Rate ${_safeProgram['trainer']}',
+                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Share your experience with this trainer',
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Divider(color: AppColors.primaryGray, height: 1),
+            const SizedBox(height: 20),
+            
+            // Rating
+            Text('Your Rating', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Row(
+              children: List.generate(5, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _rating = (index + 1).toDouble();
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Icon(index < _rating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 36),
+                  ),
+                );
+              }),
+            ),
+            if (_rating > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                _rating == 1
+                    ? 'Poor'
+                    : _rating == 2
+                        ? 'Fair'
+                        : _rating == 3
+                            ? 'Good'
+                            : _rating == 4
+                                ? 'Very Good'
+                                : 'Excellent',
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+              ),
+            ],
+            const SizedBox(height: 24),
+
+            // Comment
+            Text('Your Review Comment', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            Text('Tell others about your experience with ${_safeProgram['trainer']}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _reviewCommentController,
+              maxLines: 4,
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+              decoration: InputDecoration(
+                hintText: 'Share your experience...',
+                hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                filled: true,
+                fillColor: AppColors.primaryVariant,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryGray.withOpacity(0.3)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryGray.withOpacity(0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.accent, width: 2),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please provide a comment';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+
+            // Submit Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _submitRating,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(
+                  'Submit Review',
+                  style: AppTextStyles.buttonMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExistingRatingCard() {
+    final existingRating = _safeProgram['rating'] ?? _rating;
+    final existingReview = _safeProgram['review'] ?? _reviewCommentController.text;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.accent.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Trainer Info
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.accent,
+                child: Text(
+                  _safeProgram['trainerImage'] ?? 'UT',
+                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.onAccent),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rating for ${_safeProgram['trainer']}',
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        ...List.generate(5, (index) {
+                          return Icon(index < existingRating ? Icons.star : Icons.star_border, color: AppColors.accent, size: 20);
+                        }),
+                        const SizedBox(width: 8),
+                        Text(
+                          existingRating.toStringAsFixed(1),
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(color: AppColors.primaryGray, height: 1),
+          const SizedBox(height: 12),
+          Text('Your Comment', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
+          const SizedBox(height: 4),
+          Text(
+            existingReview.toString().isNotEmpty ? existingReview.toString() : 'No comment provided',
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitRating() {
+    if (!_reviewFormKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_rating == 0) {
+      Get.snackbar('Missing Rating', 'Please provide a rating', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.error, colorText: Colors.white);
+      return;
+    }
+
+    // Update the program data
+    setState(() {
+      _hasSubmittedRating = true;
+      _safeProgram['hasRating'] = true;
+      _safeProgram['rating'] = _rating;
+      _safeProgram['review'] = _reviewCommentController.text;
+    });
+
+    Get.snackbar(
+      'Review Submitted',
+      'Thank you for your feedback!',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.completed,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
     );
   }
 }
