@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/models/run_model.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -1285,38 +1286,90 @@ class _PlannerScreenState extends State<PlannerScreen> {
   }
 
   Widget _buildRunSummarySection(Map<String, dynamic> run) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.accent, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.directions_run, color: AppColors.accent, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Running Summary',
-                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildDetailRow(Icons.route, 'Distance', run['distance']),
-          const SizedBox(height: 8),
-          _buildDetailRow(Icons.timer, 'Time', run['time']),
-          const SizedBox(height: 8),
-          _buildDetailRow(Icons.speed, 'Pace', run['pace']),
-          const SizedBox(height: 8),
-          _buildDetailRow(Icons.local_fire_department, 'Calories', run['calories'].toString()),
-        ],
+    return GestureDetector(
+      onTap: () => _viewRunDetails(run),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.accent, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.directions_run, color: AppColors.accent, size: 24),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Running Summary',
+                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppColors.accent, size: 20),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildDetailRow(Icons.route, 'Distance', run['distance']),
+            const SizedBox(height: 8),
+            _buildDetailRow(Icons.timer, 'Time', run['time']),
+            const SizedBox(height: 8),
+            _buildDetailRow(Icons.speed, 'Pace', run['pace']),
+            const SizedBox(height: 8),
+            _buildDetailRow(Icons.local_fire_department, 'Calories', run['calories'].toString()),
+          ],
+        ),
       ),
     );
+  }
+
+  void _viewRunDetails(Map<String, dynamic> runData) {
+    // Parse the run data from planner format to RunModel
+    try {
+      // Parse distance (e.g., "3.00 km" -> 3000 meters)
+      final distanceStr = runData['distance']?.toString() ?? '0 km';
+      final distanceMatch = RegExp(r'([\d.]+)\s*km').firstMatch(distanceStr);
+      final distanceKm = distanceMatch != null ? double.tryParse(distanceMatch.group(1) ?? '0') ?? 0.0 : 0.0;
+      final distanceMeters = distanceKm * 1000;
+
+      // Parse time (e.g., "20:00" -> Duration)
+      final timeStr = runData['time']?.toString() ?? '0:00';
+      final timeParts = timeStr.split(':');
+      final minutes = timeParts.length >= 1 ? int.tryParse(timeParts[0]) ?? 0 : 0;
+      final seconds = timeParts.length >= 2 ? int.tryParse(timeParts[1]) ?? 0 : 0;
+      final duration = Duration(minutes: minutes, seconds: seconds);
+
+      // Parse pace (e.g., "4:00 /km" -> averagePace in min/km)
+      final paceStr = runData['pace']?.toString() ?? '0:00 /km';
+      final paceMatch = RegExp(r'(\d+):(\d+)\s*\/km').firstMatch(paceStr);
+      final paceMinutes = paceMatch != null ? int.tryParse(paceMatch.group(1) ?? '0') ?? 0 : 0;
+      final paceSeconds = paceMatch != null ? int.tryParse(paceMatch.group(2) ?? '0') ?? 0 : 0;
+      final averagePace = paceMinutes + (paceSeconds / 60.0);
+
+      // Get calories
+      final calories = runData['calories'] is int ? runData['calories'] as int : (runData['calories'] is String ? int.tryParse(runData['calories'].toString()) ?? 0 : 0);
+
+      // Create RunModel from parsed data
+      final runModel = RunModel(
+        id: 'planner_${_selectedDate.millisecondsSinceEpoch}',
+        userId: 'current_user',
+        activityType: 'run',
+        distanceMeters: distanceMeters,
+        duration: duration,
+        startTime: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, DateTime.now().hour, DateTime.now().minute),
+        endTime: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, DateTime.now().hour, DateTime.now().minute).add(duration),
+        averagePace: averagePace,
+        caloriesBurned: calories > 0 ? calories : null,
+        createdAt: _selectedDate,
+      );
+
+      Get.toNamed(AppRoutes.runDetail, arguments: runModel);
+    } catch (e) {
+      Get.snackbar('Error', 'Unable to view run details: $e', backgroundColor: AppColors.error, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+    }
   }
 
   Widget _buildNutritionSummarySection(Map<String, dynamic> nutrition) {

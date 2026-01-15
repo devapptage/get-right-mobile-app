@@ -417,7 +417,6 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            // Start Run button
             Expanded(
               child: SizedBox(
                 height: 56,
