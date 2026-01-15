@@ -94,15 +94,14 @@ class _PreferenceSelectionScreenState extends State<PreferenceSelectionScreen> {
                       isSelected: _selectedPreference == 'Running & Cardio',
                       onTap: () => setState(() => _selectedPreference = 'Running & Cardio'),
                     ),
-                    const SizedBox(height: 35),
+                    const Spacer(),
                     CustomButton(
                       text: 'Continue',
-                      onPressed: _selectedPreference != null
-                          ? () => Get.toNamed(AppRoutes.goalSelection, arguments: {'preference': _selectedPreference})
-                          : null,
+                      onPressed: _selectedPreference != null ? () => Get.toNamed(AppRoutes.goalSelection, arguments: {'preference': _selectedPreference}) : null,
                       backgroundColor: _selectedPreference != null ? AppColors.accent : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

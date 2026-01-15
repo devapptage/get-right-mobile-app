@@ -397,16 +397,17 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen> {
       right: 16,
       child: SafeArea(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Save Route button
             Expanded(
               child: SizedBox(
                 height: 56,
                 child: OutlinedButton.icon(
-                  onPressed: _routePoints.isEmpty ? null : _saveRoute,
+                  onPressed: _saveRoute,
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: _routePoints.isEmpty ? AppColors.primaryGray : AppColors.accent, width: 2),
-                    foregroundColor: AppColors.accent,
+                    foregroundColor: _routePoints.isEmpty ? AppColors.primaryGray : AppColors.accent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     backgroundColor: AppColors.black.withOpacity(0.7),
                   ),
@@ -420,18 +421,24 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen> {
             Expanded(
               child: SizedBox(
                 height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: _routePoints.isEmpty ? null : _startRunWithRoute,
+                child: ElevatedButton(
+                  onPressed: _startRunWithRoute,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: _routePoints.isEmpty ? AppColors.primaryGray : AppColors.accent,
                     foregroundColor: AppColors.onAccent,
                     disabledBackgroundColor: AppColors.primaryGray,
                     elevation: 4,
                     shadowColor: AppColors.accent.withOpacity(0.5),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  icon: const Icon(Icons.play_arrow_rounded, size: 28),
-                  label: Text('Start', style: AppTextStyles.buttonLarge),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.play_arrow_rounded, size: 20),
+                      const SizedBox(width: 2),
+                      Text('Start', style: AppTextStyles.buttonLarge.copyWith(color: AppColors.onAccent)),
+                    ],
+                  ),
                 ),
               ),
             ),
