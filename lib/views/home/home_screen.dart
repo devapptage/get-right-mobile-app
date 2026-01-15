@@ -7,6 +7,7 @@ import 'package:get_right/views/journal/combined_journal_screen.dart';
 import 'package:get_right/views/feed/feed_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
+import 'package:get_right/views/nutrition/nutrition_screen.dart';
 import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/widgets/common/app_drawer.dart';
 
@@ -23,11 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _screens = const [
-    FeedScreen(), // Community Feed
     MarketplaceScreen(), // Marketplace
+    FeedScreen(), // Community Feed
     CombinedJournalScreen(), // Journal (Center - Workout Journal + Runner Log)
     LibraryScreen(), // Library
-    ProfileScreen(), // Home
+    NutritionScreen(), // Home
   ];
 
   @override
@@ -72,11 +73,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProfessionalBottomNav() {
     final navItems = [
       // {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
-      {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Feed'},
       {'icon': Icons.storefront_outlined, 'activeIcon': Icons.storefront_rounded, 'label': 'Market'},
+      {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Feed'},
       {'icon': Icons.add_circle_outline, 'activeIcon': Icons.add_circle, 'label': 'Journal'},
       {'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded, 'label': 'Library'},
-      {'icon': Icons.person_outline, 'activeIcon': Icons.person_rounded, 'label': 'Profile'},
+      {'icon': Icons.restaurant_menu_outlined, 'activeIcon': Icons.restaurant_menu_rounded, 'label': 'Nutrition'},
     ];
 
     return ClipRRect(

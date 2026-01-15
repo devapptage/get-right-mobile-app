@@ -44,7 +44,6 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
                 _buildStatsSection(run),
                 _buildDetailedStats(run),
                 if (run.splits != null && run.splits!.isNotEmpty) _buildSplitsSection(run),
-                _buildNotesSection(run),
                 _buildActionButtons(run),
                 const SizedBox(height: 24),
               ],
@@ -433,40 +432,6 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
   }
 
   /// Build notes section
-  Widget _buildNotesSection(RunModel run) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.note_outlined, color: AppColors.accent, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Notes',
-                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            run.notes ?? 'No notes added',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: run.notes != null ? AppColors.onSurface : AppColors.primaryGray,
-              fontStyle: run.notes == null ? FontStyle.italic : FontStyle.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   /// Build action buttons
   Widget _buildActionButtons(RunModel run) {

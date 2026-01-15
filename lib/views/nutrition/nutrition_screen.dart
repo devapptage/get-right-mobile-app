@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/controllers/nutrition_controller.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
@@ -37,15 +38,58 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-          ),
-          onPressed: () => Get.back(),
-        ),
+        centerTitle: true,
+        leading: Obx(() {
+          final notificationController = Get.find<NotificationController>();
+          final unreadCount = notificationController.unreadCount;
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                icon: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 3,
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                    ),
+                    Container(
+                      width: 25,
+                      height: 3,
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                    ),
+                    Container(
+                      width: 20,
+                      height: 3,
+                      decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                    ),
+                  ],
+                ),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ).paddingOnly(left: 10),
+              if (unreadCount > 0)
+                Positioned(
+                  right: 0,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                    child: Text(
+                      unreadCount > 99 ? '99+' : '$unreadCount',
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, height: 1.0),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }),
         title: Text(
           'Nutrition',
           style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),

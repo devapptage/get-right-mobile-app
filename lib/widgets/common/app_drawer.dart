@@ -55,16 +55,6 @@ class AppDrawer extends StatelessWidget {
                 _buildSectionLabel('FITNESS'),
 
                 _buildDrawerItem(
-                  icon: Icons.restaurant_menu_outlined,
-                  activeIcon: Icons.restaurant_menu,
-                  title: 'Calorie Tracker',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.nutrition);
-                  },
-                ),
-
-                _buildDrawerItem(
                   icon: Icons.trending_up,
                   activeIcon: Icons.trending_up,
                   title: 'Progress',
