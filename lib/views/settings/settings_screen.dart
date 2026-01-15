@@ -16,6 +16,14 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ),
+          onPressed: () => Get.back(),
+        ),
         title: Text('Settings', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
         centerTitle: true,
       ),
@@ -73,12 +81,6 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           // Notifications Settings
-          ListTile(
-            leading: const Icon(Icons.tune, color: AppColors.onBackground),
-            title: Text('Notification Preferences', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
-            trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
-            onTap: () => Get.toNamed(AppRoutes.notifications),
-          ),
 
           // const Divider(height: 32),
 
