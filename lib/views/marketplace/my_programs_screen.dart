@@ -246,6 +246,11 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Get.offAllNamed(AppRoutes.home);
+        }
+      },
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -254,7 +259,7 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
               decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
               child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
             ),
-            onPressed: () => Get.back(),
+            onPressed: () => Get.offAllNamed(AppRoutes.home),
           ),
           title: Text('My Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
           centerTitle: true,
