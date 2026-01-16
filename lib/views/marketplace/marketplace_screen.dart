@@ -1713,7 +1713,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           }),
           title: Text(
             'Marketplace',
-            style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
           ),
           centerTitle: true,
           actions: [

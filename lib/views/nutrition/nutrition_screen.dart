@@ -92,7 +92,7 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
         }),
         title: Text(
           'Nutrition',
-          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(70),

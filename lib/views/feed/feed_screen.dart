@@ -201,18 +201,18 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           }),
           title: Text(
             'Community Feed',
-            style: AppTextStyles.titleLarge.copyWith(color: const Color(0xFF000000), fontWeight: FontWeight.w900),
+            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
           ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.search, color: Color(0xFF000000)),
+              icon: const Icon(Icons.search, color: AppColors.accent),
               onPressed: () {
                 // TODO: Implement search
               },
             ),
             IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: Color(0xFF000000)),
+              icon: const Icon(Icons.notifications_outlined, color: AppColors.accent),
               onPressed: () {
                 // TODO: Show notifications
               },

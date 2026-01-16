@@ -100,11 +100,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
           child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
         ).paddingAll(8),
-        title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppColors.onPrimary),
+            icon: const Icon(Icons.settings_outlined, color: AppColors.accent),
             onPressed: () => Get.toNamed(AppRoutes.settings),
           ),
         ],
@@ -193,14 +193,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 const SizedBox(height: 4),
                 Text('Training for strength and building a better version of myself every day.', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
                 const SizedBox(height: 4),
-                Text(
-                  'getright.com/brogan',
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w500),
-                ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
 
           // Personal Records Section
           Padding(
