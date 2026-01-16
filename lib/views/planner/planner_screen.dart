@@ -5,6 +5,7 @@ import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 /// Planner screen - workout plans and calendar with color-coded entries
 class PlannerScreen extends StatefulWidget {
@@ -21,32 +22,271 @@ class _PlannerScreenState extends State<PlannerScreen> {
 
   // Mock workout data for calendar (status: completed, incomplete, rest)
   final Map<DateTime, Map<String, dynamic>> _dayData = {
+    // December 2025 mock data
+    DateTime(2025, 12, 1): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': true,
+      'workout': {'duration': '45:00', 'exercises': 5, 'sets': 15, 'calories': 450},
+      'run': null,
+      'nutrition': {'calories': '2100/2200', 'protein': '140g', 'carbs': '220g', 'fats': '65g'},
+      'notes': 'Started new program',
+    },
+    DateTime(2025, 12, 2): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': {'distance': '5.20 km', 'time': '28:00', 'pace': '5:23 /km', 'calories': 320},
+      'nutrition': {'calories': '1950/2200', 'protein': '130g', 'carbs': '210g', 'fats': '58g'},
+      'notes': 'Morning run',
+    },
     DateTime(2025, 12, 3): {
-      'workoutStatus': 'completed', // completed, incomplete, rest
+      'workoutStatus': 'completed',
       'hasProgressPhoto': true,
       'workout': {'duration': '30:00', 'exercises': 4, 'sets': 12, 'calories': 300},
       'run': null,
-      'nutrition': null,
+      'nutrition': {'calories': '1850/2200', 'protein': '145g', 'carbs': '195g', 'fats': '62g'},
       'notes': '',
+    },
+    DateTime(2025, 12, 4): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '60:00', 'exercises': 6, 'sets': 18, 'calories': 550},
+      'run': null,
+      'nutrition': {'calories': '2150/2200', 'protein': '155g', 'carbs': '230g', 'fats': '70g'},
+      'notes': 'Leg day - intense session',
     },
     DateTime(2025, 12, 5): {
       'workoutStatus': 'completed',
       'hasProgressPhoto': true,
       'workout': {'duration': '30:00', 'exercises': 4, 'sets': 12, 'calories': 300},
       'run': {'distance': '3.00 km', 'time': '20:00', 'pace': '4:00 /km', 'calories': 250},
-      'nutrition': {'calories': '1800/2200', 'protein': '150g', 'carbs': '200g', 'fats': '60g'},
+      'nutrition': {'calories': '1800/2200', 'protein': '120g', 'carbs': '200g', 'fats': '60g'},
       'notes': 'Great workout today!',
     },
-    DateTime(2025, 12, 7): {'workoutStatus': 'rest', 'hasProgressPhoto': false, 'workout': null, 'run': null, 'nutrition': null, 'notes': 'Rest day - recovery'},
+    DateTime(2025, 12, 6): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': null,
+      'nutrition': {'calories': '1900/2200', 'protein': '125g', 'carbs': '205g', 'fats': '63g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 7): {
+      'workoutStatus': 'rest',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': null,
+      'nutrition': {'calories': '1600/2200', 'protein': '100g', 'carbs': '180g', 'fats': '55g'},
+      'notes': 'Rest day - recovery',
+    },
+    DateTime(2025, 12, 8): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '40:00', 'exercises': 5, 'sets': 14, 'calories': 380},
+      'run': null,
+      'nutrition': {'calories': '2050/2200', 'protein': '150g', 'carbs': '215g', 'fats': '68g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 9): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': true,
+      'workout': null,
+      'run': {'distance': '8.50 km', 'time': '45:00', 'pace': '5:18 /km', 'calories': 520},
+      'nutrition': {'calories': '2250/2200', 'protein': '135g', 'carbs': '240g', 'fats': '72g'},
+      'notes': 'Long run - feeling strong',
+    },
+    DateTime(2025, 12, 10): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '35:00', 'exercises': 4, 'sets': 13, 'calories': 330},
+      'run': null,
+      'nutrition': {'calories': '1950/2200', 'protein': '142g', 'carbs': '208g', 'fats': '64g'},
+      'notes': '',
+    },
     DateTime(2025, 12, 11): {
       'workoutStatus': 'incomplete',
       'hasProgressPhoto': false,
       'workout': {'duration': '30:00', 'exercises': 4, 'sets': 12, 'calories': 300},
       'run': null,
       'nutrition': null,
+      'notes': 'Planned workout',
+    },
+    DateTime(2025, 12, 12): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '50:00', 'exercises': 6, 'sets': 16, 'calories': 480},
+      'run': {'distance': '4.20 km', 'time': '22:00', 'pace': '4:14 /km', 'calories': 280},
+      'nutrition': {'calories': '2200/2200', 'protein': '160g', 'carbs': '225g', 'fats': '75g'},
+      'notes': 'Double session day',
+    },
+    DateTime(2025, 12, 13): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': true,
+      'workout': {'duration': '38:00', 'exercises': 5, 'sets': 15, 'calories': 360},
+      'run': null,
+      'nutrition': {'calories': '1980/2200', 'protein': '148g', 'carbs': '212g', 'fats': '66g'},
       'notes': '',
     },
+    DateTime(2025, 12, 14): {
+      'workoutStatus': 'rest',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': null,
+      'nutrition': {'calories': '1650/2200', 'protein': '105g', 'carbs': '185g', 'fats': '56g'},
+      'notes': 'Active recovery - light walk',
+    },
+    DateTime(2025, 12, 15): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '42:00', 'exercises': 5, 'sets': 14, 'calories': 400},
+      'run': null,
+      'nutrition': {'calories': '2100/2200', 'protein': '152g', 'carbs': '218g', 'fats': '69g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 16): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': {'distance': '6.80 km', 'time': '36:00', 'pace': '5:18 /km', 'calories': 410},
+      'nutrition': {'calories': '1920/2200', 'protein': '128g', 'carbs': '202g', 'fats': '61g'},
+      'notes': 'Evening run',
+    },
+    DateTime(2025, 12, 17): {
+      'workoutStatus': 'incomplete',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '35:00', 'exercises': 4, 'sets': 13, 'calories': 340},
+      'run': null,
+      'nutrition': null,
+      'notes': 'Scheduled workout',
+    },
+    DateTime(2025, 12, 18): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': true,
+      'workout': {'duration': '55:00', 'exercises': 7, 'sets': 20, 'calories': 600},
+      'run': null,
+      'nutrition': {'calories': '2300/2200', 'protein': '165g', 'carbs': '245g', 'fats': '80g'},
+      'notes': 'Weekend warrior session',
+    },
+    DateTime(2025, 12, 19): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': {'distance': '10.00 km', 'time': '52:00', 'pace': '5:12 /km', 'calories': 620},
+      'nutrition': {'calories': '2180/2200', 'protein': '138g', 'carbs': '235g', 'fats': '73g'},
+      'notes': '10K milestone!',
+    },
+    DateTime(2025, 12, 20): {
+      'workoutStatus': 'rest',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': null,
+      'nutrition': {'calories': '1700/2200', 'protein': '110g', 'carbs': '190g', 'fats': '58g'},
+      'notes': 'Rest day',
+    },
+    DateTime(2025, 12, 21): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '33:00', 'exercises': 4, 'sets': 12, 'calories': 310},
+      'run': null,
+      'nutrition': {'calories': '2000/2200', 'protein': '146g', 'carbs': '210g', 'fats': '65g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 22): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '48:00', 'exercises': 6, 'sets': 17, 'calories': 470},
+      'run': {'distance': '3.50 km', 'time': '18:00', 'pace': '3:51 /km', 'calories': 240},
+      'nutrition': {'calories': '2250/2200', 'protein': '158g', 'carbs': '238g', 'fats': '76g'},
+      'notes': 'Fast run today',
+    },
+    DateTime(2025, 12, 23): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': true,
+      'workout': {'duration': '40:00', 'exercises': 5, 'sets': 15, 'calories': 390},
+      'run': null,
+      'nutrition': {'calories': '1950/2200', 'protein': '143g', 'carbs': '207g', 'fats': '64g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 24): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': {'distance': '5.00 km', 'time': '25:00', 'pace': '5:00 /km', 'calories': 310},
+      'nutrition': {'calories': '2400/2200', 'protein': '120g', 'carbs': '280g', 'fats': '85g'},
+      'notes': 'Christmas Eve run',
+    },
+    DateTime(2025, 12, 25): {
+      'workoutStatus': 'rest',
+      'hasProgressPhoto': false,
+      'workout': null,
+      'run': null,
+      'nutrition': {'calories': '2500/2200', 'protein': '110g', 'carbs': '300g', 'fats': '90g'},
+      'notes': 'Christmas - family time',
+    },
+    DateTime(2025, 12, 26): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '45:00', 'exercises': 5, 'sets': 16, 'calories': 440},
+      'run': null,
+      'nutrition': {'calories': '2050/2200', 'protein': '151g', 'carbs': '220g', 'fats': '68g'},
+      'notes': 'Back to routine',
+    },
+    DateTime(2025, 12, 27): {
+      'workoutStatus': 'incomplete',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '30:00', 'exercises': 4, 'sets': 12, 'calories': 300},
+      'run': null,
+      'nutrition': null,
+      'notes': 'Planned workout',
+    },
+    DateTime(2025, 12, 28): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '50:00', 'exercises': 6, 'sets': 18, 'calories': 500},
+      'run': null,
+      'nutrition': {'calories': '2120/2200', 'protein': '154g', 'carbs': '222g', 'fats': '71g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 29): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': true,
+      'workout': null,
+      'run': {'distance': '7.20 km', 'time': '38:00', 'pace': '5:17 /km', 'calories': 450},
+      'nutrition': {'calories': '1970/2200', 'protein': '132g', 'carbs': '209g', 'fats': '63g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 30): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '43:00', 'exercises': 5, 'sets': 15, 'calories': 420},
+      'run': null,
+      'nutrition': {'calories': '2080/2200', 'protein': '149g', 'carbs': '216g', 'fats': '67g'},
+      'notes': '',
+    },
+    DateTime(2025, 12, 31): {
+      'workoutStatus': 'completed',
+      'hasProgressPhoto': false,
+      'workout': {'duration': '60:00', 'exercises': 7, 'sets': 21, 'calories': 650},
+      'run': {'distance': '5.50 km', 'time': '28:00', 'pace': '5:05 /km', 'calories': 340},
+      'nutrition': {'calories': '2350/2200', 'protein': '162g', 'carbs': '248g', 'fats': '78g'},
+      'notes': 'End of year challenge!',
+    },
   };
+
+  String _formatRunTime(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds.remainder(60);
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String _formatPace(double paceMinPerKm) {
+    if (paceMinPerKm == 0 || paceMinPerKm.isInfinite || paceMinPerKm.isNaN) {
+      return '--:-- /km';
+    }
+    final minutes = paceMinPerKm.floor();
+    final seconds = ((paceMinPerKm - minutes) * 60).round();
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')} /km';
+  }
 
   Map<String, dynamic>? _getDataForDate(DateTime date) {
     final key = DateTime(date.year, date.month, date.day);
@@ -59,9 +299,12 @@ class _PlannerScreenState extends State<PlannerScreen> {
 
     final status = data['workoutStatus'];
 
-    if (status == 'completed') return const Color(0xFF90EE90); // Light green
-    if (status == 'incomplete') return const Color(0xFF29603C); // Dark green
-    if (status == 'rest') return const Color(0xFF4A90E2); // Blue
+    // Completed workouts: Light green
+    if (status == 'completed') return const Color(0xFF90EE90);
+    // Planned/incomplete workouts: Dark green
+    if (status == 'incomplete') return const Color(0xFF29603C);
+    // Rest day: Blue
+    if (status == 'rest') return const Color(0xFF4A90E2);
 
     return Colors.transparent;
   }
@@ -957,6 +1200,32 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   // Calendar grid
                   _buildCalendarGrid(),
                   const SizedBox(height: 16),
+
+                  // Pagination dots below calendar
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), shape: BoxShape.circle),
+                        ),
+                      ],
+                    ),
+                  ).paddingOnly(bottom: 16),
                 ],
               ),
             ),
@@ -965,12 +1234,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
             // Selected date header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(_formatDate(_selectedDate), style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-                  Text('Select Date', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent)),
-                ],
+              child: Text(
+                _formatDate(_selectedDate),
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 12),
@@ -1036,13 +1302,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
             child: Container(
               margin: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.accent.withOpacity(0.2) : (dateColor != Colors.transparent ? dateColor : Colors.transparent),
+                color: isSelected ? AppColors.accent : (dateColor != Colors.transparent ? dateColor : Colors.transparent),
                 borderRadius: BorderRadius.circular(8),
-                border: isToday
-                    ? Border.all(color: AppColors.accent, width: 2)
-                    : isSelected
-                    ? Border.all(color: AppColors.accent, width: 1)
-                    : null,
+                border: isToday && !isSelected ? Border.all(color: AppColors.accent, width: 2) : null,
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -1050,7 +1312,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   Text(
                     '$day',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: isSelected || isToday ? AppColors.onBackground : (dateColor != Colors.transparent ? AppColors.onSurface : AppColors.primaryGray),
+                      color: isSelected ? AppColors.onAccent : (isToday ? AppColors.onBackground : (dateColor != Colors.transparent ? AppColors.onSurface : AppColors.primaryGray)),
                       fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
@@ -1112,14 +1374,49 @@ class _PlannerScreenState extends State<PlannerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Progress Photos
-          if (data['hasProgressPhoto']) _buildProgressPhotosSection(),
+          // Progress Photos Section with swipe hint
+          if (data['hasProgressPhoto']) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Text('Swipe left for Progress Pictures', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray))],
+            ),
+            const SizedBox(height: 8),
+            // Pagination dots for progress photos
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 4),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 4),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), shape: BoxShape.circle),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildProgressPhotosSection(),
+            const SizedBox(height: 12),
+          ],
 
           // Workout Summary
           if (data['workout'] != null) _buildWorkoutSummarySection(data['workout']),
 
           // Run Summary
           if (data['run'] != null) _buildRunSummarySection(data['run']),
+
+          // Simple Calories Card (when only run calories available, no nutrition card)
+          if (data['run'] != null && data['nutrition'] == null && data['workout'] == null) _buildSimpleCaloriesCard(data['run']),
 
           // Nutrition Summary
           if (data['nutrition'] != null) _buildNutritionSummarySection(data['nutrition']),
@@ -1187,7 +1484,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -1256,22 +1553,24 @@ class _PlannerScreenState extends State<PlannerScreen> {
             children: [
               const Icon(Icons.fitness_center, color: AppColors.accent, size: 24),
               const SizedBox(width: 8),
-              Text(
-                'Workout Summary',
-                style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              Expanded(
                 child: Text(
-                  '30:00',
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                  'Workout Summary',
+                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.share_outlined, color: AppColors.accent, size: 20),
+                onPressed: () => _showShareOptions(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ],
           ),
           const SizedBox(height: 16),
+          // Duration first, then other stats
+          _buildDetailRow(Icons.timer, 'Duration', workout['duration'] ?? 'N/A'),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -1279,6 +1578,31 @@ class _PlannerScreenState extends State<PlannerScreen> {
               _buildStatItem(Icons.repeat, 'Sets', workout['sets'].toString()),
               _buildStatItem(Icons.local_fire_department, 'Calories', workout['calories'].toString()),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleCaloriesCard(Map<String, dynamic> run) {
+    final calories = run['calories']?.toString() ?? '0';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.local_fire_department, color: AppColors.primaryGray, size: 20),
+          const SizedBox(width: 12),
+          Text('Calories', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+          const Spacer(),
+          Text(
+            calories,
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -1309,17 +1633,22 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.accent, size: 20),
+                IconButton(
+                  icon: const Icon(Icons.share_outlined, color: AppColors.accent, size: 20),
+                  onPressed: () => _showShareOptions(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
               ],
             ),
             const SizedBox(height: 16),
-            _buildDetailRow(Icons.route, 'Distance', run['distance']),
+            _buildDetailRow(Icons.route, 'Distance', run['distance'] ?? '0 km'),
             const SizedBox(height: 8),
-            _buildDetailRow(Icons.timer, 'Time', run['time']),
+            _buildDetailRow(Icons.timer, 'Time', run['time'] ?? '0:00'),
             const SizedBox(height: 8),
-            _buildDetailRow(Icons.speed, 'Pace', run['pace']),
+            _buildDetailRow(Icons.speed, 'Pace', run['pace'] ?? '--:-- /km'),
             const SizedBox(height: 8),
-            _buildDetailRow(Icons.local_fire_department, 'Calories', run['calories'].toString()),
+            _buildDetailRow(Icons.local_fire_department, 'Calories', (run['calories'] ?? 0).toString()),
           ],
         ),
       ),
@@ -1327,8 +1656,14 @@ class _PlannerScreenState extends State<PlannerScreen> {
   }
 
   void _viewRunDetails(Map<String, dynamic> runData) {
-    // Parse the run data from planner format to RunModel
     try {
+      // If we have the actual RunModel stored, use it directly
+      if (runData['runModel'] != null && runData['runModel'] is RunModel) {
+        Get.toNamed(AppRoutes.runDetail, arguments: runData['runModel'] as RunModel);
+        return;
+      }
+
+      // Otherwise, parse the run data from planner format to RunModel
       // Parse distance (e.g., "3.00 km" -> 3000 meters)
       final distanceStr = runData['distance']?.toString() ?? '0 km';
       final distanceMatch = RegExp(r'([\d.]+)\s*km').firstMatch(distanceStr);
@@ -1354,7 +1689,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
 
       // Create RunModel from parsed data
       final runModel = RunModel(
-        id: 'planner_${_selectedDate.millisecondsSinceEpoch}',
+        id: runData['id'] ?? 'planner_${_selectedDate.millisecondsSinceEpoch}',
         userId: 'current_user',
         activityType: 'run',
         distanceMeters: distanceMeters,
@@ -1483,6 +1818,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
     if (date.year == today.year && date.month == today.month && date.day == today.day) {
       return 'Today\'s Schedule';
     }
-    return '${_getMonthName(date.month)} ${date.day}, ${date.year}';
+    // Format as "DEC 5, 2025" to match design
+    final monthAbbrev = DateFormat('MMM').format(date).toUpperCase();
+    return '$monthAbbrev ${date.day}, ${date.year}';
   }
 }
