@@ -11,6 +11,7 @@ class ProgressScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text('Progress', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         leading: IconButton(
           icon: Container(

@@ -533,12 +533,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 20),
           ),
           onPressed: () {
-            Scaffold.of(context).openDrawer();
+            Get.back();
           },
         ),
         title: Text(
           'My Workouts',
-          style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w700),
+          style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
@@ -15,6 +16,7 @@ class FeedScreen extends StatefulWidget {
 
 class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _storageService = Get.find<StorageService>();
 
   // Mock feed data
   final List<Map<String, dynamic>> _feedPosts = [
@@ -554,12 +556,18 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                       _buildInteractionButton(
                         icon: post['isSaved'] ? Icons.bookmark : Icons.bookmark_border,
                         label: _formatCount(post['saves']),
-                        color: post['isSaved'] ? AppColors.completed : AppColors.primaryGray,
-                        onTap: () {
+                        color: post['isSaved'] ? AppColors.accent : AppColors.primaryGray,
+                        onTap: () async {
+                          final isSaved = post['isSaved'] ?? false;
                           setState(() {
-                            post['isSaved'] = !post['isSaved'];
-                            post['saves'] += post['isSaved'] ? 1 : -1;
+                            post['isSaved'] = !isSaved;
+                            post['saves'] += !isSaved ? 1 : -1;
                           });
+                          if (!isSaved) {
+                            await _storageService.addSavedPost(post);
+                          } else {
+                            await _storageService.removeSavedPost(post['id']);
+                          }
                         },
                       ),
                       const SizedBox(width: 16),
@@ -749,17 +757,23 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
     );
   }
 
-  void _handlePostAction(String action, Map<String, dynamic> post) {
+  void _handlePostAction(String action, Map<String, dynamic> post) async {
     switch (action) {
       case 'save':
+        final isSaved = post['isSaved'] ?? false;
         setState(() {
-          post['isSaved'] = !post['isSaved'];
+          post['isSaved'] = !isSaved;
         });
+        if (!isSaved) {
+          await _storageService.addSavedPost(post);
+        } else {
+          await _storageService.removeSavedPost(post['id']);
+        }
         Get.snackbar(
-          post['isSaved'] ? 'Saved' : 'Unsaved',
-          post['isSaved'] ? 'Post saved to your collection' : 'Post removed from collection',
-          backgroundColor: AppColors.completed,
-          colorText: AppColors.onError,
+          !isSaved ? 'Saved' : 'Unsaved',
+          !isSaved ? 'Post saved to your collection' : 'Post removed from collection',
+          backgroundColor: AppColors.accent,
+          colorText: AppColors.onAccent,
           snackPosition: SnackPosition.BOTTOM,
           duration: const Duration(seconds: 2),
         );

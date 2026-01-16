@@ -373,4 +373,45 @@ class StorageService {
   String? getExerciseFrequency() {
     return getString(AppConstants.keyExerciseFrequency);
   }
+
+  // Saved Posts Methods
+
+  /// Save bookmarked posts
+  Future<bool> saveSavedPosts(List<Map<String, dynamic>> posts) async {
+    final List<String> postsJson = posts.map((post) => jsonEncode(post)).toList();
+    return await saveStringList(AppConstants.keySavedPosts, postsJson);
+  }
+
+  /// Get saved posts
+  List<Map<String, dynamic>> getSavedPosts() {
+    final List<String>? postsJson = getStringList(AppConstants.keySavedPosts);
+    if (postsJson == null || postsJson.isEmpty) {
+      return [];
+    }
+    return postsJson.map((postJson) => jsonDecode(postJson) as Map<String, dynamic>).toList();
+  }
+
+  /// Add a saved post
+  Future<bool> addSavedPost(Map<String, dynamic> post) async {
+    final savedPosts = getSavedPosts();
+    // Check if post already exists
+    if (!savedPosts.any((p) => p['id'] == post['id'])) {
+      savedPosts.add(post);
+      return await saveSavedPosts(savedPosts);
+    }
+    return true;
+  }
+
+  /// Remove a saved post
+  Future<bool> removeSavedPost(String postId) async {
+    final savedPosts = getSavedPosts();
+    savedPosts.removeWhere((p) => p['id'] == postId);
+    return await saveSavedPosts(savedPosts);
+  }
+
+  /// Check if post is saved
+  bool isPostSaved(String postId) {
+    final savedPosts = getSavedPosts();
+    return savedPosts.any((p) => p['id'] == postId);
+  }
 }

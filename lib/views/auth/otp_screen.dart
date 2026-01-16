@@ -210,7 +210,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                           // Verify button
                           GetBuilder<AuthController>(
                             builder: (controller) {
-                              return CustomButton(text: 'Verify Code', onPressed: () => Get.offAllNamed(AppRoutes.profileSetup));
+                              return CustomButton(text: 'Verify Code', onPressed: () => Get.toNamed(AppRoutes.profileSetup));
                             },
                           ),
                           const SizedBox(height: 32),

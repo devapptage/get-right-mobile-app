@@ -96,10 +96,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        leading: Container(
-          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-          child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-        ).paddingAll(8),
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ).paddingAll(8),
+        ),
         title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [

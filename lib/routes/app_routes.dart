@@ -95,6 +95,7 @@ class AppRoutes {
   static const String feed = '/feed';
   static const String createPost = '/create-post';
   static const String postDetail = '/post-detail';
+  static const String savedPosts = '/saved-posts';
 
   // Search Routes
   static const String search = '/search';

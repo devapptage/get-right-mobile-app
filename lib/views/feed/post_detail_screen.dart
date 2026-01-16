@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
@@ -16,6 +17,7 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _commentController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final _storageService = Get.find<StorageService>();
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
 
@@ -61,7 +63,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
     super.initState();
     _post = Get.arguments as Map<String, dynamic>? ?? _getMockPost();
     _isLiked = _post['isLiked'] ?? false;
-    _isSaved = _post['isSaved'] ?? false;
+    _isSaved = _storageService.isPostSaved(_post['id'] ?? '');
     _likes = _post['likes'] ?? 0;
 
     // Initialize like animation
@@ -282,8 +284,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
                         // Share button
                         const Spacer(),
                         IconButton(icon: const Icon(Icons.send_outlined, size: 28), color: AppColors.onBackground, onPressed: _showShareOptions),
-
                         // Save button
+                        IconButton(
+                          icon: Icon(_isSaved ? Icons.bookmark : Icons.bookmark_border, size: 25),
+                          color: _isSaved ? AppColors.accent : AppColors.onBackground,
+                          onPressed: _handleSave,
+                        ),
                       ],
                     ),
                   ),
@@ -409,6 +415,35 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
       _likeAnimationController.forward().then((_) {
         _likeAnimationController.reverse();
       });
+    }
+  }
+
+  Future<void> _handleSave() async {
+    final wasSaved = _isSaved;
+    setState(() {
+      _isSaved = !_isSaved;
+      _post['isSaved'] = _isSaved;
+    });
+    if (!wasSaved) {
+      await _storageService.addSavedPost(_post);
+      Get.snackbar(
+        'Saved',
+        'Post saved to your collection',
+        backgroundColor: AppColors.accent,
+        colorText: AppColors.onAccent,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+    } else {
+      await _storageService.removeSavedPost(_post['id'] ?? '');
+      Get.snackbar(
+        'Unsaved',
+        'Post removed from collection',
+        backgroundColor: AppColors.primaryGray,
+        colorText: AppColors.onPrimary,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
     }
   }
 

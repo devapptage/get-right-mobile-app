@@ -394,9 +394,9 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? AppColors.completed.withOpacity(0.1)
+                      ? AppColors.accent.withOpacity(0.1)
                       : isActive
-                      ? AppColors.completed.withOpacity(0.1)
+                      ? AppColors.accent.withOpacity(0.1)
                       : AppColors.upcoming.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -408,9 +408,9 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
                       : 'Scheduled',
                   style: AppTextStyles.labelSmall.copyWith(
                     color: isCompleted
-                        ? AppColors.completed
+                        ? AppColors.accent
                         : isActive
-                        ? AppColors.completed
+                        ? AppColors.accent
                         : AppColors.upcoming,
                     fontWeight: FontWeight.bold,
                   ),

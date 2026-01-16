@@ -99,7 +99,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: [IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Get.offNamed(AppRoutes.otp))],
+                        children: [IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Get.close(1))],
                       ),
 
                       // Header
