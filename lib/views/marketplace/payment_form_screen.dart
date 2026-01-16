@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/widgets/common/custom_text_field.dart';
@@ -16,6 +17,7 @@ class PaymentFormScreen extends StatefulWidget {
 
 class _PaymentFormScreenState extends State<PaymentFormScreen> {
   final Map<String, dynamic> paymentData = Get.arguments ?? {};
+  final StorageService _storageService = Get.find<StorageService>();
 
   final _cardNumberController = TextEditingController();
   final _cardHolderController = TextEditingController();
@@ -34,6 +36,12 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
   }
 
   Future<void> _processPayment() async {
+    // Validate form
+    if (_cardNumberController.text.isEmpty || _cardHolderController.text.isEmpty || _expiryController.text.isEmpty || _cvvController.text.isEmpty) {
+      Get.snackbar('Error', 'Please fill in all payment details', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.error, colorText: Colors.white);
+      return;
+    }
+
     setState(() {
       _isProcessing = true;
     });
@@ -41,12 +49,58 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
     // Simulate payment processing
     await Future.delayed(const Duration(seconds: 2));
 
-    setState(() {
-      _isProcessing = false;
-    });
+    // Check if this is a subscription payment
+    final isSubscription = paymentData['type'] == 'subscription';
 
-    // Navigate to program terms screen
-    Get.offNamed(AppRoutes.programTerms, arguments: paymentData);
+    if (isSubscription) {
+      // Unlock premium features immediately
+      final subscriptionType = paymentData['subscriptionType'] ?? 'yearly'; // monthly, quarterly, yearly
+      final now = DateTime.now();
+      DateTime expiryDate;
+
+      // Calculate expiry date based on subscription type
+      switch (subscriptionType) {
+        case 'monthly':
+          expiryDate = DateTime(now.year, now.month + 1, now.day);
+          break;
+        case 'quarterly':
+          expiryDate = DateTime(now.year, now.month + 3, now.day);
+          break;
+        case 'yearly':
+        default:
+          expiryDate = DateTime(now.year + 1, now.month, now.day);
+          break;
+      }
+
+      // Save subscription to storage
+      await _storageService.saveSubscription(true, expiryDate: expiryDate, subscriptionType: subscriptionType);
+
+      setState(() {
+        _isProcessing = false;
+      });
+
+      // Show success message
+      Get.snackbar(
+        'Success!',
+        'Premium features unlocked!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.accent,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+
+      // Navigate back to previous screen or home
+      Future.delayed(const Duration(milliseconds: 500), () {
+        Get.back(); // Go back to previous screen
+      });
+    } else {
+      // Regular program payment - navigate to program terms screen
+      setState(() {
+        _isProcessing = false;
+      });
+
+      Get.offNamed(AppRoutes.programTerms, arguments: paymentData);
+    }
   }
 
   @override

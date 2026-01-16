@@ -23,6 +23,9 @@ class AppConstants {
   static const String keyFitnessLevel = 'fitness_level';
   static const String keyExerciseFrequency = 'exercise_frequency';
   static const String keySavedPosts = 'saved_posts';
+  static const String keyHasSubscription = 'has_subscription';
+  static const String keySubscriptionExpiryDate = 'subscription_expiry_date';
+  static const String keySubscriptionType = 'subscription_type'; // 'monthly', 'quarterly', 'yearly'
 
   // Workout Tags
   static const List<String> workoutTags = ['Leg Day', 'Upper Body', 'Arms', 'Chest', 'Back', 'Shoulders', 'Core', 'Cardio', 'HIIT', 'Yoga', 'Stretching', 'Full Body'];

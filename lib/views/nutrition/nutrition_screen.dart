@@ -147,8 +147,7 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
           ),
         ),
       ),
-      body: TabBarView(controller: _tabController, children: const [NutritionTrackerTab(), RecipesTab()]),
+      body: TabBarView(controller: _tabController, children: [NutritionTrackerTab(), const RecipesTab()]),
     );
   }
 }
-

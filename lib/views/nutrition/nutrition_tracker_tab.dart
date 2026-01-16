@@ -2,19 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/nutrition_controller.dart';
 import 'package:get_right/models/meal_entry.dart';
+import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/views/nutrition/add_food_screen.dart';
 
 /// Nutrition Tracker Tab - Shows daily calorie and macro tracking
+/// Requires subscription for full access
 class NutritionTrackerTab extends StatelessWidget {
-  const NutritionTrackerTab({super.key});
+  NutritionTrackerTab({super.key});
+
+  bool _hasSubscription() {
+    final storageService = Get.find<StorageService>();
+    return storageService.hasActiveSubscription();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<NutritionController>(
       builder: (controller) {
         final currentDay = controller.currentDay;
+
+        // If no subscription, show limited view with upgrade prompt
+        if (!_hasSubscription()) {
+          return _buildLimitedView(context, controller);
+        }
 
         return Stack(
           children: [
@@ -55,13 +68,13 @@ class NutritionTrackerTab extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Meal Sections
-                  _buildMealSection(controller, MealType.breakfast),
+                  _buildMealSection(context, controller, MealType.breakfast),
                   const SizedBox(height: 12),
-                  _buildMealSection(controller, MealType.lunch),
+                  _buildMealSection(context, controller, MealType.lunch),
                   const SizedBox(height: 12),
-                  _buildMealSection(controller, MealType.dinner),
+                  _buildMealSection(context, controller, MealType.dinner),
                   const SizedBox(height: 12),
-                  _buildMealSection(controller, MealType.snacks),
+                  _buildMealSection(context, controller, MealType.snacks),
 
                   const SizedBox(height: 80), // Extra padding for FAB
                 ],
@@ -95,6 +108,12 @@ class NutritionTrackerTab extends StatelessWidget {
   }
 
   void _showAddFoodOptions(BuildContext context, NutritionController controller) {
+    // Check subscription before showing add food options
+    if (!_hasSubscription()) {
+      _showSubscriptionRequiredDialog(context);
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -135,6 +154,235 @@ class NutritionTrackerTab extends StatelessWidget {
     );
   }
 
+  Widget _buildLimitedView(BuildContext context, NutritionController controller) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Subscription Upgrade Banner
+          _buildSubscriptionBanner(context),
+          const SizedBox(height: 24),
+
+          // Limited preview - show calories card but with subscription notice
+          _buildCaloriesCard(controller.currentDay.totalCalories, controller.currentDay.calorieGoal, controller.currentDay.calorieProgress, isLimited: true),
+
+          const SizedBox(height: 24),
+
+          // Subscription benefits section
+          _buildSubscriptionBenefitsSection(context),
+
+          const SizedBox(height: 24),
+
+          // Premium features locked
+          _buildLockedFeaturesSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionBanner(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.star, color: Colors.white, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Unlock Premium Features',
+                      style: AppTextStyles.titleLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('Subscribe to track calories & macros', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9))),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showSubscriptionOptions(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.accent,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: Text(
+                'Upgrade Now',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionBenefitsSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.lightGray.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'What You\'ll Get',
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          _buildBenefitItem(Icons.local_fire_department, 'Track Calories & Macros', 'Monitor your daily nutrition goals'),
+          const SizedBox(height: 12),
+          _buildBenefitItem(Icons.restaurant_menu, 'Full Cookbook Access', 'Easy-to-prepare meals and shakes'),
+          const SizedBox(height: 12),
+          _buildBenefitItem(Icons.people, 'Community Features', 'Post meals, progress pics & workout videos'),
+          const SizedBox(height: 12),
+          _buildBenefitItem(Icons.person_search, 'Trainer Subscriptions', '1-on-1 personal training (in-person or online)'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBenefitItem(IconData icon, String title, String description) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+          child: Icon(icon, color: AppColors.accent, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 2),
+              Text(description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.mediumGray)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLockedFeaturesSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.lightGray.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.lightGray),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.lock_outline, size: 48, color: AppColors.mediumGray),
+          const SizedBox(height: 12),
+          Text(
+            'Premium Features Locked',
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Subscribe to unlock full calorie tracking, macro monitoring, cookbook access, and community features.',
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mediumGray),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSubscriptionRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: const Icon(Icons.star, color: AppColors.accent, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Subscription Required',
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Calorie tracking is a premium feature. Subscribe to unlock:', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+            const SizedBox(height: 16),
+            _buildBenefitItem(Icons.local_fire_department, 'Daily calorie & macro tracking', ''),
+            const SizedBox(height: 8),
+            _buildBenefitItem(Icons.restaurant_menu, 'Full cookbook access', ''),
+            const SizedBox(height: 8),
+            _buildBenefitItem(Icons.people, 'Community features', ''),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Later', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mediumGray)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showSubscriptionOptions(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('View Plans'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSubscriptionOptions(BuildContext context) {
+    // Navigate to subscription/payment screen
+    // For now, navigate to payment form - in production, create a dedicated subscription screen
+    Get.toNamed(AppRoutes.paymentForm, arguments: {'type': 'subscription'});
+  }
+
   Widget _buildAddFoodOption(BuildContext context, IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
@@ -162,7 +410,7 @@ class NutritionTrackerTab extends StatelessWidget {
     );
   }
 
-  Widget _buildCaloriesCard(double consumed, double goal, double progress) {
+  Widget _buildCaloriesCard(double consumed, double goal, double progress, {bool isLimited = false}) {
     final remaining = goal - consumed;
     return Container(
       padding: const EdgeInsets.all(24),
@@ -220,6 +468,29 @@ class NutritionTrackerTab extends StatelessWidget {
             remaining > 0 ? '${remaining.toStringAsFixed(0)} kcal remaining' : '${(-remaining).toStringAsFixed(0)} kcal over',
             style: AppTextStyles.bodyMedium.copyWith(color: remaining > 0 ? AppColors.mediumGray : Colors.red, fontWeight: FontWeight.w500),
           ),
+          if (isLimited) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.accent.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.accent, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Subscribe to unlock full calorie tracking',
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -260,7 +531,7 @@ class NutritionTrackerTab extends StatelessWidget {
     );
   }
 
-  Widget _buildMealSection(NutritionController controller, MealType mealType) {
+  Widget _buildMealSection(BuildContext context, NutritionController controller, MealType mealType) {
     final meals = controller.currentDay.getMealsByType(mealType);
     final totalCalories = controller.currentDay.getCaloriesByMealType(mealType);
 
@@ -275,6 +546,10 @@ class NutritionTrackerTab extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
+              if (!_hasSubscription()) {
+                _showSubscriptionRequiredDialog(context);
+                return;
+              }
               Get.to(() => AddFoodScreen(mealType: mealType));
             },
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),

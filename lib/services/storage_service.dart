@@ -414,4 +414,59 @@ class StorageService {
     final savedPosts = getSavedPosts();
     return savedPosts.any((p) => p['id'] == postId);
   }
+
+  // Subscription methods
+
+  /// Check if user has active subscription
+  bool hasActiveSubscription() {
+    final hasSubscription = getBool(AppConstants.keyHasSubscription) ?? false;
+    if (!hasSubscription) return false;
+
+    // Check if subscription has expired
+    final expiryDateStr = getString(AppConstants.keySubscriptionExpiryDate);
+    if (expiryDateStr == null) return false;
+
+    try {
+      final expiryDate = DateTime.parse(expiryDateStr);
+      return DateTime.now().isBefore(expiryDate);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Save subscription status
+  Future<bool> saveSubscription(bool hasSubscription, {DateTime? expiryDate, String? subscriptionType}) async {
+    await saveBool(AppConstants.keyHasSubscription, hasSubscription);
+    if (expiryDate != null) {
+      await saveString(AppConstants.keySubscriptionExpiryDate, expiryDate.toIso8601String());
+    }
+    if (subscriptionType != null) {
+      await saveString(AppConstants.keySubscriptionType, subscriptionType);
+    }
+    return true;
+  }
+
+  /// Get subscription expiry date
+  DateTime? getSubscriptionExpiryDate() {
+    final expiryDateStr = getString(AppConstants.keySubscriptionExpiryDate);
+    if (expiryDateStr == null) return null;
+    try {
+      return DateTime.parse(expiryDateStr);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get subscription type
+  String? getSubscriptionType() {
+    return getString(AppConstants.keySubscriptionType);
+  }
+
+  /// Cancel subscription
+  Future<bool> cancelSubscription() async {
+    await saveBool(AppConstants.keyHasSubscription, false);
+    await remove(AppConstants.keySubscriptionExpiryDate);
+    await remove(AppConstants.keySubscriptionType);
+    return true;
+  }
 }
