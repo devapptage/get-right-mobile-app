@@ -440,32 +440,7 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
       child: Column(
         children: [
           // Share Run button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Implement share functionality
-                Get.snackbar(
-                  'Coming Soon',
-                  'Share run feature will be available soon',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: AppColors.accent,
-                  colorText: AppColors.white,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accent,
-                foregroundColor: AppColors.onAccent,
-                elevation: 4,
-                shadowColor: AppColors.accent.withOpacity(0.5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              icon: const Icon(Icons.share_rounded, size: 24),
-              label: Text('Share Run', style: AppTextStyles.buttonLarge),
-            ),
-          ),
-          const SizedBox(height: 12),
+
           // New Run button
           SizedBox(
             width: double.infinity,

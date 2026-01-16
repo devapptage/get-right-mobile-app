@@ -97,17 +97,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
         centerTitle: true,
         elevation: 0,
         backgroundColor: AppColors.background,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
-            ),
-            child: const Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.onBackground),
-          ),
-          onPressed: () => Get.back(),
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ).paddingAll(8),
         ),
       ),
       body: SafeArea(

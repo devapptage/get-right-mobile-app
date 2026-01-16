@@ -55,9 +55,12 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onBackground),
-          onPressed: () => Get.back(),
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ).paddingAll(8),
         ),
         title: Text('Select Activity Type', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
         centerTitle: true,
@@ -98,10 +101,7 @@ class _ActivityTypeSelectionScreenState extends State<ActivityTypeSelectionScree
                                   style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  _plannedRoute!.name,
-                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark),
-                                ),
+                                Text(_plannedRoute!.name, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark)),
                                 const SizedBox(height: 4),
                                 Text(
                                   '${(_plannedRoute!.estimatedDistance / 1000).toStringAsFixed(2)} km',

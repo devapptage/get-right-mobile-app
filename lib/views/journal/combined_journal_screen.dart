@@ -160,7 +160,7 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.calendar_month, color: Color(0xFF000000)),
+              icon: const Icon(Icons.calendar_month, color: AppColors.accent),
               onPressed: () {
                 Get.toNamed('/planner');
               },

@@ -26,6 +26,13 @@ class ReportsScreen extends StatelessWidget {
               Tab(text: 'Posts'),
             ],
           ),
+          leading: GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+            ).paddingAll(8),
+          ),
         ),
         body: Column(
           children: [
@@ -135,11 +142,7 @@ class _ReportsList extends StatelessWidget {
     });
   }
 
-  Future<bool?> _confirm({
-    required String title,
-    required String message,
-    required String confirmText,
-  }) {
+  Future<bool?> _confirm({required String title, required String message, required String confirmText}) {
     return Get.dialog<bool>(
       AlertDialog(
         title: Text(title),
@@ -164,13 +167,11 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(999),
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(999)),
+      child: Text(
+        text,
+        style: AppTextStyles.labelSmall.copyWith(color: foreground, fontWeight: FontWeight.w600),
       ),
-      child: Text(text, style: AppTextStyles.labelSmall.copyWith(color: foreground, fontWeight: FontWeight.w600)),
     );
   }
 }
-
-

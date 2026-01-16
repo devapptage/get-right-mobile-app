@@ -283,7 +283,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
                         ),
                         // Share button
                         const Spacer(),
-                        IconButton(icon: const Icon(Icons.send_outlined, size: 28), color: AppColors.onBackground, onPressed: _showShareOptions),
+                        IconButton(icon: const Icon(Icons.share_outlined, size: 28), color: AppColors.onBackground, onPressed: _showShareOptions),
                         // Save button
                         IconButton(
                           icon: Icon(_isSaved ? Icons.bookmark : Icons.bookmark_border, size: 25),

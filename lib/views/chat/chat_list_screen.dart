@@ -20,11 +20,31 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen> {
   ChatController? _chatController;
   bool _isInitializing = true;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _initializeController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<ConversationModel> _filterConversations(List<ConversationModel> conversations, String query) {
+    if (query.isEmpty) {
+      return conversations;
+    }
+    final lowerQuery = query.toLowerCase();
+    return conversations.where((conversation) {
+      return conversation.trainerName.toLowerCase().contains(lowerQuery) ||
+          conversation.programTitle.toLowerCase().contains(lowerQuery) ||
+          (conversation.lastMessage != null && conversation.lastMessage!.message.toLowerCase().contains(lowerQuery));
+    }).toList();
   }
 
   Future<void> _initializeController() async {
@@ -101,112 +121,174 @@ class _ChatListScreenState extends State<ChatListScreen> {
           : Obx(() {
               final conversations = _chatController!.conversations;
               final isLoading = _chatController!.isLoading.value;
+              final filteredConversations = _filterConversations(conversations, _searchQuery);
 
-              if (isLoading && conversations.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (conversations.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.chat_bubble_outline, size: 80, color: AppColors.primaryGray),
-                        const SizedBox(height: 24),
-                        Text('No Messages', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground)),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Start a conversation with your trainers from enrolled programs.',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
-                          textAlign: TextAlign.center,
+              return Column(
+                children: [
+                  // Search Bar
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    color: AppColors.background,
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search conversations...',
+                        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                        prefixIcon: const Icon(Icons.search, color: AppColors.primaryGray),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, color: AppColors.primaryGray),
+                                onPressed: () {
+                                  setState(() {
+                                    _searchController.clear();
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: AppColors.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryGray.withOpacity(0.3)),
                         ),
-                        const SizedBox(height: 32),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Get.toNamed(AppRoutes.myPrograms);
-                          },
-                          icon: const Icon(Icons.fitness_center),
-                          label: const Text('View My Programs'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accent,
-                            foregroundColor: AppColors.onAccent,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                          ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryGray.withOpacity(0.3)),
                         ),
-                      ],
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.accent, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
                     ),
                   ),
-                );
-              }
-
-              return RefreshIndicator(
-                onRefresh: () => _chatController!.loadConversations(),
-                child: ListView.builder(
-                  itemCount: conversations.length,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemBuilder: (context, index) {
-                    final conversation = conversations[index];
-                    final lastMessage = conversation.lastMessage;
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: AppColors.accent,
-                        child: conversation.trainerImage != null
-                            ? Text(conversation.trainerImage!, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent))
-                            : Text(
-                                conversation.trainerName.isNotEmpty ? conversation.trainerName[0].toUpperCase() : 'T',
-                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent),
-                              ),
-                      ),
-                      title: Text(conversation.trainerName, style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(conversation.programTitle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
-                          if (lastMessage != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              lastMessage.type == 'image'
-                                  ? '📷 Photo'
-                                  : lastMessage.type == 'video'
-                                  ? '🎥 Video'
-                                  : lastMessage.type == 'audio'
-                                  ? '🎤 Audio'
-                                  : lastMessage.message,
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          if (lastMessage != null) Text(_formatTimestamp(lastMessage.timestamp), style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark)),
-                          if (conversation.unreadCount > 0) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(12)),
-                              child: Text(
-                                conversation.unreadCount > 99 ? '99+' : '${conversation.unreadCount}',
-                                style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      onTap: () => _openChatRoom(conversation),
-                    );
-                  },
-                ),
+                  // Conversations List
+                  Expanded(child: _buildConversationsList(isLoading, filteredConversations)),
+                ],
               );
             }),
+    );
+  }
+
+  Widget _buildConversationsList(bool isLoading, List<ConversationModel> conversations) {
+    if (isLoading && conversations.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (conversations.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(_searchQuery.isNotEmpty ? Icons.search_off : Icons.chat_bubble_outline, size: 80, color: AppColors.primaryGray),
+              const SizedBox(height: 24),
+              Text(_searchQuery.isNotEmpty ? 'No Results Found' : 'No Messages', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground)),
+              const SizedBox(height: 12),
+              Text(
+                _searchQuery.isNotEmpty ? 'Try adjusting your search query' : 'Start a conversation with your trainers from enrolled programs.',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray),
+                textAlign: TextAlign.center,
+              ),
+              if (!_searchQuery.isNotEmpty) ...[
+                const SizedBox(height: 32),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.myPrograms);
+                  },
+                  icon: const Icon(Icons.fitness_center),
+                  label: const Text('View My Programs'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: AppColors.onAccent,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => _chatController!.loadConversations(),
+      child: ListView.builder(
+        itemCount: conversations.length,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemBuilder: (context, index) {
+          final conversation = conversations[index];
+          final lastMessage = conversation.lastMessage;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 2))],
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              leading: CircleAvatar(
+                backgroundColor: AppColors.accent,
+                child: conversation.trainerImage != null
+                    ? Text(conversation.trainerImage!, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent))
+                    : Text(
+                        conversation.trainerName.isNotEmpty ? conversation.trainerName[0].toUpperCase() : 'T',
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onAccent),
+                      ),
+              ),
+              title: Text(conversation.trainerName, style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground)),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 2),
+                  if (lastMessage != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      lastMessage.type == 'image'
+                          ? '📷 Photo'
+                          : lastMessage.type == 'video'
+                          ? '🎥 Video'
+                          : lastMessage.type == 'audio'
+                          ? '🎤 Audio'
+                          : lastMessage.message,
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (lastMessage != null) Text(_formatTimestamp(lastMessage.timestamp), style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark)),
+                  if (conversation.unreadCount > 0) ...[
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(12)),
+                      child: Text(conversation.unreadCount > 99 ? '99+' : '${conversation.unreadCount}', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent)),
+                    ),
+                  ],
+                ],
+              ),
+              onTap: () => _openChatRoom(conversation),
+            ),
+          );
+        },
+      ),
     );
   }
 }

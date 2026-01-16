@@ -15,6 +15,13 @@ class BlockedUsersScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Blocked Users', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+          ).paddingAll(8),
+        ),
       ),
       body: Column(
         children: [
@@ -65,7 +72,7 @@ class BlockedUsersScreen extends StatelessWidget {
 
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: AppColors.primaryGrayLight,
+                      backgroundColor: AppColors.accent.withOpacity(0.2),
                       foregroundColor: AppColors.onBackground,
                       child: Text(initials, style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
                     ),
@@ -73,11 +80,7 @@ class BlockedUsersScreen extends StatelessWidget {
                     subtitle: Text(u.username, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark)),
                     trailing: TextButton(
                       onPressed: () async {
-                        final confirm = await _confirm(
-                          title: 'Unblock user?',
-                          message: 'They will be able to view and interact with you again.',
-                          confirmText: 'Unblock',
-                        );
+                        final confirm = await _confirm(title: 'Unblock user?', message: 'They will be able to view and interact with you again.', confirmText: 'Unblock');
                         if (confirm == true) controller.unblock(u.id);
                       },
                       child: Text('Unblock', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.accent)),
@@ -99,11 +102,7 @@ class BlockedUsersScreen extends StatelessWidget {
     return (parts.first.characters.take(1).toString() + parts.last.characters.take(1).toString()).toUpperCase();
   }
 
-  Future<bool?> _confirm({
-    required String title,
-    required String message,
-    required String confirmText,
-  }) {
+  Future<bool?> _confirm({required String title, required String message, required String confirmText}) {
     return Get.dialog<bool>(
       AlertDialog(
         title: Text(title),
@@ -116,5 +115,3 @@ class BlockedUsersScreen extends StatelessWidget {
     );
   }
 }
-
-

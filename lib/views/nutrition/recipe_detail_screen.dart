@@ -107,13 +107,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Recipe Info Row
-                  Row(
+                  // Recipe Info Row - Preparation, Cooking, and Serving Details
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
                     children: [
                       _buildInfoChip(Icons.access_time, '${widget.recipe.prepTimeMinutes} min prep'),
-                      const SizedBox(width: 12),
                       _buildInfoChip(Icons.restaurant_menu, '${widget.recipe.cookTimeMinutes} min cook'),
-                      const SizedBox(width: 12),
                       _buildInfoChip(Icons.people, '${widget.recipe.servings} servings'),
                     ],
                   ),

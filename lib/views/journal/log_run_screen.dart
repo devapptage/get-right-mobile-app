@@ -58,15 +58,6 @@ class _LogRunScreenState extends State<LogRunScreen> {
         ),
         title: Text('Log Run', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: _saveRun,
-            child: Text(
-              'Save',
-              style: AppTextStyles.labelLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
