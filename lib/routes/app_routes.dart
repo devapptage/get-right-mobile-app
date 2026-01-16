@@ -26,6 +26,8 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
   static const String createProfile = '/create-profile';
+  static const String followers = '/followers';
+  static const String following = '/following';
 
   // Journal Routes
   static const String journal = '/journal';

@@ -19,6 +19,8 @@ import 'package:get_right/views/home/home_screen.dart';
 import 'package:get_right/views/home/dashboard_screen.dart';
 import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/views/profile/edit_profile_screen.dart';
+import 'package:get_right/views/profile/followers_screen.dart';
+import 'package:get_right/views/profile/following_screen.dart';
 import 'package:get_right/views/journal/My_work_screen.dart';
 import 'package:get_right/views/journal/workout_journal_screen.dart';
 import 'package:get_right/views/journal/workout_timer_screen.dart';
@@ -113,6 +115,8 @@ class AppPages {
     // Profile Pages
     GetPage(name: AppRoutes.profile, page: () => const ProfileScreen(), transition: Transition.rightToLeft),
     GetPage(name: AppRoutes.editProfile, page: () => const EditProfileScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.followers, page: () => const FollowersScreen(), transition: Transition.rightToLeft),
+    GetPage(name: AppRoutes.following, page: () => const FollowingScreen(), transition: Transition.rightToLeft),
 
     // Journal Pages
     GetPage(name: AppRoutes.journal, page: () => const WorkoutScreen(), transition: Transition.fade),

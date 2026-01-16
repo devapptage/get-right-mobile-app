@@ -173,7 +173,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [_buildStatColumn('6', 'Posts'), _buildStatColumn('1247', 'Followers'), _buildStatColumn('342', 'Following')],
+                    children: [
+                      _buildStatColumn('6', 'Posts'),
+                      _buildStatColumn('1247', 'Followers', onTap: () => Get.toNamed(AppRoutes.followers)),
+                      _buildStatColumn('342', 'Following', onTap: () => Get.toNamed(AppRoutes.following)),
+                    ],
                   ),
                 ),
               ],
@@ -481,8 +485,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildStatColumn(String count, String label) {
-    return Column(
+  Widget _buildStatColumn(String count, String label, {VoidCallback? onTap}) {
+    final widget = Column(
       children: [
         Text(
           count,
@@ -492,6 +496,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
       ],
     );
+
+    if (onTap != null) {
+      return GestureDetector(onTap: onTap, child: widget);
+    }
+
+    return widget;
   }
 
   Widget _buildPersonalRecordsGrid() {

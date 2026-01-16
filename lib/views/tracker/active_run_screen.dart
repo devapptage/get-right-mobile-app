@@ -19,7 +19,7 @@ class ActiveRunScreen extends StatefulWidget {
 }
 
 class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProviderStateMixin {
-  final RunTrackingController _controller = Get.find<RunTrackingController>();
+  late final RunTrackingController _controller;
   GoogleMapController? _mapController;
   late AnimationController _pulseController;
   Timer? _mapUpdateTimer;
@@ -29,19 +29,38 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
+    // Initialize controller (put if doesn't exist, find if it does)
+    _controller = Get.put(RunTrackingController(), permanent: false);
     _pulseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat(reverse: true);
-    _startMapUpdates();
+
+    // Reset controller status to 'Ready' for new run
+    // Use post-frame callback to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Reset run status to 'Ready' if not currently tracking
+      if (!_controller.isTracking.value) {
+        _controller.runStatus.value = 'Ready';
+      }
+    });
 
     // Get activity type and planned route from arguments if provided
+    // Use post-frame callback to avoid setState during build
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null) {
-      if (args['activityType'] != null) {
-        _controller.activityType.value = args['activityType'];
-      }
-      if (args['plannedRoute'] != null) {
-        _plannedRoute = args['plannedRoute'] as PlannedRouteModel;
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (args['activityType'] != null) {
+          _controller.activityType.value = args['activityType'];
+        }
+        if (args['plannedRoute'] != null) {
+          setState(() {
+            _plannedRoute = args['plannedRoute'] as PlannedRouteModel;
+          });
+        }
+      });
     }
+
+    _startMapUpdates();
   }
 
   @override

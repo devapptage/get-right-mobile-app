@@ -131,11 +131,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  if (type == 'program') {
-                    Get.toNamed(AppRoutes.marketplace);
-                  } else if (type == 'exercise') {
-                    Get.toNamed(AppRoutes.library);
-                  }
+                  // Navigate to home and switch to appropriate tab
+                  Get.offAllNamed(
+                    AppRoutes.home,
+                    arguments: {
+                      'navigateToTab': type == 'program' ? 0 : 3, // 0 = Marketplace, 3 = Library
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,

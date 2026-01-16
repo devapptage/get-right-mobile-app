@@ -8,7 +8,6 @@ import 'package:get_right/views/feed/feed_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
 import 'package:get_right/views/nutrition/nutrition_screen.dart';
-import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/widgets/common/app_drawer.dart';
 
 /// Home screen with bottom navigation - 5 tabs
@@ -41,9 +40,18 @@ class _HomeScreenState extends State<HomeScreen> {
     // Initialize notification controller
     Get.put(NotificationController());
 
-    // Check if we should redirect based on preference from auth questionnaire
+    // Check if we should redirect based on preference from auth questionnaire or navigateToTab argument
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = Get.arguments as Map<String, dynamic>?;
+      
+      // Check for navigateToTab argument (used from favorites screen)
+      final navigateToTab = args?['navigateToTab'] as int?;
+      if (navigateToTab != null) {
+        _navController.changeTab(navigateToTab);
+        return;
+      }
+      
+      // Check for preference argument
       final preference = args?['preference'] as String?;
       if (preference != null) {
         // Navigate to journal tab (index 2)
