@@ -95,24 +95,54 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
           style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(70),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
-            ),
-            child: TabBar(
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.label,
-              indicatorWeight: 0,
-              indicator: const BoxDecoration(),
-              labelPadding: EdgeInsets.zero,
-              dividerColor: Colors.transparent,
-              tabs: [
-                _CustomTab(icon: Icons.restaurant_menu, label: 'Tracker', controller: _tabController, index: 0),
-                _CustomTab(icon: Icons.menu_book, label: 'Recipes', controller: _tabController, index: 1),
-              ],
+          preferredSize: const Size.fromHeight(68),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
+              child: AnimatedBuilder(
+                animation: _tabController,
+                builder: (context, child) {
+                  return TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: AppColors.onAccent,
+                    unselectedLabelColor: AppColors.onSurface.withOpacity(0.6),
+                    labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
+                    unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w500),
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.restaurant_menu, size: 18, color: _tabController.index == 0 ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.6)),
+                            const SizedBox(width: 6),
+                            const Text('Tracker'),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.menu_book, size: 18, color: _tabController.index == 1 ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.6)),
+                            const SizedBox(width: 6),
+                            const Text('Recipes'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -122,60 +152,3 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
   }
 }
 
-class _CustomTab extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final TabController controller;
-  final int index;
-
-  const _CustomTab({required this.icon, required this.label, required this.controller, required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, child) {
-        final isActive = controller.index == index;
-
-        // Only use isActive for final selection state to avoid glitches
-        final bool isSelected = isActive;
-
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            decoration: BoxDecoration(
-              gradient: isSelected ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
-              color: isSelected ? null : Colors.transparent,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: isSelected ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))] : null,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: isSelected ? Colors.white : AppColors.green, size: 20),
-                isSelected ? const SizedBox.shrink() : SizedBox(width: 8),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: SizedBox(width: isSelected ? 8 : 0),
-                ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: Text(
-                    label,
-                    style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? Colors.white : AppColors.green, fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
