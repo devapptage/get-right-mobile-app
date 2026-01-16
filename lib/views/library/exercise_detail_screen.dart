@@ -95,7 +95,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text(exercise['name'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary)),
+        title: Text(exercise['name'], style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [
           Obx(() {

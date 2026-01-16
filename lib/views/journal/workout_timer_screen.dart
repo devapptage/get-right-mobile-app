@@ -115,12 +115,12 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
   @override
   Widget build(BuildContext context) {
     if (_exercise == null || _timedSets.isEmpty) {
-      return Scaffold(appBar: AppBar(backgroundColor: AppColors.primary, foregroundColor: AppColors.onBackground, title: const Text('Timer')), body: Center(child: Text('No timed sets available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground))));
+      return Scaffold(appBar: AppBar(backgroundColor: AppColors.primary, foregroundColor: AppColors.onBackground, title: Text('Timer', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent))), body: Center(child: Text('No timed sets available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground))));
     }
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: AppColors.primary, elevation: 0, leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppColors.onBackground), onPressed: () => Get.back()), title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Timer', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onBackground)), Text(_exercise!.exerciseName, style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold))])),
+      appBar: AppBar(backgroundColor: AppColors.primary, elevation: 0, leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppColors.onBackground), onPressed: () => Get.back()), title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Timer', style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)), Text(_exercise!.exerciseName, style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold))])),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

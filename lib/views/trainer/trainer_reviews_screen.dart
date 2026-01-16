@@ -22,7 +22,7 @@ class _TrainerReviewsScreenState extends State<TrainerReviewsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Reviews', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Reviews', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
       ),
       body: Column(

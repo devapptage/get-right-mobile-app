@@ -261,7 +261,7 @@ class _MyProgramsScreenState extends State<MyProgramsScreen> with SingleTickerPr
             ),
             onPressed: () => Get.offAllNamed(AppRoutes.home),
           ),
-          title: Text('My Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+          title: Text('My Programs', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
           centerTitle: true,
           bottom: TabBar(
             controller: _tabController,

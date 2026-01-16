@@ -784,7 +784,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         Get.dialog(
           AlertDialog(
             backgroundColor: AppColors.surface,
-            title: Text('Logout', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface)),
+            title: Text('Logout', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
             content: Text('Are you sure you want to logout?', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
             actions: [
               TextButton(

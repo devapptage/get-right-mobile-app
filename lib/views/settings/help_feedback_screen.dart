@@ -11,7 +11,7 @@ class HelpFeedbackScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Help & Feedback', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Help & Feedback', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),

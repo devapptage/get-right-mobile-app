@@ -24,7 +24,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text('Settings', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Settings', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
       ),
       body: ListView(

@@ -791,7 +791,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Report Post', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface)),
+        title: Text('Report Post', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [_buildReportOption('Inappropriate content'), _buildReportOption('Misleading advice'), _buildReportOption('Spam'), _buildReportOption('Harassment')],

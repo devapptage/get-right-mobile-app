@@ -56,7 +56,7 @@ class _PaymentFormScreenState extends State<PaymentFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Payment', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

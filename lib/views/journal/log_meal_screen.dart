@@ -63,7 +63,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
           icon: const Icon(Icons.close, color: AppColors.onPrimary),
           onPressed: () => Get.back(),
         ),
-        title: Text('Log Meal', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Log Meal', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [
           TextButton(

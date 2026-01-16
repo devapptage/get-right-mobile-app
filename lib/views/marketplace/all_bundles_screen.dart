@@ -22,7 +22,7 @@ class AllBundlesScreen extends StatelessWidget {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text('All Bundles', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('All Bundles', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

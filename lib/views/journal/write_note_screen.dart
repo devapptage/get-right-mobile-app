@@ -59,7 +59,7 @@ class _WriteNoteScreenState extends State<WriteNoteScreen> {
           icon: const Icon(Icons.close, color: AppColors.onPrimary),
           onPressed: () => Get.back(),
         ),
-        title: Text('Write Note', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Write Note', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [
           TextButton(

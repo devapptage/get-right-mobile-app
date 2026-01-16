@@ -436,7 +436,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(_trainerName ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary)),
+            Text(_trainerName ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent)),
             if (_programTitle != null) Text(_programTitle!, style: AppTextStyles.bodySmall.copyWith(color: AppColors.onPrimary.withOpacity(0.7))),
           ],
         ),

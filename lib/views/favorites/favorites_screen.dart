@@ -72,7 +72,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
             }
           },
         ),
-        title: Text('Favorites', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Favorites', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,

@@ -231,7 +231,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Daily Notes', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+        title: Text('Daily Notes', style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent)),
         content: TextField(
           controller: notesController,
           maxLines: 5,
@@ -848,7 +848,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text('Calendar', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Calendar', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [
           IconButton(

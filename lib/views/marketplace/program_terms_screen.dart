@@ -136,7 +136,7 @@ class _ProgramTermsScreenState extends State<ProgramTermsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Program Terms', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Program Terms', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),

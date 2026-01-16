@@ -168,7 +168,7 @@ class _CompletedProgramDetailScreenState extends State<CompletedProgramDetailScr
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Program Details', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Program Details', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

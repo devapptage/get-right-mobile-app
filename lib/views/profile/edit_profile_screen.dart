@@ -355,7 +355,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           onPressed: () => Get.back(),
         ),
         centerTitle: true,
-        title: Text('Edit Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text('Edit Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
       ),
 
       body: _isLoading

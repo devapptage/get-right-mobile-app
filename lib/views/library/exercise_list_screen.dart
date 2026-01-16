@@ -212,7 +212,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text(muscleGroup['name'], style: AppTextStyles.titleLarge.copyWith(color: AppColors.onPrimary)),
+        title: Text(muscleGroup['name'], style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
         actions: [
           IconButton(

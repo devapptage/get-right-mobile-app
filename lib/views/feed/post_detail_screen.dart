@@ -140,7 +140,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> with SingleTickerPr
                 duration: const Duration(milliseconds: 200),
                 child: Text(
                   _post['creator'] ?? '',
-                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                 ),
               ),
               actions: [

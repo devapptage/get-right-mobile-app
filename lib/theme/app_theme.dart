@@ -36,15 +36,15 @@ class AppTheme {
 
       // Scaffold Background - Steel Grey
       scaffoldBackgroundColor: AppColors.background, // Steel Grey background
-      // App Bar Theme - Steel Grey background with Black text
-      appBarTheme: const AppBarTheme(
+      // App Bar Theme - Steel Grey background with Green accent title
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primary, // Steel Grey
         foregroundColor: AppColors.onBackground, // Black text/icons
         elevation: 0,
         centerTitle: false,
         systemOverlayStyle: SystemUiOverlayStyle.dark, // Dark icons for light background
-        titleTextStyle: AppTextStyles.titleLarge,
-        iconTheme: IconThemeData(color: AppColors.accent, size: 24), // Green icons
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(color: AppColors.accent), // Green accent title
+        iconTheme: const IconThemeData(color: AppColors.accent, size: 24), // Green icons
       ),
 
       // Text Theme - Black text on steel grey backgrounds
