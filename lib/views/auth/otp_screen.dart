@@ -175,7 +175,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                         children: [
                           Text(
                             'Verify Your Email',
-                            style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
+                            style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: -1),
                             textAlign: TextAlign.center,
                           ),
 

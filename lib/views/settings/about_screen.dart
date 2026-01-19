@@ -13,6 +13,7 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('About', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
+        centerTitle: true,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),

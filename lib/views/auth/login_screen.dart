@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     // Welcome text with modern typography
                     Text(
                       'Welcome Back!',
-                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.onBackground, fontSize: 36, fontWeight: FontWeight.w800, letterSpacing: -1),
+                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 36, fontWeight: FontWeight.w800, letterSpacing: -1),
                     ),
                     const SizedBox(height: 12),
                     Text(

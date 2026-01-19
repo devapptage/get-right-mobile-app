@@ -21,10 +21,7 @@ class TermsConditionsScreen extends StatelessWidget {
             child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
           ).paddingAll(8),
         ),
-        title: Text(
-          'Terms & Conditions',
-          style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w700),
-        ),
+        title: Text('Terms & Conditions', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
