@@ -4,6 +4,7 @@ import 'package:get_right/models/run_model.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/journal/add_workout_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -417,7 +418,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
               trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
               onTap: () {
                 Get.back();
-                Get.toNamed(AppRoutes.logRun);
+                Get.to(AddWorkoutScreen());
               },
             ),
             ListTile(
