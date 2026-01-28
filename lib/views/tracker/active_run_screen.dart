@@ -1,0 +1,762 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:get/get.dart';
+import 'package:get_right/controllers/run_tracking_controller.dart';
+import 'package:get_right/models/planned_route_model.dart';
+import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/theme/color_constants.dart';
+import 'package:get_right/theme/text_styles.dart';
+
+/// Active Run Screen - Live GPS tracking with map and stats
+class ActiveRunScreen extends StatefulWidget {
+  const ActiveRunScreen({super.key});
+
+  @override
+  State<ActiveRunScreen> createState() => _ActiveRunScreenState();
+}
+
+class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProviderStateMixin {
+  late final RunTrackingController _controller;
+  GoogleMapController? _mapController;
+  late AnimationController _pulseController;
+  Timer? _mapUpdateTimer;
+  bool _isLocked = false;
+  PlannedRouteModel? _plannedRoute;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controller (put if doesn't exist, find if it does)
+    _controller = Get.put(RunTrackingController(), permanent: false);
+    _pulseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat(reverse: true);
+
+    // Reset controller status to 'Ready' for new run
+    // Use post-frame callback to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Reset run status to 'Ready' if not currently tracking
+      if (!_controller.isTracking.value) {
+        _controller.runStatus.value = 'Ready';
+      }
+    });
+
+    // Get activity type and planned route from arguments if provided
+    // Use post-frame callback to avoid setState during build
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (args['activityType'] != null) {
+          _controller.activityType.value = args['activityType'];
+        }
+        if (args['plannedRoute'] != null) {
+          setState(() {
+            _plannedRoute = args['plannedRoute'] as PlannedRouteModel;
+          });
+        }
+      });
+    }
+
+    _startMapUpdates();
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _mapUpdateTimer?.cancel();
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  void _startMapUpdates() {
+    _mapUpdateTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final position = _controller.currentPosition.value;
+      if (position != null && _mapController != null) {
+        _mapController!.animateCamera(CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        _showExitDialog();
+        return false;
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Scaffold(
+          body: Stack(
+            children: [
+              // Map Layer
+              _buildMap(),
+
+              // Overlay with stats (hidden when locked, only shown when tracking)
+              // if (!_isLocked) Obx(() => _controller.isTracking.value ? _buildStatsOverlay() : const SizedBox.shrink()),
+
+              // Top safe area with back button (hidden when locked)
+              if (!_isLocked) _buildTopBar(),
+
+              // Bottom sheet with controls (hidden when locked)
+              if (!_isLocked) _buildBottomSheet(),
+
+              // Lock overlay (shown when locked)
+              if (_isLocked) _buildLockOverlay(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build map with route
+  Widget _buildMap() {
+    return Obx(() {
+      final position = _controller.currentPosition.value;
+      final routePoints = _controller.routePoints;
+
+      if (position == null) {
+        return Container(
+          color: AppColors.surface,
+          child: const Center(child: CircularProgressIndicator(color: AppColors.accent)),
+        );
+      }
+
+      // Create polylines from route points and planned route
+      final Set<Polyline> polylines = {};
+
+      // Add planned route polyline (dashed line to show the planned path)
+      if (_plannedRoute != null && _plannedRoute!.routePoints.isNotEmpty) {
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('planned_route'),
+            points: _plannedRoute!.routePoints,
+            color: AppColors.accent.withOpacity(0.6),
+            width: 4,
+            patterns: [PatternItem.dash(20), PatternItem.gap(10)],
+          ),
+        );
+      }
+
+      // Add actual run route polyline (solid line for the path traveled)
+      if (routePoints.length > 1) {
+        polylines.add(
+          Polyline(
+            polylineId: const PolylineId('run_route'),
+            points: routePoints.map((point) => LatLng(point.latitude, point.longitude)).toList(),
+            color: AppColors.accent,
+            width: 5,
+            patterns: [PatternItem.dot, PatternItem.gap(10)],
+          ),
+        );
+      }
+
+      // Create markers set
+      final Set<Marker> markers = {};
+
+      // Add current position marker
+      markers.add(
+        Marker(
+          markerId: const MarkerId('current_position'),
+          position: LatLng(position.latitude, position.longitude),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
+
+      // Add planned route start marker
+      if (_plannedRoute != null && _plannedRoute!.routePoints.isNotEmpty) {
+        final startPoint = _plannedRoute!.routePoints.first;
+        markers.add(
+          Marker(
+            markerId: const MarkerId('planned_route_start'),
+            position: startPoint,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            infoWindow: const InfoWindow(title: 'Route Start'),
+          ),
+        );
+
+        // Add planned route end marker (if different from start)
+        if (_plannedRoute!.routePoints.length > 1) {
+          final endPoint = _plannedRoute!.routePoints.last;
+          markers.add(
+            Marker(
+              markerId: const MarkerId('planned_route_end'),
+              position: endPoint,
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              infoWindow: const InfoWindow(title: 'Route End'),
+            ),
+          );
+        }
+      }
+
+      return GoogleMap(
+        initialCameraPosition: CameraPosition(target: LatLng(position.latitude, position.longitude), zoom: 17),
+        onMapCreated: (controller) {
+          _mapController = controller;
+          _setMapStyle(controller);
+          // Zoom to fit planned route if available
+          if (_plannedRoute != null && _plannedRoute!.routePoints.isNotEmpty) {
+            _fitPlannedRoute();
+          }
+        },
+        myLocationEnabled: false,
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+        mapToolbarEnabled: false,
+        compassEnabled: false,
+        polylines: polylines,
+        markers: markers,
+      );
+    });
+  }
+
+  /// Fit camera to show the planned route
+  void _fitPlannedRoute() {
+    if (_plannedRoute == null || _plannedRoute!.routePoints.isEmpty || _mapController == null) return;
+
+    double minLat = _plannedRoute!.routePoints.first.latitude;
+    double maxLat = _plannedRoute!.routePoints.first.latitude;
+    double minLng = _plannedRoute!.routePoints.first.longitude;
+    double maxLng = _plannedRoute!.routePoints.first.longitude;
+
+    for (final point in _plannedRoute!.routePoints) {
+      minLat = minLat < point.latitude ? minLat : point.latitude;
+      maxLat = maxLat > point.latitude ? maxLat : point.latitude;
+      minLng = minLng < point.longitude ? minLng : point.longitude;
+      maxLng = maxLng > point.longitude ? maxLng : point.longitude;
+    }
+
+    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng)), 100.0));
+  }
+
+  /// Set custom map style for dark theme
+  void _setMapStyle(GoogleMapController controller) {
+    const String mapStyle = '''
+    [
+      {
+        "elementType": "geometry",
+        "stylers": [{"color": "#1a1a1a"}]
+      },
+      {
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "#8a8a8a"}]
+      },
+      {
+        "elementType": "labels.text.stroke",
+        "stylers": [{"color": "#1a1a1a"}]
+      },
+      {
+        "featureType": "poi",
+        "elementType": "geometry",
+        "stylers": [{"color": "#2a2a2a"}]
+      },
+      {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [{"color": "#29603C"}, {"lightness": -40}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [{"color": "#2a2a2a"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [{"color": "#1a1a1a"}]
+      },
+      {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [{"color": "#000000"}]
+      }
+    ]
+    ''';
+    controller.setMapStyle(mapStyle);
+  }
+
+  /// Build top bar with status
+  Widget _buildTopBar() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, bottom: 12, left: 12, right: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.black.withOpacity(0.8), AppColors.black.withOpacity(0)]),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close_rounded, color: AppColors.white, size: 28),
+              onPressed: _showExitDialog,
+            ),
+            Expanded(
+              child: Center(
+                child: Obx(() {
+                  final status = _controller.runStatus.value;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: status == 'Paused' ? AppColors.upcoming.withOpacity(0.9) : AppColors.accent.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.white, width: 2),
+                    ),
+                    child: Text(
+                      status.toUpperCase(),
+                      style: AppTextStyles.labelLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            const SizedBox(width: 48),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build stats overlay (for Stack positioning)
+  Widget _buildStatsOverlay() {
+    return Positioned(top: MediaQuery.of(context).padding.top + 80, left: 16, right: 16, child: _buildStatsContent());
+  }
+
+  /// Build stats content (without Positioned wrapper, for use in Column)
+  Widget _buildStatsContent() {
+    return Obx(() {
+      return Column(
+        children: [
+          // Main stat cards - Row 1
+          Row(
+            children: [
+              Expanded(child: _buildStatCard('Distance', _controller.formatDistance(_controller.distanceMeters.value), Icons.straighten_rounded)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildStatCard('Time', _controller.formatDuration(_controller.elapsedTime.value), Icons.timer_rounded)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 2
+          Row(
+            children: [
+              Expanded(child: _buildStatCard('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km', Icons.speed_rounded)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildStatCard('Avg Pace', '${_controller.formatPace(_controller.averagePace.value)}/km', Icons.insights_rounded)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Row 3
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard('Calories', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value} cal' : '--', Icons.local_fire_department_rounded),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: _buildStatCard('Elevation', _controller.formatElevation(_controller.elevationGain.value), Icons.terrain_rounded)),
+            ],
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildStatCard(String label, String value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.black.withOpacity(0.75),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.accent.withOpacity(0.4), width: 1.5),
+        boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.5), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: AppColors.accent, size: 18),
+              const SizedBox(width: 6),
+              Text(label, style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray, fontSize: 12)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: AppTextStyles.titleLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 20),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build bottom sheet with controls
+  Widget _buildBottomSheet() {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.25,
+      minChildSize: 0.25,
+      maxChildSize: 0.6,
+      builder: (context, scrollController) {
+        return Obx(() {
+          final isTracking = _controller.isTracking.value;
+          final isPaused = _controller.isPaused.value;
+          final activityType = _controller.activityType.value;
+
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, -5))],
+            ),
+            child: Column(
+              children: [
+                // Drag handle
+                Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.5), borderRadius: BorderRadius.circular(2)),
+                ),
+
+                // Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Column(
+                        children: [
+                          // Activity type and status
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      activityType,
+                                      style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(isTracking ? 'Active workout' : 'Tap to start your workout', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
+                                  ],
+                                ),
+                              ),
+                              if (isTracking)
+                                Obx(() {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(12)),
+                                    child: Text(
+                                      _controller.formatDuration(_controller.elapsedTime.value),
+                                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold),
+                                    ),
+                                  );
+                                }),
+                            ],
+                          ),
+                          15.h.verticalSpace,
+                          // Control buttons
+                          if (!isTracking)
+                            _buildStartButton()
+                          else ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Stop button
+                                _buildControlButton(icon: Icons.stop_rounded, label: 'Stop', color: AppColors.error, onPressed: _showStopDialog),
+                                const SizedBox(width: 20),
+                                // Pause/Resume button
+                                _buildControlButton(
+                                  icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                                  label: isPaused ? 'Resume' : 'Pause',
+                                  color: isPaused ? AppColors.accent : AppColors.upcoming,
+                                  onPressed: () {
+                                    if (isPaused) {
+                                      _controller.resumeTracking();
+                                    } else {
+                                      _controller.pauseTracking();
+                                    }
+                                  },
+                                  isLarge: true,
+                                ),
+                                const SizedBox(width: 20),
+                                // Lock button
+                                _buildControlButton(
+                                  icon: _isLocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                                  label: _isLocked ? 'Unlock' : 'Lock',
+                                  color: _isLocked ? AppColors.accent : AppColors.primaryGray,
+                                  onPressed: () {
+                                    setState(() {
+                                      _isLocked = !_isLocked;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            15.h.verticalSpace,
+                            _buildStatsContent(),
+                          ],
+
+                          SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  Widget _buildBottomSheetStat(String label, String value, {bool showHeart = false}) {
+    return Column(
+      children: [
+        if (showHeart)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.favorite, color: Colors.red, size: 16),
+              const SizedBox(width: 4),
+            ],
+          ),
+        Text(
+          value,
+          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontSize: 11)),
+      ],
+    );
+  }
+
+  /// Build Start button
+  Widget _buildStartButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          final success = await _controller.startTracking(activity: _controller.activityType.value);
+          if (!success) {
+            Get.snackbar('Error', 'Failed to start tracking', snackPosition: SnackPosition.BOTTOM);
+          }
+        },
+        icon: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(color: AppColors.onAccent, shape: BoxShape.circle),
+          child: Icon(Icons.play_arrow, color: AppColors.accent, size: 18),
+        ),
+        label: Text('Start', style: AppTextStyles.buttonLarge),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.accent,
+          foregroundColor: AppColors.onAccent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildControlButton({required IconData icon, required String label, required Color color, required VoidCallback onPressed, bool isLarge = false}) {
+    final size = isLarge ? 75.0 : 65.0;
+    final iconSize = isLarge ? 36.0 : 28.0;
+
+    return Column(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.9),
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.white, width: 3),
+            boxShadow: [BoxShadow(color: color.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPressed,
+              customBorder: const CircleBorder(),
+              child: Icon(icon, color: AppColors.white, size: iconSize),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: AppTextStyles.labelMedium.copyWith(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+            shadows: [Shadow(color: AppColors.black.withOpacity(0.8), blurRadius: 4)],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Show exit confirmation dialog
+  void _showExitDialog() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Discard Run?', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
+        content: Text('Are you sure you want to exit without saving this run?', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel', style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryGray)),
+          ),
+          TextButton(
+            onPressed: () {
+              _controller.cancelTracking();
+              Get.back(); // Close dialog
+              Get.back(); // Go back to tracker screen
+            },
+            child: Text('Discard', style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show stop confirmation dialog
+  void _showStopDialog() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Finish Run?', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
+        content: Text('Do you want to save this run?', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel', style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryGray)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final run = await _controller.stopTracking();
+              Get.back(); // Close dialog
+              if (run != null) {
+                Get.offNamed(AppRoutes.runDetail, arguments: run);
+              } else {
+                Get.back(); // Go back to tracker screen
+              }
+            },
+            child: Text('Save', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accent)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build lock overlay - shows minimal stats when screen is locked
+  Widget _buildLockOverlay() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isLocked = false;
+        });
+      },
+      child: Container(
+        color: AppColors.black,
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Lock icon
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGray.withOpacity(0.3),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.accent.withOpacity(0.5), width: 2),
+                ),
+                child: Icon(Icons.lock_rounded, color: AppColors.accent, size: 48),
+              ),
+              const SizedBox(height: 32),
+
+              // Minimal stats display
+              Obx(() {
+                return Column(
+                  children: [
+                    // Time (large)
+                    Text(
+                      _controller.formatDuration(_controller.elapsedTime.value),
+                      style: AppTextStyles.headlineLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 64),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Distance and Pace
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLockStat('Distance', _controller.formatDistance(_controller.distanceMeters.value)),
+                        const SizedBox(width: 32),
+                        _buildLockStat('Pace', '${_controller.formatPace(_controller.currentPace.value)}/km'),
+                        const SizedBox(width: 32),
+                        _buildLockStat('Cal', _controller.caloriesBurned.value > 0 ? '${_controller.caloriesBurned.value}' : '--'),
+                      ],
+                    ),
+                  ],
+                );
+              }),
+
+              const SizedBox(height: 48),
+
+              // Unlock hint
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.accent.withOpacity(0.5), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.touch_app_rounded, color: AppColors.accent, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Tap to unlock',
+                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLockStat(String label, String value) {
+    return Column(
+      children: [
+        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray, fontSize: 12)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.titleLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+      ],
+    );
+  }
+}
