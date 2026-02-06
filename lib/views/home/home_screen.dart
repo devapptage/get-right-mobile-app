@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
       {'icon': Icons.storefront_outlined, 'activeIcon': Icons.storefront_rounded, 'label': 'Market'},
       {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Feed'},
-      {'icon': Icons.add_circle_outline, 'activeIcon': Icons.add_circle, 'label': 'Journal'},
+      {'icon': Icons.book_outlined, 'activeIcon': Icons.book_rounded, 'label': 'Journal'},
       {'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded, 'label': 'Library'},
       {'icon': Icons.restaurant_menu_outlined, 'activeIcon': Icons.restaurant_menu_rounded, 'label': 'Nutrition'},
     ];
@@ -104,14 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: List.generate(navItems.length, (index) {
-                  final isCenter = index == 2;
                   return _buildNavItem(
                     icon: navItems[index]['icon'] as IconData,
                     activeIcon: navItems[index]['activeIcon'] as IconData,
                     label: navItems[index]['label'] as String,
                     index: index,
                     isSelected: _navController.currentIndex == index,
-                    isCenter: isCenter,
                   );
                 }),
               ),
@@ -123,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Modern navigation item
-  Widget _buildNavItem({required IconData icon, required IconData activeIcon, required String label, required int index, required bool isSelected, bool isCenter = false}) {
+  Widget _buildNavItem({required IconData icon, required IconData activeIcon, required String label, required int index, required bool isSelected}) {
     const greenAccent = Color(0xFF29603C);
     const blackPrimary = Color(0xFF000000);
     const textSecondary = Color(0xFF404040);
@@ -142,16 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
-                width: isCenter ? 48 : (isSelected ? 40 : 34),
-                height: isCenter ? 48 : (isSelected ? 40 : 34),
+                width: isSelected ? 40 : 34,
+                height: isSelected ? 40 : 34,
                 decoration: BoxDecoration(
-                  color: isCenter
-                      ? greenAccent
-                      : isSelected
-                      ? greenAccent.withOpacity(0.12)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(isCenter ? 26 : 22),
-                  boxShadow: isCenter ? [BoxShadow(color: greenAccent.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))] : null,
+                  color: isSelected ? greenAccent.withOpacity(0.12) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(22),
                 ),
                 child: Center(
                   child: AnimatedSwitcher(
@@ -162,32 +155,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Icon(
                       isSelected ? activeIcon : icon,
                       key: ValueKey('$index-$isSelected'),
-                      color: isCenter
-                          ? Colors.white
-                          : isSelected
-                          ? greenAccent
-                          : textSecondary,
-                      size: isCenter ? 24 : 20,
+                      color: isSelected ? greenAccent : textSecondary,
+                      size: 20,
                     ),
                   ),
                 ),
               ),
-              // Label (hidden for center item)
-              if (!isCenter) ...[
-                const SizedBox(height: 3),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? blackPrimary : textSecondary,
-                    letterSpacing: 0.2,
-                    height: 1.0,
-                  ),
-                  child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+              // Label
+              const SizedBox(height: 3),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? blackPrimary : textSecondary,
+                  letterSpacing: 0.2,
+                  height: 1.0,
                 ),
-              ],
+                child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
             ],
           ),
         ),
