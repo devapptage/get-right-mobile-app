@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_right/models/exercise_library_model.dart';
 import 'package:get_right/models/exercise_set_model.dart';
 import 'package:get_right/models/workout_exercise_model.dart';
+import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 
@@ -17,8 +18,12 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   bool _isManual = false;
   bool _isSuperset = false;
   bool _isEditing = false;
+  bool _hasAskedWarmupWorkout = false;
   final TextEditingController _nameController = TextEditingController();
   List<_Config> _configs = [];
+  String? _focusedFieldType; // 'reps' or 'weight'
+  int? _focusedConfigIdx;
+  int? _focusedSetIdx;
 
   @override
   void initState() {
@@ -28,6 +33,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
       _isWarmup = args['isWarmup'] ?? false;
       _isManual = args['isManual'] ?? false;
       _isSuperset = args['isSuperset'] ?? false;
+      _hasAskedWarmupWorkout = args['isWarmup'] != null; // If isWarmup is provided, we've already asked
 
       // Handle editing existing exercise
       if (args['existingExercise'] != null) {
@@ -66,6 +72,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
             setData.distanceUnit = set.distanceUnit ?? 'miles';
           } else {
             setData.weight = set.weight ?? 0;
+            setData.isBodyweight = set.weightType == 'BW';
           }
           cfg.sets.add(setData);
         }
@@ -86,7 +93,133 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
         _configs.add(_Config(name: '', id: 'manual_${DateTime.now().millisecondsSinceEpoch}'));
       }
     }
-    if (_configs.isEmpty) _configs.add(_Config(name: '', id: 'manual_${DateTime.now().millisecondsSinceEpoch}'));
+    if (_configs.isEmpty) {
+      _configs.add(_Config(name: '', id: 'manual_${DateTime.now().millisecondsSinceEpoch}'));
+    }
+    
+    // Show popup asking warmup/workout if not already determined
+    if (!_hasAskedWarmupWorkout) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showWarmupWorkoutDialog());
+    }
+  }
+  
+  void _showWarmupWorkoutDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 8,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Add Exercise',
+                style: AppTextStyles.titleLarge.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Would you like to add this exercise to warmup or workout?',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _isWarmup = true;
+                          _hasAskedWarmupWorkout = true;
+                        });
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 4,
+                        shadowColor: AppColors.error.withOpacity(0.4),
+                      ),
+                      child: Text(
+                        'Warmup',
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _isWarmup = false;
+                          _hasAskedWarmupWorkout = true;
+                        });
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 4,
+                        shadowColor: AppColors.accent.withOpacity(0.4),
+                      ),
+                      child: Text(
+                        'Workout',
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: AppColors.onAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  void _openExerciseSelectionForCard(int cardIndex) {
+    Get.toNamed(
+      AppRoutes.exerciseSelection,
+      arguments: {'isWarmup': _isWarmup, 'isSuperset': false}, // Don't pass superset flag for individual card selection
+    )?.then((result) {
+      if (result != null && result['exercise'] != null) {
+        final ex = result['exercise'] as ExerciseLibraryModel;
+        setState(() {
+          // Update the specific card's exercise name
+          if (cardIndex < _configs.length) {
+            _configs[cardIndex].name = ex.name;
+            _configs[cardIndex].id = ex.id;
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -110,8 +243,8 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
         return ExerciseSetModel(
           id: 'set_${i + 1}_${now.millisecondsSinceEpoch}',
           setNumber: i + 1,
-          reps: cfg.mainType != 'Time' ? s.reps : null,
-          repsType: 'standard',
+          reps: cfg.mainType != 'Time' ? (s.reps == -1 ? null : s.reps) : null,
+          repsType: cfg.mainType != 'Time' ? (s.reps == -1 ? 'AMRAP' : 'standard') : null,
           timeSeconds: cfg.mainType == 'Time' ? s.time : null,
           weight: cfg.extraType == 'Weight' ? s.weight : null,
           weightType: cfg.extraType == 'Weight' ? (s.weight == 0 ? 'BW' : 'standard') : null,
@@ -296,10 +429,17 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        setState(() {
+          _focusedFieldType = null;
+          _focusedConfigIdx = null;
+          _focusedSetIdx = null;
+        });
+      },
       child: Scaffold(
         backgroundColor: AppColors.background,
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           backgroundColor: AppColors.primary,
           elevation: 0,
@@ -320,9 +460,60 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
           children: [
             SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 140),
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 140),
               child: Column(
-                children: _configs
+                children: [
+                  // Create Superset toggle
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _isSuperset,
+                        onChanged: (value) {
+                          setState(() {
+                            _isSuperset = value ?? false;
+                            if (_isSuperset && _configs.length < 2) {
+                              // Add second exercise for superset - create identical config
+                              final firstConfig = _configs[0];
+                              final secondConfig = _Config(
+                                name: '', // Start with empty name for second exercise
+                                id: 'manual_${DateTime.now().millisecondsSinceEpoch}',
+                              );
+                              secondConfig.mainType = firstConfig.mainType;
+                              secondConfig.extraType = firstConfig.extraType;
+                              // Copy sets structure
+                              secondConfig.sets.clear();
+                              for (var set in firstConfig.sets) {
+                                final newSet = _SetData();
+                                newSet.reps = set.reps;
+                                newSet.time = set.time;
+                                newSet.weight = set.weight;
+                                newSet.distance = set.distance;
+                                newSet.distanceUnit = set.distanceUnit;
+                                newSet.isBodyweight = set.isBodyweight;
+                                secondConfig.sets.add(newSet);
+                              }
+                              _configs.add(secondConfig);
+                            } else if (!_isSuperset && _configs.length > 1) {
+                              // Remove second exercise if not superset
+                              _configs.removeRange(1, _configs.length);
+                            }
+                          });
+                        },
+                        activeColor: AppColors.accent,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      Text(
+                        'Create Superset',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Exercise cards
+                  ..._configs
                     .asMap()
                     .entries
                     .map(
@@ -332,10 +523,186 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       ),
                     )
                     .toList(),
+                ],
               ),
             ),
 
-            // Fixed button at bottom
+            // Keyboard toolbar (appears at bottom when keyboard is showing, replaces save button)
+            if (_focusedFieldType != null && MediaQuery.of(context).viewInsets.bottom > 0)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom + 16,
+                    left: 20,
+                    right: 20,
+                    top: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Left side: AMRAP or BW button
+                      _focusedFieldType == 'reps'
+                          ? ElevatedButton(
+                              onPressed: () {
+                                if (_focusedConfigIdx != null && _focusedSetIdx != null) {
+                                  final cfg = _configs[_focusedConfigIdx!];
+                                  final setData = cfg.sets[_focusedSetIdx!];
+                                  setState(() {
+                                    setData.reps = -1; // Use -1 to represent AMRAP
+                                  });
+                                  FocusScope.of(context).unfocus();
+                                  setState(() {
+                                    _focusedFieldType = null;
+                                    _focusedConfigIdx = null;
+                                    _focusedSetIdx = null;
+                                  });
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.accent,
+                                foregroundColor: AppColors.onAccent,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                elevation: 4,
+                                shadowColor: AppColors.accent.withOpacity(0.3),
+                              ),
+                              child: Text(
+                                'AMRAP',
+                                style: AppTextStyles.buttonMedium.copyWith(
+                                  color: AppColors.onAccent,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            )
+                          : _focusedFieldType == 'weight'
+                              ? ElevatedButton(
+                                  onPressed: () {
+                                    if (_focusedConfigIdx != null && _focusedSetIdx != null) {
+                                      final cfg = _configs[_focusedConfigIdx!];
+                                      final setData = cfg.sets[_focusedSetIdx!];
+                                      setState(() {
+                                        setData.weight = 0; // 0 represents Bodyweight
+                                        setData.isBodyweight = true; // Mark as explicitly set to BW
+                                      });
+                                      FocusScope.of(context).unfocus();
+                                      setState(() {
+                                        _focusedFieldType = null;
+                                        _focusedConfigIdx = null;
+                                        _focusedSetIdx = null;
+                                      });
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.accent,
+                                    foregroundColor: AppColors.onAccent,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    elevation: 4,
+                                    shadowColor: AppColors.accent.withOpacity(0.3),
+                                  ),
+                                  child: Text(
+                                    'BW',
+                                    style: AppTextStyles.buttonMedium.copyWith(
+                                      color: AppColors.onAccent,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                      // Right side: Done button
+                      ElevatedButton(
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          setState(() {
+                            _focusedFieldType = null;
+                            _focusedConfigIdx = null;
+                            _focusedSetIdx = null;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: AppColors.onAccent,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 4,
+                          shadowColor: AppColors.accent.withOpacity(0.3),
+                        ),
+                        child: Text(
+                          'Done',
+                          style: AppTextStyles.buttonMedium.copyWith(
+                            color: AppColors.onAccent,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            // Fixed save button at bottom (hidden when keyboard is showing)
+            if (_focusedFieldType == null || MediaQuery.of(context).viewInsets.bottom == 0)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom + 16,
+                    left: 20,
+                    right: 20,
+                    top: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: _onSave,
+                      icon: const Icon(Icons.check_rounded, size: 22),
+                      label: Text(
+                        'Save Exercise',
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: AppColors.onAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.onAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 6,
+                        shadowColor: AppColors.accent.withOpacity(0.4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -343,63 +710,105 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   }
 
   Widget _buildCard(_Config cfg, int idx) {
-    // final isMan = cfg.name.isEmpty || _isEditing;
-    return Column(
+    return Container(
+      key: ValueKey('card_$idx'),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _nameController,
+          // Exercise name input (inside each card) with search icon
+          StatefulBuilder(
+            builder: (context, setCardState) {
+              final nameController = TextEditingController(text: cfg.name);
+              return TextField(
+                controller: nameController,
                 decoration: InputDecoration(
                   hintText: 'Enter exercise name',
-                  hintStyle: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.6)),
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.primaryGrayDark.withOpacity(0.5),
+                    fontSize: 15,
+                  ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.search, color: AppColors.primaryGrayDark, size: 22),
+                    onPressed: () => _openExerciseSelectionForCard(idx),
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
-                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 17),
-              ),
-            ),
-            IconButton(
-              onPressed: _onSave,
-              icon: Icon(Icons.check_rounded, color: AppColors.accent, size: 30),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    cfg.name = value;
+                  });
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 20),
         // "Two tabs" selector (like the screenshot): main metric (Reps/Time) + extra metric (Weight/Distance)
         Row(
           children: [
             Expanded(
               child: Container(
-                decoration: BoxDecoration(color: const Color.fromARGB(255, 149, 151, 155).withOpacity(0.3), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.2)),
+                  ),
                 child: Row(
                   children: ['Reps', 'Time'].map((t) {
                     final sel = cfg.mainType == t;
-                    final icons = {'Reps': Icons.repeat_rounded, 'Time': Icons.timer_outlined};
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => cfg.mainType = t),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(vertical: 7),
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            margin: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             gradient: sel
-                                ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                                  ? LinearGradient(
+                                      colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
                                 : null,
                             color: sel ? null : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
-                            boxShadow: sel ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                              boxShadow: sel
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.accent.withOpacity(0.35),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ]
+                                  : null,
                           ),
                           child: Center(
                             child: Text(
                               t,
                               style: AppTextStyles.labelSmall.copyWith(
-                                color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
+                                  color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.7),
                                 fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                                  fontSize: 13,
                               ),
                             ),
                           ),
@@ -410,36 +819,52 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 10),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(color: const Color.fromARGB(255, 149, 151, 155).withOpacity(0.3), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGray.withOpacity(0.2)),
+                  ),
                 child: Row(
                   children: ['Weight', 'Distance'].map((t) {
                     final sel = cfg.extraType == t;
-                    final icons = {'Weight': Icons.fitness_center, 'Distance': Icons.straighten_rounded};
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => cfg.extraType = t),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(vertical: 7),
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            margin: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             gradient: sel
-                                ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                                  ? LinearGradient(
+                                      colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
                                 : null,
                             color: sel ? null : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
-                            boxShadow: sel ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                              boxShadow: sel
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.accent.withOpacity(0.35),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ]
+                                  : null,
                           ),
                           child: Center(
                             child: Text(
                               t,
                               style: AppTextStyles.labelSmall.copyWith(
-                                color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
+                                  color: sel ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.7),
                                 fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                                  fontSize: 13,
                               ),
                             ),
                           ),
@@ -452,11 +877,13 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
             ),
           ],
         ),
-        const SizedBox(height: 28),
+          const SizedBox(height: 20),
+          // Sets configuration section
         Padding(
-          padding: const EdgeInsets.only(left: 25),
+            padding: const EdgeInsets.only(left: 8),
           child: Column(
             children: [
+                // Header row
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
@@ -465,7 +892,12 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       flex: 1,
                       child: Text(
                         'SET',
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.onSurface,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                            fontSize: 11,
+                          ),
                       ),
                     ),
                     Expanded(
@@ -473,7 +905,12 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       child: Text(
                         (cfg.mainType == 'Time' ? 'TIME (s)' : 'REPS').toUpperCase(),
                         textAlign: TextAlign.center,
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.onSurface,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                            fontSize: 11,
+                          ),
                       ),
                     ),
                     Expanded(
@@ -481,57 +918,63 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       child: Text(
                         (cfg.extraType == 'Distance' ? 'DISTANCE (mi)' : 'WEIGHT (lbs)').toUpperCase(),
                         textAlign: TextAlign.center,
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.onSurface,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                            fontSize: 11,
+                          ),
                       ),
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 12),
+                const SizedBox(height: 10),
+                // Set rows
               ...cfg.sets.asMap().entries.map((e) => _buildSetRow(cfg, idx, e.key, e.value)),
-              const SizedBox(height: 24),
+                const SizedBox(height: 16),
             ],
           ),
         ),
+          // Add/Remove set buttons
         Row(
           children: [
             Expanded(
               child: SizedBox(
-                height: 36,
+                  height: 40,
                 child: ElevatedButton.icon(
                   onPressed: cfg.sets.length > 1 ? () => setState(() => cfg.sets.removeLast()) : null,
-                  icon: const Icon(Icons.remove_rounded, size: 18),
-                  label: Text('Set', style: AppTextStyles.buttonSmall),
+                    icon: const Icon(Icons.remove_rounded, size: 16),
+                    label: Text('Set', style: AppTextStyles.buttonSmall.copyWith(fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cfg.sets.length > 1 ? Colors.red.shade400 : Colors.grey.shade300,
                     foregroundColor: cfg.sets.length > 1 ? Colors.white : Colors.grey.shade500,
-                    elevation: cfg.sets.length > 1 ? 2 : 0,
-                    shadowColor: Colors.red.withOpacity(0.3),
+                      elevation: cfg.sets.length > 1 ? 3 : 0,
+                      shadowColor: Colors.red.withOpacity(0.4),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                    minimumSize: const Size(0, 36),
+                      minimumSize: const Size(0, 40),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 10),
             Expanded(
               child: SizedBox(
-                height: 36,
+                  height: 40,
                 child: ElevatedButton.icon(
                   onPressed: () => setState(() => cfg.sets.add(_SetData())),
-                  icon: Icon(Icons.add_rounded, size: 18),
-                  label: Text('Set', style: AppTextStyles.buttonSmall),
+                    icon: const Icon(Icons.add_rounded, size: 16),
+                    label: Text('Set', style: AppTextStyles.buttonSmall.copyWith(fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     foregroundColor: AppColors.onAccent,
-                    elevation: 2,
-                    shadowColor: AppColors.accent.withOpacity(0.3),
+                      elevation: 3,
+                      shadowColor: AppColors.accent.withOpacity(0.4),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                    minimumSize: const Size(0, 36),
+                      minimumSize: const Size(0, 40),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
@@ -540,6 +983,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
           ],
         ),
       ],
+      ),
     );
   }
 
@@ -554,11 +998,16 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
           Expanded(
             flex: 1,
             child: Container(
-              height: 48,
+              height: 44,
+              alignment: Alignment.center,
               child: Text(
                 '${setIdx + 1}',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w700),
-              ).paddingSymmetric(horizontal: 12, vertical: 12),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.accent,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -568,34 +1017,78 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
               children: [
                 Expanded(
                   child: Container(
-                    height: 48,
+                    height: 44,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 149, 151, 155),
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
+                      border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: TextField(
-                      controller: TextEditingController(text: cfg.mainType == 'Time' ? (data.time > 0 ? data.time.toString() : '') : (data.reps > 0 ? data.reps.toString() : '')),
+                      key: ValueKey('reps_${cfgIdx}_${setIdx}'),
+                      controller: TextEditingController(
+                        text: cfg.mainType == 'Time'
+                            ? (data.time > 0 ? data.time.toString() : '')
+                            : (data.reps == -1
+                                ? 'AMRAP'
+                                : (data.reps > 0 ? data.reps.toString() : '')),
+                      )..selection = TextSelection.collapsed(
+                          offset: cfg.mainType == 'Time'
+                              ? (data.time > 0 ? data.time.toString().length : 0)
+                              : (data.reps == -1
+                                  ? 5 // 'AMRAP'.length
+                                  : (data.reps > 0 ? data.reps.toString().length : 0)),
+                        ),
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: cfg.mainType == 'Time' ? '30' : '10',
-                        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.5)),
+                        hintStyle: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primaryGrayDark.withOpacity(0.4),
+                          fontSize: 14,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                       ),
-                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
-                      onChanged: (v) {
-                        final n = int.tryParse(v) ?? 0;
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.onSurface,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                      onTap: () {
                         setState(() {
+                          _focusedFieldType = cfg.mainType == 'Time' ? null : 'reps';
+                          _focusedConfigIdx = cfgIdx;
+                          _focusedSetIdx = setIdx;
+                        });
+                      },
+                      onChanged: (v) {
+                        // Only update data model, don't trigger rebuild that recreates controller
+                        if (v.toUpperCase() == 'AMRAP' || v == 'AMRAP') {
+                          data.reps = -1;
+                        } else {
+                        final n = int.tryParse(v) ?? 0;
                           if (cfg.mainType == 'Time')
                             data.time = n;
                           else
                             data.reps = n;
+                        }
+                      },
+                      onSubmitted: (_) {
+                        FocusScope.of(context).unfocus();
+                        setState(() {
+                          _focusedFieldType = null;
+                          _focusedConfigIdx = null;
+                          _focusedSetIdx = null;
                         });
                       },
-                      onSubmitted: (_) => FocusScope.of(context).unfocus(),
                     ),
                   ),
                 ),
@@ -610,11 +1103,18 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                     children: [
                       Expanded(
                         child: Container(
-                          height: 48,
+                          height: 44,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryGrayLight.withOpacity(0.2),
+                            color: AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
+                            border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: TextField(
                             controller: TextEditingController(text: data.distance > 0 ? data.distance.toString() : ''),
@@ -624,10 +1124,17 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: '0.0',
-                              hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.5)),
+                              hintStyle: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.primaryGrayDark.withOpacity(0.4),
+                                fontSize: 14,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                             ),
-                            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.onSurface,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
                             onChanged: (v) => setState(() => data.distance = double.tryParse(v) ?? 0),
                             onSubmitted: (_) => FocusScope.of(context).unfocus(),
                           ),
@@ -639,26 +1146,75 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                     children: [
                       Expanded(
                         child: Container(
-                          height: 48,
+                          height: 44,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryGrayLight.withOpacity(0.2),
+                            color: AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.primaryGrayLight.withOpacity(0.4), width: 1),
+                            border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: TextField(
-                            controller: TextEditingController(text: data.weight > 0 ? data.weight.toInt().toString() : ''),
+                            key: ValueKey('weight_${cfgIdx}_${setIdx}'),
+                            controller: TextEditingController(
+                              text: data.isBodyweight && data.weight == 0
+                                  ? 'BW'
+                                  : (data.weight > 0 ? data.weight.toInt().toString() : ''),
+                            )..selection = TextSelection.collapsed(
+                                offset: data.isBodyweight && data.weight == 0
+                                    ? 2 // 'BW'.length
+                                    : (data.weight > 0 ? data.weight.toInt().toString().length : 0),
+                              ),
                             textAlign: TextAlign.center,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: '0',
-                              hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.5)),
+                              hintStyle: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.primaryGrayDark.withOpacity(0.4),
+                                fontSize: 14,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                             ),
-                            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
-                            onChanged: (v) => setState(() => data.weight = double.tryParse(v) ?? 0),
-                            onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.onSurface,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _focusedFieldType = 'weight';
+                                _focusedConfigIdx = cfgIdx;
+                                _focusedSetIdx = setIdx;
+                              });
+                            },
+                            onChanged: (v) {
+                              // Only update data model, don't trigger rebuild that recreates controller
+                              if (v.toUpperCase() == 'BW' || v.toLowerCase() == 'bw') {
+                                data.weight = 0;
+                                data.isBodyweight = true;
+                              } else {
+                                final parsed = double.tryParse(v);
+                                if (parsed != null) {
+                                  data.weight = parsed;
+                                  data.isBodyweight = false; // Clear BW flag when user types a number
+                                }
+                              }
+                            },
+                            onSubmitted: (_) {
+                              FocusScope.of(context).unfocus();
+                              setState(() {
+                                _focusedFieldType = null;
+                                _focusedConfigIdx = null;
+                                _focusedSetIdx = null;
+                              });
+                            },
                           ),
                         ),
                       ),
@@ -685,4 +1241,5 @@ class _SetData {
   double weight = 0;
   double distance = 0;
   String distanceUnit = 'miles';
+  bool isBodyweight = false; // Track if BW was explicitly set
 }

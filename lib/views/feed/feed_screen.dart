@@ -17,6 +17,7 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _storageService = Get.find<StorageService>();
+  late PageController _forYouPageController;
 
   // Mock feed data
   final List<Map<String, dynamic>> _feedPosts = [
@@ -131,11 +132,13 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _forYouPageController = PageController();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _forYouPageController.dispose();
     super.dispose();
   }
 
@@ -245,10 +248,12 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildForYouFeed() {
-    return ListView.builder(
+    return PageView.builder(
+      controller: _forYouPageController,
+      scrollDirection: Axis.vertical,
       itemCount: _feedPosts.length,
       itemBuilder: (context, index) {
-        return _buildFeedPost(_feedPosts[index]);
+        return _buildTikTokStylePost(_feedPosts[index]);
       },
     );
   }
@@ -285,127 +290,85 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildExplorePage() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          _buildCategorySection('Workout Tips', Icons.fitness_center, AppColors.accent),
-          _buildCategorySection('Nutrition', Icons.restaurant, AppColors.completed),
-          _buildCategorySection('Running', Icons.directions_run, AppColors.upcoming),
-          _buildCategorySection('Sports Training', Icons.sports_basketball, AppColors.error),
-          _buildCategorySection('Mobility', Icons.self_improvement, AppColors.accent),
-          const SizedBox(height: 80),
-        ],
+    // Get all posts for the explore grid
+    final allPosts = List<Map<String, dynamic>>.from(_feedPosts);
+    
+    // Add some duplicate posts to fill the grid (in a real app, this would come from an API)
+    final expandedPosts = <Map<String, dynamic>>[];
+    for (int i = 0; i < 3; i++) {
+      expandedPosts.addAll(allPosts);
+    }
+    
+    return GridView.builder(
+      padding: const EdgeInsets.all(2),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 2,
+        mainAxisSpacing: 2,
+        childAspectRatio: 1.0, // Square thumbnails like Instagram
       ),
+      itemCount: expandedPosts.length,
+      itemBuilder: (context, index) {
+        return _buildExploreGridItem(expandedPosts[index]);
+      },
     );
   }
 
-  Widget _buildCategorySection(String title, IconData icon, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Icon(icon, color: color, size: 24),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () {
-                    // TODO: Show all in category
-                  },
-                  child: Text('See All', style: TextStyle(color: color)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 210,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return _buildExploreCard(_feedPosts[index % _feedPosts.length]);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExploreCard(Map<String, dynamic> post) {
+  Widget _buildExploreGridItem(Map<String, dynamic> post) {
+    final isTrainer = post['isTrainer'] == true;
+    final hasVideo = post['videoUrl'] != null && post['videoUrl'].toString().isNotEmpty;
+    
     return GestureDetector(
       onTap: () => _showPostDetail(post),
-      child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(right: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    children: [
-                      Image.network(
-                        post['thumbnail'],
-                        width: 140,
-                        height: 150,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 140,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 140,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: Center(child: Icon(Icons.play_circle_filled, color: Colors.white.withOpacity(0.9), size: 50)),
-                      ),
-                    ],
-                  ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Thumbnail image
+          Image.network(
+            post['thumbnail'],
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)],
                 ),
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.7), borderRadius: BorderRadius.circular(4)),
-                    child: Text(post['duration'], style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontSize: 10)),
-                  ),
+              ),
+            ),
+          ),
+          
+          // Video play icon overlay (if it's a video)
+          if (hasVideo)
+            Positioned.fill(
+              child: Center(
+                child: Icon(
+                  Icons.play_circle_outline,
+                  color: Colors.white.withOpacity(0.8),
+                  size: 40,
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              post['title'],
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          
+          // Dim gold star for trainers (top right)
+          if (isTrainer)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.star,
+                  color: const Color(0xFFD4AF37).withOpacity(0.7), // Dim gold star
+                  size: 16,
+                ),
+              ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -608,6 +571,307 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             ),
           ),
           const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTikTokStylePost(Map<String, dynamic> post) {
+    final hasVideo = post['videoUrl'] != null && post['videoUrl'].toString().isNotEmpty;
+    final isTrainer = post['isTrainer'] == true;
+    
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Full-screen background image/video
+          Image.network(
+            post['thumbnail'],
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)],
+                ),
+              ),
+            ),
+          ),
+          
+          // Dark gradient overlay at bottom for text readability
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 300,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                ),
+              ),
+            ),
+          ),
+          
+          // Right side interaction buttons (TikTok style)
+          Positioned(
+            right: 12,
+            bottom: 100,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Profile avatar
+                GestureDetector(
+                  onTap: () => _navigateToCreatorProfile(post),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor: AppColors.accent.withOpacity(0.2),
+                      child: Text(
+                        post['creatorImage'],
+                        style: AppTextStyles.titleSmall.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Like button
+                _buildTikTokActionButton(
+                  icon: post['isLiked'] ? Icons.favorite : Icons.favorite_border,
+                  count: post['likes'],
+                  isActive: post['isLiked'] == true,
+                  onTap: () {
+                    setState(() {
+                      post['isLiked'] = !post['isLiked'];
+                      post['likes'] += post['isLiked'] ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                // Comment button
+                _buildTikTokActionButton(
+                  icon: Icons.comment_outlined,
+                  count: post['comments'],
+                  onTap: () => _showComments(post),
+                ),
+                const SizedBox(height: 20),
+                
+                // Save button
+                _buildTikTokActionButton(
+                  icon: post['isSaved'] ? Icons.bookmark : Icons.bookmark_border,
+                  count: post['saves'],
+                  isActive: post['isSaved'] == true,
+                  onTap: () async {
+                    final isSaved = post['isSaved'] ?? false;
+                    setState(() {
+                      post['isSaved'] = !isSaved;
+                      post['saves'] += !isSaved ? 1 : -1;
+                    });
+                    if (!isSaved) {
+                      await _storageService.addSavedPost(post);
+                    } else {
+                      await _storageService.removeSavedPost(post['id']);
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                // Share button
+                _buildTikTokActionButton(
+                  icon: Icons.share_outlined,
+                  count: post['shares'],
+                  onTap: () => _showShareOptions(post),
+                ),
+                if (isTrainer) ...[
+                  const SizedBox(height: 20),
+                  // Trainer badge
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4AF37).withOpacity(0.8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.star, color: Colors.white, size: 24),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          
+          // Bottom left: Creator info and description
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 80, // Leave space for right side buttons
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Creator name and follow button
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => _navigateToCreatorProfile(post),
+                        child: Text(
+                          '@${post['creator'].toString().toLowerCase().replaceAll(' ', '')}',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 4)],
+                          ),
+                        ),
+                      ),
+                      if (isTrainer) ...[
+                        const SizedBox(width: 6),
+                        Icon(Icons.verified, color: AppColors.completed, size: 18),
+                      ],
+                      const Spacer(),
+                      if (!post['isFollowing'])
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              post['isFollowing'] = true;
+                            });
+                            Get.snackbar(
+                              'Following',
+                              'You are now following ${post['creator']}',
+                              backgroundColor: AppColors.completed,
+                              colorText: Colors.white,
+                              snackPosition: SnackPosition.BOTTOM,
+                              duration: const Duration(seconds: 2),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'Follow',
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Description
+                  Text(
+                    post['description'],
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      shadows: [Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 4)],
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Hashtags
+                  Wrap(
+                    spacing: 8,
+                    children: (post['tags'] as List<String>).take(3).map((tag) {
+                      return Text(
+                        tag,
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w600,
+                          shadows: [Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 4)],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Video duration badge (top right)
+          if (hasVideo)
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.play_circle_outline, color: Colors.white, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      post['duration'],
+                      style: AppTextStyles.labelSmall.copyWith(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          
+          // Play button overlay (center) - only show if video
+          if (hasVideo)
+            Positioned.fill(
+              child: Center(
+                child: Icon(
+                  Icons.play_circle_filled,
+                  color: Colors.white.withOpacity(0.9),
+                  size: 80,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildTikTokActionButton({
+    required IconData icon,
+    required int count,
+    required VoidCallback onTap,
+    bool isActive = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isActive ? AppColors.error : Colors.white,
+            size: 32,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _formatCount(count),
+            style: AppTextStyles.labelSmall.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              shadows: [Shadow(color: Colors.black.withOpacity(0.8), blurRadius: 4)],
+            ),
+          ),
         ],
       ),
     );

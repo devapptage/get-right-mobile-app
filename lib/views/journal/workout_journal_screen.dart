@@ -159,7 +159,22 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
         _showAddExerciseContent = false;
       });
   });
-  void _onAddExercise() => Get.toNamed(AppRoutes.addExercise);
+  void _onAddExercise() {
+    // Navigate directly to exercise configuration screen (same as big plus button)
+    Get.toNamed(AppRoutes.exerciseConfiguration)?.then((result) {
+      if (result != null && result['exercises'] != null) {
+        final exercises = result['exercises'] as List<WorkoutExerciseModel>;
+        final isWarmup = result['isWarmup'] as bool? ?? false;
+        setState(() {
+          if (isWarmup) {
+            _workout = _workout!.copyWith(warmupExercises: [..._workout!.warmupExercises, ...exercises]);
+          } else {
+            _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, ...exercises]);
+          }
+        });
+      }
+    });
+  }
 
   void _onQuickAddSetsReps() {
     _showQuickAddDialog(isTimer: false);
@@ -457,8 +472,19 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
           child: Center(
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  _showAddExerciseContent = true;
+                // Navigate directly to exercise configuration screen
+                Get.toNamed(AppRoutes.exerciseConfiguration)?.then((result) {
+                  if (result != null && result['exercises'] != null) {
+                    final exercises = result['exercises'] as List<WorkoutExerciseModel>;
+                    final isWarmup = result['isWarmup'] as bool? ?? false;
+                    setState(() {
+                      if (isWarmup) {
+                        _workout = _workout!.copyWith(warmupExercises: [..._workout!.warmupExercises, ...exercises]);
+                      } else {
+                        _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, ...exercises]);
+                      }
+                    });
+                  }
                 });
               },
               child: Container(

@@ -28,69 +28,10 @@ class SupersetCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Superset Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(14), topRight: Radius.circular(14)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(20)),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.compare_arrows, color: AppColors.onAccent, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        'SUPERSET',
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.onAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '2 exercises',
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGrayDark, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          ),
-
           // Exercise 1
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.accent, width: 2),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'A',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: ExerciseCard(exercise: exercise1, onMenuTap: onMenuTap1, onTimerTap: onTimerTap1),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            child: ExerciseCard(exercise: exercise1, onMenuTap: onMenuTap1, onTimerTap: onTimerTap1),
           ),
 
           // Divider
@@ -111,34 +52,7 @@ class SupersetCard extends StatelessWidget {
           // Exercise 2
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 6, 12, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.accent, width: 2),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'B',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: ExerciseCard(exercise: exercise2, onMenuTap: onMenuTap2, onTimerTap: onTimerTap2),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            child: ExerciseCard(exercise: exercise2, onMenuTap: onMenuTap2, onTimerTap: onTimerTap2),
           ),
         ],
       ),

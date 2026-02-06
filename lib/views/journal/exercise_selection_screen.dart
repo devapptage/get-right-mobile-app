@@ -22,7 +22,10 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
   void initState() {
     super.initState();
     final args = Get.arguments as Map<String, dynamic>?;
-    if (args != null) _isWarmup = args['isWarmup'] ?? false;
+    if (args != null) {
+      _isWarmup = args['isWarmup'] ?? false;
+      _isSuperset = args['isSuperset'] ?? false; // Only show superset option if explicitly requested
+    }
     _searchCtrl.addListener(_filter);
   }
 
@@ -59,16 +62,10 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
       Get.snackbar('Superset', 'Select exactly 2 exercises for superset', backgroundColor: AppColors.error, colorText: AppColors.onError);
       return;
     }
-    Get.toNamed(
-      AppRoutes.exerciseConfiguration,
-      arguments: {
-        'isWarmup': _isWarmup,
-        'isSuperset': _isSuperset,
-        'exercise': _selected.length == 1 ? _selected.first : null,
-        'exercises': _isSuperset ? _selected.toList() : null,
-      },
-    )?.then((r) {
-      if (r != null) Get.back(result: r);
+    // Return the selected exercise(s) directly instead of navigating
+    Get.back(result: {
+      'exercise': _selected.length == 1 ? _selected.first : null,
+      'exercises': _isSuperset ? _selected.toList() : null,
     });
   }
 
@@ -117,26 +114,28 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: _isSuperset,
-                      onChanged: (v) => setState(() {
-                        _isSuperset = v ?? false;
-                        if (!_isSuperset && _selected.length > 1) {
-                          final first = _selected.first;
-                          _selected.clear();
-                          _selected.add(first);
-                        }
-                      }),
-                      activeColor: AppColors.accent,
-                    ),
-                    Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
-                  ],
+              // Only show superset checkbox if explicitly enabled (not when called from magnifying glass)
+              if (_isSuperset)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: _isSuperset,
+                        onChanged: (v) => setState(() {
+                          _isSuperset = v ?? false;
+                          if (!_isSuperset && _selected.length > 1) {
+                            final first = _selected.first;
+                            _selected.clear();
+                            _selected.add(first);
+                          }
+                        }),
+                        activeColor: AppColors.accent,
+                      ),
+                      Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
+                    ],
+                  ),
                 ),
-              ),
               Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.only(bottom: showButtons ? 140 : 0),
@@ -216,25 +215,30 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: Text(
-                          _isSuperset && _selected.length == 2 ? 'Configure Superset' : 'Configure ${_selected.first.name}',
+                          _isSuperset && _selected.length == 2 
+                              ? 'Configure Superset' 
+                              : (_isSuperset ? 'Configure ${_selected.first.name}' : 'Select Exercise'),
                           style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onAccent),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: _onManual,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.onBackground,
-                          side: const BorderSide(color: AppColors.primaryGray, width: 2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    // Only show "Couldn't find Exercise?" button when no exercise is selected
+                    if (_selected.isEmpty) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: _onManual,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.onBackground,
+                            side: const BorderSide(color: AppColors.primaryGray, width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text("Couldn't find Exercise?", style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
                         ),
-                        child: Text("Couldn't find Exercise?", style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
