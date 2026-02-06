@@ -39,6 +39,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       'saves': 421,
       'isLiked': false,
       'isSaved': false,
+      'isPremium': true,
+      'isFavorited': true,
       'timestamp': '2 hours ago',
       'duration': '45s',
     },
@@ -60,6 +62,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       'saves': 892,
       'isLiked': true,
       'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
       'timestamp': '4 hours ago',
       'duration': '1:15',
     },
@@ -81,6 +85,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       'saves': 156,
       'isLiked': false,
       'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
       'timestamp': '8 hours ago',
       'duration': '30s',
     },
@@ -102,6 +108,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       'saves': 234,
       'isLiked': true,
       'isSaved': false,
+      'isPremium': true,
+      'isFavorited': true,
       'timestamp': '1 day ago',
       'duration': '1:00',
     },
@@ -123,6 +131,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       'saves': 567,
       'isLiked': false,
       'isSaved': true,
+      'isPremium': false,
+      'isFavorited': false,
       'timestamp': '1 day ago',
       'duration': '1:20',
     },
@@ -302,127 +312,88 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildExplorePage() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          _buildCategorySection('Workout Tips', Icons.fitness_center, AppColors.accent),
-          _buildCategorySection('Nutrition', Icons.restaurant, AppColors.completed),
-          _buildCategorySection('Running', Icons.directions_run, AppColors.upcoming),
-          _buildCategorySection('Sports Training', Icons.sports_basketball, AppColors.error),
-          _buildCategorySection('Mobility', Icons.self_improvement, AppColors.accent),
-          const SizedBox(height: 80),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategorySection(String title, IconData icon, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Icon(icon, color: color, size: 24),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () {
-                    // TODO: Show all in category
-                  },
-                  child: Text('See All', style: TextStyle(color: color)),
-                ),
-              ],
+    return CustomScrollView(
+      slivers: [
+        // Main grid of all posts
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              childAspectRatio: 1.0, // Square grid items
             ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 210,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return _buildExploreCard(_feedPosts[index % _feedPosts.length]);
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return _buildExploreGridItem(_feedPosts[index % _feedPosts.length]);
               },
+              childCount: 12, // Show 12 items (4 rows x 3 columns)
             ),
           ),
-        ],
-      ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+      ],
     );
   }
 
-  Widget _buildExploreCard(Map<String, dynamic> post) {
+  Widget _buildExploreGridItem(Map<String, dynamic> post) {
+    final isPremium = post['isPremium'] ?? false;
+    final isFavorited = post['isFavorited'] ?? false;
+    final isStarred = isPremium || isFavorited;
+
     return GestureDetector(
       onTap: () => _showPostDetail(post),
-      child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(right: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    children: [
-                      Image.network(
-                        post['thumbnail'],
-                        width: 140,
-                        height: 150,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 140,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 140,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.3)]),
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: Center(child: Icon(Icons.play_circle_filled, color: Colors.white.withOpacity(0.9), size: 50)),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.7), borderRadius: BorderRadius.circular(4)),
-                    child: Text(post['duration'], style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontSize: 10)),
-                  ),
-                ),
-              ],
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Thumbnail image
+          Image.network(
+            post['thumbnail'],
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              post['title'],
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w600),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          ),
+
+          // Gradient overlay for better visibility
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black.withOpacity(0.2)]),
             ),
-          ],
-        ),
+          ),
+
+          // White circular play button in center
+          Center(
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, spreadRadius: 1)],
+              ),
+              child: Icon(Icons.play_arrow, color: AppColors.accent, size: 24),
+            ),
+          ),
+
+          // Premium star icon in top-right corner (always shown, gold if premium/favorited, gray otherwise)
+          Positioned(
+            top: 6,
+            right: 6,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(color: const Color.fromARGB(153, 71, 71, 71), shape: BoxShape.circle),
+              child: Icon(
+                Icons.star,
+                color: Color.fromARGB(255, 175, 149, 2), // Gold for premium/favorited, gray for regular
+                size: 18,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
