@@ -17,6 +17,7 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _storageService = Get.find<StorageService>();
+  final Map<int, PageController> _pageControllers = {};
 
   // Mock feed data
   final List<Map<String, dynamic>> _feedPosts = [
@@ -136,7 +137,18 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _tabController.dispose();
+    for (var controller in _pageControllers.values) {
+      controller.dispose();
+    }
+    _pageControllers.clear();
     super.dispose();
+  }
+
+  PageController _getPageController(int tabIndex) {
+    if (!_pageControllers.containsKey(tabIndex)) {
+      _pageControllers[tabIndex] = PageController();
+    }
+    return _pageControllers[tabIndex]!;
   }
 
   @override
@@ -236,6 +248,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         ),
         body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage()]),
         floatingActionButton: FloatingActionButton(
+          heroTag: 'feed_fab',
           onPressed: _showCreatePostOptions,
           backgroundColor: AppColors.accent,
           child: const Icon(Icons.add, color: Colors.white, size: 32),
@@ -245,10 +258,12 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildForYouFeed() {
-    return ListView.builder(
+    return PageView.builder(
+      controller: _getPageController(0),
+      scrollDirection: Axis.vertical,
       itemCount: _feedPosts.length,
       itemBuilder: (context, index) {
-        return _buildFeedPost(_feedPosts[index]);
+        return _buildFullScreenPost(_feedPosts[index]);
       },
     );
   }
@@ -276,10 +291,12 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       );
     }
 
-    return ListView.builder(
+    return PageView.builder(
+      controller: _getPageController(1),
+      scrollDirection: Axis.vertical,
       itemCount: followingPosts.length,
       itemBuilder: (context, index) {
-        return _buildFeedPost(followingPosts[index]);
+        return _buildFullScreenPost(followingPosts[index]);
       },
     );
   }
@@ -406,6 +423,257 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFullScreenPost(Map<String, dynamic> post) {
+    return GestureDetector(
+      onTap: () => _showPostDetail(post),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Full screen background image/video
+          Image.network(
+            post['thumbnail'],
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
+              ),
+            ),
+          ),
+
+          // Gradient overlay for better text visibility
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(0.3), Colors.black.withOpacity(0.6)],
+                stops: const [0.0, 0.6, 1.0],
+              ),
+            ),
+          ),
+
+          // Large white circular play button in center
+          Center(
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, spreadRadius: 2)],
+              ),
+              child: Icon(Icons.play_arrow, color: AppColors.accent, size: 50),
+            ),
+          ),
+
+          // Top right duration badge
+          Positioned(
+            top: 20,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: Colors.black.withOpacity(0.7), borderRadius: BorderRadius.circular(6)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.play_circle_outline, color: Colors.white, size: 17),
+                  const SizedBox(width: 4),
+                  Text(
+                    post['duration'] ?? '30s',
+                    style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Right side interaction buttons
+          Positioned(
+            right: 16,
+            bottom: 120,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Profile Avatar
+                GestureDetector(
+                  onTap: () => _navigateToCreatorProfile(post),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: AppColors.accent.withOpacity(0.2),
+                      child: Text(
+                        post['creatorImage'] ?? 'U',
+                        style: AppTextStyles.titleSmall.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Like button
+                _buildVerticalInteractionButton(
+                  icon: post['isLiked'] ? Icons.favorite : Icons.favorite_border,
+                  count: post['likes'] ?? 0,
+                  color: post['isLiked'] ? Colors.red : Colors.white,
+                  onTap: () {
+                    setState(() {
+                      post['isLiked'] = !post['isLiked'];
+                      post['likes'] += post['isLiked'] ? 1 : -1;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Comment button
+                _buildVerticalInteractionButton(icon: Icons.comment_outlined, count: post['comments'] ?? 0, color: Colors.white, onTap: () => _showComments(post)),
+                const SizedBox(height: 20),
+
+                // Save/Bookmark button
+                _buildVerticalInteractionButton(
+                  icon: post['isSaved'] ? Icons.bookmark : Icons.bookmark_border,
+                  count: post['saves'] ?? 0,
+                  color: Colors.white,
+                  onTap: () async {
+                    final isSaved = post['isSaved'] ?? false;
+                    setState(() {
+                      post['isSaved'] = !isSaved;
+                      post['saves'] += !isSaved ? 1 : -1;
+                    });
+                    if (!isSaved) {
+                      await _storageService.addSavedPost(post);
+                    } else {
+                      await _storageService.removeSavedPost(post['id']);
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Share button
+                _buildVerticalInteractionButton(icon: Icons.share_outlined, count: post['shares'] ?? 0, color: Colors.white, onTap: () => _showShareOptions(post)),
+                const SizedBox(height: 20),
+
+                // Premium star icon
+                GestureDetector(
+                  onTap: () {
+                    // TODO: Handle premium/favorite action
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: Color.fromARGB(255, 145, 123, 2), shape: BoxShape.circle),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: AppColors.white, // Gold color for premium
+                          size: 28,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Bottom left text content
+          Positioned(
+            left: 16,
+            bottom: 15,
+            right: 100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Username
+                GestureDetector(
+                  onTap: () => _navigateToCreatorProfile(post),
+                  child: Row(
+                    children: [
+                      Text(
+                        '@${(post['creator'] ?? 'user').toString().toLowerCase().replaceAll(' ', '')}',
+                        style: AppTextStyles.titleSmall.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          shadows: [Shadow(color: Colors.black.withOpacity(0.7), blurRadius: 6, offset: const Offset(0, 2))],
+                        ),
+                      ),
+                      if (post['isTrainer'])
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: Icon(Icons.verified, color: AppColors.completed, size: 18),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Caption
+                Text(
+                  post['description'] ?? '',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                    shadows: [Shadow(color: Colors.black.withOpacity(0.7), blurRadius: 6, offset: const Offset(0, 2))],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Hashtags
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children:
+                      (post['tags'] as List<String>?)
+                          ?.map(
+                            (tag) => Text(
+                              tag,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                shadows: [Shadow(color: Colors.black.withOpacity(0.7), blurRadius: 6, offset: const Offset(0, 2))],
+                              ),
+                            ),
+                          )
+                          .toList() ??
+                      [],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerticalInteractionButton({required IconData icon, required int count, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 6),
+          Text(
+            _formatCount(count),
+            style: AppTextStyles.labelSmall.copyWith(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              shadows: [Shadow(color: Colors.black.withOpacity(0.7), blurRadius: 4, offset: const Offset(0, 1))],
+            ),
+          ),
+        ],
       ),
     );
   }
