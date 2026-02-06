@@ -26,7 +26,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
   bool _isLoading = true;
   bool _isStarted = false;
   bool _isPaused = false;
-  bool _showAddExerciseContent = false;
+  // Dialog is now used instead of inline add-exercise content
   Timer? _timer;
   int _seconds = 0;
   int _calories = 0;
@@ -145,29 +145,19 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
 
   String _formatTime(int s) => '${(s ~/ 60).toString().padLeft(2, '0')}:${(s % 60).toString().padLeft(2, '0')}';
 
-  void _onAddWarmup() => Get.toNamed(AppRoutes.exerciseSelection, arguments: {'isWarmup': true})?.then((r) {
+  void _onAddWarmup() => Get.toNamed(AppRoutes.exerciseConfiguration, arguments: {'isWarmup': true})?.then((r) {
     if (r != null && r['exercises'] != null)
       setState(() {
         _workout = _workout!.copyWith(warmupExercises: [..._workout!.warmupExercises, ...r['exercises'] as List<WorkoutExerciseModel>]);
-        _showAddExerciseContent = false;
       });
   });
-  void _onAddWorkout() => Get.toNamed(AppRoutes.exerciseSelection, arguments: {'isWarmup': false})?.then((r) {
+  void _onAddWorkout() => Get.toNamed(AppRoutes.exerciseConfiguration, arguments: {'isWarmup': false})?.then((r) {
     if (r != null && r['exercises'] != null)
       setState(() {
         _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, ...r['exercises'] as List<WorkoutExerciseModel>]);
-        _showAddExerciseContent = false;
       });
   });
   void _onAddExercise() => Get.toNamed(AppRoutes.addExercise);
-
-  void _onQuickAddSetsReps() {
-    _showQuickAddDialog(isTimer: false);
-  }
-
-  void _onQuickAddTimer() {
-    _showQuickAddDialog(isTimer: true);
-  }
 
   void _showQuickAddDialog({required bool isTimer}) {
     final TextEditingController nameController = TextEditingController();
@@ -331,7 +321,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                                 } else {
                                   _workout = _workout!.copyWith(workoutExercises: [..._workout!.workoutExercises, exercise]);
                                 }
-                                _showAddExerciseContent = false;
                               });
 
                               nameController.dispose();
@@ -373,8 +362,6 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
             Expanded(
               child: _isLoading
                   ? Center(child: CircularProgressIndicator(color: AppColors.accent))
-                  : _showAddExerciseContent
-                  ? _buildAddExerciseContent()
                   : _workout == null || _workout!.isEmpty
                   ? _buildEmpty()
                   : _buildContent(),
@@ -410,14 +397,12 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
               decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
               child: const Icon(Icons.add, color: AppColors.onAccent, size: 20),
             ),
-            onPressed: _onAddExercise,
+            onPressed: _showAddExerciseDialog,
           ),
         ],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: AppColors.accent))
-          : _showAddExerciseContent
-          ? _buildAddExerciseContent()
           : _workout == null || _workout!.isEmpty
           ? _buildEmpty()
           : _buildContent(),
@@ -456,11 +441,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
           right: 0,
           child: Center(
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _showAddExerciseContent = true;
-                });
-              },
+              onTap: _showAddExerciseDialog,
               child: Container(
                 width: 80,
                 height: 80,
@@ -500,87 +481,79 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
     );
   }
 
-  Widget _buildAddExerciseContent() {
-    return Stack(
-      children: [
-        Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+  void _showAddExerciseDialog() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+          decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Add Exercise',
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Would you like to add this exercise to warmup or workout?',
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark),
+              ),
+              const SizedBox(height: 24),
+              Row(
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: _onAddWarmup,
-                      icon: const Icon(Icons.whatshot_outlined, size: 22),
-                      label: Text('Add Warmup Exercise', style: AppTextStyles.buttonLarge),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.secondary,
-                        foregroundColor: AppColors.onSecondary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back();
+                          _onAddWarmup();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFB71C1C),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Warmup',
+                          style: AppTextStyles.buttonMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: _onAddWorkout,
-                      icon: const Icon(Icons.fitness_center, size: 22),
-                      label: Text('Add Workout Exercise', style: AppTextStyles.buttonLarge),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.onAccent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back();
+                          _onAddWorkout();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Workout',
+                          style: AppTextStyles.buttonMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   height: 56,
-                  //   child: ElevatedButton.icon(
-                  //     onPressed: _onQuickAddSetsReps,
-                  //     icon: const Icon(Icons.add_circle_outline, size: 22),
-                  //     label: Text('Quick Add (Sets & Reps)', style: AppTextStyles.buttonLarge),
-                  //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: AppColors.completed,
-                  //       foregroundColor: Colors.white,
-                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  //       elevation: 0,
-                  //     ),
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 16),
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   height: 56,
-                  //   child: ElevatedButton.icon(
-                  //     onPressed: _onQuickAddTimer,
-                  //     icon: const Icon(Icons.timer_outlined, size: 22),
-                  //     label: Text('Quick Add (Timer-Based)', style: AppTextStyles.buttonLarge),
-                  //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: AppColors.upcoming,
-                  //       foregroundColor: Colors.white,
-                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  //       elevation: 0,
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
-
-        // Back button at top left
-      ],
+      ),
+      barrierDismissible: true,
     );
   }
 
@@ -626,7 +599,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                                   decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
                                   child: const Icon(Icons.add, color: AppColors.onAccent, size: 20),
                                 ),
-                                onPressed: _onAddExercise,
+                                onPressed: _showAddExerciseDialog,
                               ),
                             ],
                           ),

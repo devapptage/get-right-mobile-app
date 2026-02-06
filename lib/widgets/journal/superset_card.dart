@@ -68,22 +68,6 @@ class SupersetCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.accent, width: 2),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'A',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
                     Expanded(
                       child: ExerciseCard(exercise: exercise1, onMenuTap: onMenuTap1, onTimerTap: onTimerTap1),
                     ),
@@ -116,22 +100,6 @@ class SupersetCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.accent, width: 2),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'B',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
                     Expanded(
                       child: ExerciseCard(exercise: exercise2, onMenuTap: onMenuTap2, onTimerTap: onTimerTap2),
                     ),

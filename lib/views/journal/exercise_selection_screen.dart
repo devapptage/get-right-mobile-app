@@ -14,6 +14,7 @@ class ExerciseSelectionScreen extends StatefulWidget {
 class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
   final TextEditingController _searchCtrl = TextEditingController();
   bool _isWarmup = false;
+  bool _selectOnly = false;
   List<ExerciseLibraryModel> _filtered = ExerciseLibraryData.exercises;
   final Set<ExerciseLibraryModel> _selected = {};
   bool _isSuperset = false;
@@ -22,7 +23,10 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
   void initState() {
     super.initState();
     final args = Get.arguments as Map<String, dynamic>?;
-    if (args != null) _isWarmup = args['isWarmup'] ?? false;
+    if (args != null) {
+      _isWarmup = args['isWarmup'] ?? false;
+      _selectOnly = args['selectOnly'] ?? false;
+    }
     _searchCtrl.addListener(_filter);
   }
 
@@ -38,6 +42,11 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
   }
 
   void _toggleSelect(ExerciseLibraryModel ex) {
+    // In selectOnly mode, immediately return the selected exercise
+    if (_selectOnly) {
+      Get.back(result: {'exercise': ex});
+      return;
+    }
     setState(() {
       if (_selected.contains(ex))
         _selected.remove(ex);
@@ -57,6 +66,11 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
     }
     if (_isSuperset && _selected.length != 2) {
       Get.snackbar('Superset', 'Select exactly 2 exercises for superset', backgroundColor: AppColors.error, colorText: AppColors.onError);
+      return;
+    }
+    // If selectOnly mode, return the selected exercise directly
+    if (_selectOnly) {
+      Get.back(result: {'exercise': _selected.first});
       return;
     }
     Get.toNamed(
@@ -117,26 +131,6 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: _isSuperset,
-                      onChanged: (v) => setState(() {
-                        _isSuperset = v ?? false;
-                        if (!_isSuperset && _selected.length > 1) {
-                          final first = _selected.first;
-                          _selected.clear();
-                          _selected.add(first);
-                        }
-                      }),
-                      activeColor: AppColors.accent,
-                    ),
-                    Text('Create Superset (select 2)', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onBackground)),
-                  ],
-                ),
-              ),
               Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.only(bottom: showButtons ? 140 : 0),
