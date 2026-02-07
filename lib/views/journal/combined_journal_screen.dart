@@ -69,7 +69,7 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
           ),
         ),
         child: Scaffold(
-          extendBodyBehindAppBar: true,
+          extendBodyBehindAppBar: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
           backgroundColor: Colors.transparent,
