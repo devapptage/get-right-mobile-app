@@ -60,10 +60,23 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
       decoration: const BoxDecoration(
         gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)]),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.background,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          appBarTheme: Theme.of(context).appBarTheme.copyWith(
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+          ),
+        ),
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+          forceMaterialTransparency: true,
           elevation: 0,
           toolbarHeight: 56,
           systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark, statusBarBrightness: Brightness.light),
@@ -169,6 +182,7 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
           centerTitle: true,
         ),
         body: TabBarView(controller: _tabController, children: const [WorkoutJournalScreen(isEmbedded: true), RunTrackerScreen()]),
+        ),
       ),
     );
   }
