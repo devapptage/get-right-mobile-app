@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
@@ -34,14 +33,16 @@ class PersonalRecord {
 
 /// Profile screen - Social media style profile
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  /// When true, renders only the profile content (no Scaffold/AppBar) for embedding in tabs
+  final bool isEmbedded;
+
+  const ProfileScreen({super.key, this.isEmbedded = false});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ProfileScreenState extends State<ProfileScreen> {
   final _storageService = Get.find<StorageService>();
   List<PersonalRecord> _personalRecords = [];
 
@@ -59,7 +60,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     // Initialize with default records
     _personalRecords = [
       PersonalRecord(id: '1', liftName: 'Bench Press', value: '315', unit: 'lbs', date: DateTime(2024, 12, 12), displayPublicly: true),
@@ -86,13 +86,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    if (widget.isEmbedded) {
+      return Container(
+        color: AppColors.background,
+        child: SingleChildScrollView(child: _buildPublicProfileBody()),
+      );
+    }
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -111,73 +111,66 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             onPressed: () => Get.toNamed(AppRoutes.settings),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(68),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: AppColors.onAccent,
-                unselectedLabelColor: AppColors.onSurface.withOpacity(0.6),
-                labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
-                unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w500),
-                tabs: const [
-                  Tab(text: 'Public'),
-                  Tab(text: 'Personal'),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
-      body: TabBarView(controller: _tabController, children: [_buildPublicProfile(), _buildPersonalProfile()]),
+      body: SingleChildScrollView(child: _buildPublicProfileBody()),
     );
   }
 
-  Widget _buildPublicProfile() {
-    return SingleChildScrollView(
-      child: Column(
+  Widget _buildPublicProfileBody() {
+    return Column(
         children: [
           const SizedBox(height: 20),
           // Profile Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Picture
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.accent, width: 3),
-                  ),
-                  child: CircleAvatar(
-                    radius: 45,
-                    backgroundColor: AppColors.surface,
-                    child: Icon(Icons.person, size: 50, color: AppColors.accent),
-                  ),
+                // Profile Picture and Edit Info button
+                Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.accent, width: 3),
+                      ),
+                      child: CircleAvatar(
+                        radius: 45,
+                        backgroundColor: AppColors.surface,
+                        child: Icon(Icons.person, size: 50, color: AppColors.accent),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final result = await Get.toNamed(AppRoutes.editProfile);
+                        if (result == true) _loadProfileData();
+                      },
+                      icon: const Icon(Icons.edit, size: 10),
+                      label: Text('Edit Info', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 11)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.accent,
+                        side: const BorderSide(color: AppColors.accent, width: 1),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        minimumSize: const Size(0, 24),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 30),
+                const SizedBox(width: 12),
                 // Stats
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatColumn('6', 'Posts'),
-                      _buildStatColumn('1247', 'Followers', onTap: () => Get.toNamed(AppRoutes.followers)),
-                      _buildStatColumn('342', 'Following', onTap: () => Get.toNamed(AppRoutes.following)),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatColumn('6', 'Posts'),
+                        _buildStatColumn('1247', 'Followers', onTap: () => Get.toNamed(AppRoutes.followers)),
+                        _buildStatColumn('342', 'Following', onTap: () => Get.toNamed(AppRoutes.following)),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -286,203 +279,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           ),
           const SizedBox(height: 20),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPersonalProfile() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          // Profile Header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                // Profile Avatar
-                Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.accent, width: 3),
-                      ),
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.accent.withOpacity(0.2),
-                        child: Icon(Icons.person, size: 50, color: AppColors.accent),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () async {
-                          final result = await Get.toNamed(AppRoutes.editProfile);
-                          if (result == true) {
-                            // Reload profile data when returning from edit screen
-                            _loadProfileData();
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.accent,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.background, width: 2),
-                          ),
-                          child: const Icon(Icons.edit, size: 16, color: AppColors.onAccent),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(_fullName ?? "User Name", style: AppTextStyles.headlineMedium.copyWith(color: AppColors.onBackground)),
-                const SizedBox(height: 4),
-                Text(_storageService.getEmail() ?? "user@example.com", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: 180,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final result = await Get.toNamed(AppRoutes.editProfile);
-                      if (result == true) {
-                        // Reload profile data when returning from edit screen
-                        _loadProfileData();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, foregroundColor: AppColors.onAccent, elevation: 0),
-                    icon: const Icon(Icons.edit, size: 18),
-                    label: const Text('Edit Profile'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Personal Information Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Personal Information", style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground)),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primaryGray, width: 1),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildInfoRow('Full Name', _fullName ?? 'Not set', Icons.person_outline),
-                      const Divider(height: 24, color: AppColors.primaryGray),
-
-                      _buildInfoRow('Date of Birth', _dateOfBirth ?? 'Not set', Icons.cake_outlined),
-                      const Divider(height: 24, color: AppColors.primaryGray),
-                      _buildInfoRow('Contact Number', _contactNumber ?? '52165168', Icons.phone_outlined),
-                      const Divider(height: 24, color: AppColors.primaryGray),
-                      _buildInfoRow('Gender', _gender ?? 'Male', Icons.wc),
-                      const Divider(height: 24, color: AppColors.primaryGray),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Bio Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primaryGray, width: 1),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.edit_note, color: AppColors.accent, size: 20),
-                          const SizedBox(width: 8),
-                          Text('Bio', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _bio ?? 'No bio added yet.',
-                        style: AppTextStyles.bodyMedium.copyWith(color: _bio != null && _bio!.isNotEmpty ? AppColors.onSurface : AppColors.primaryGray),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Onboarding Preferences Card
-                if (_preference != null || _goals.isNotEmpty || _fitnessLevel != null || _exerciseFrequency != null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryGray, width: 1),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.quiz_outlined, color: AppColors.accent, size: 20),
-                            const SizedBox(width: 8),
-                            Text('Onboarding Preferences', style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        if (_preference != null) ...[_buildPreferenceInfoRow('Preference', _preference!, Icons.fitness_center), const SizedBox(height: 12)],
-                        if (_goals.isNotEmpty) ...[
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.flag_outlined, color: AppColors.accent, size: 20),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Goals', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                                    const SizedBox(height: 8),
-                                    Wrap(spacing: 8, runSpacing: 8, children: _goals.map((goal) => _buildPreferenceChip(goal)).toList()),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                        if (_fitnessLevel != null) ...[_buildPreferenceInfoRow('Fitness Level', _fitnessLevel!, Icons.trending_up), const SizedBox(height: 12)],
-                        if (_exerciseFrequency != null) _buildPreferenceInfoRow('Exercise Frequency', _exerciseFrequency!, Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Menu Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SizedBox(height: 16), _buildLogoutCard(), const SizedBox(height: 24)]),
-          ),
-        ],
-      ),
-    );
+      );
   }
 
   Widget _buildStatColumn(String count, String label, {VoidCallback? onTap}) {
@@ -733,121 +530,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     // Add creator info to post data
     final postWithCreator = {...post, 'creator': 'brogan seier', 'creatorInitials': 'BS', 'isLiked': false, 'isSaved': false};
     Get.toNamed(AppRoutes.postDetail, arguments: postWithCreator);
-  }
-
-  Widget _buildInfoRow(String label, String value, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.accent, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-              const SizedBox(height: 4),
-              Text(value, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPreferenceInfoRow(String label, String value, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.accent, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPreferenceChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.accent.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.accent, width: 1),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildLogoutCard() {
-    return GestureDetector(
-      onTap: () {
-        Get.dialog(
-          AlertDialog(
-            backgroundColor: AppColors.surface,
-            title: Text('Logout', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
-            content: Text('Are you sure you want to logout?', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray)),
-            actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text('Cancel', style: TextStyle(color: AppColors.primaryGray)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Get.back();
-                  final authController = Get.find<AuthController>();
-                  authController.logout();
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: AppColors.onError),
-                child: const Text('Logout'),
-              ),
-            ],
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.error, width: 2),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(color: AppColors.error.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.logout, color: AppColors.error, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Logout', style: AppTextStyles.titleSmall.copyWith(color: AppColors.error)),
-                  const SizedBox(height: 2),
-                  Text('Sign out of your account', style: AppTextStyles.labelSmall.copyWith(color: AppColors.error.withOpacity(0.8))),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: AppColors.error, size: 24),
-          ],
-        ),
-      ),
-    );
   }
 
   void _showCreatePostOptions() {

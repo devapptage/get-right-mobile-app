@@ -5,6 +5,7 @@ import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/profile/profile_screen.dart';
 
 /// Community Feed - Social Media Platform for fitness content
 class FeedScreen extends StatefulWidget {
@@ -128,11 +129,14 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
     },
   ];
 
+  static const List<String> _tabLabels = ['For You', 'Following', 'Explore', 'Profile'];
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _forYouPageController = PageController();
+    _tabController.addListener(() => setState(() {}));
   }
 
   @override
@@ -205,21 +209,22 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             );
           }),
           title: Text(
-            'Community Feed',
+            _tabLabels[_tabController.index],
             style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
           ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.search, color: AppColors.accent),
+              icon: Icon(
+                _tabController.index == 3 ? Icons.settings_outlined : Icons.search,
+                color: AppColors.accent,
+              ),
               onPressed: () {
-                // TODO: Implement search
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: AppColors.accent),
-              onPressed: () {
-                // TODO: Show notifications
+                if (_tabController.index == 3) {
+                  Get.toNamed(AppRoutes.settings);
+                } else {
+                  // TODO: Implement search
+                }
               },
             ),
           ],
@@ -231,18 +236,14 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold),
             unselectedLabelStyle: AppTextStyles.titleSmall,
             tabs: const [
-              Tab(text: 'For You'),
-              Tab(text: 'Following'),
-              Tab(text: 'Explore'),
+              Tab(icon: Icon(Icons.public), text: 'For You'),
+              Tab(icon: Icon(Icons.people), text: 'Following'),
+              Tab(icon: Icon(Icons.explore), text: 'Explore'),
+              Tab(icon: Icon(Icons.person), text: 'Profile'),
             ],
           ),
         ),
-        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage()]),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _showCreatePostOptions,
-          backgroundColor: AppColors.accent,
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
-        ),
+        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage(), const ProfileScreen(isEmbedded: true)]),
       ),
     );
   }
@@ -281,10 +282,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       );
     }
 
-    return ListView.builder(
+    return PageView.builder(
+      scrollDirection: Axis.vertical,
       itemCount: followingPosts.length,
       itemBuilder: (context, index) {
-        return _buildFeedPost(followingPosts[index]);
+        return _buildTikTokStylePost(followingPosts[index]);
       },
     );
   }
