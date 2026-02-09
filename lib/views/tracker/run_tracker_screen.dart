@@ -25,16 +25,28 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
   double _totalDistance = 0.0;
   bool _mapLoadError = false;
   bool _isMapCreated = false;
+  Widget? _cachedMapWidget;
+  Position? _lastCameraPosition;
+  DateTime? _lastCameraUpdate;
 
   @override
   void initState() {
     super.initState();
     _loadStats();
     _initializeLocation();
-    // Listen to position updates and update camera only
+    // Listen to position updates and update camera only (with debouncing)
     ever(_trackingController.currentPosition, (position) {
       if (position != null && _mapController != null && _isMapCreated && mounted) {
-        _updateCameraPosition(position);
+        final now = DateTime.now();
+        // Debounce camera updates to prevent buffer overflow (max 1 update per 500ms)
+        if (_lastCameraUpdate == null ||
+            _lastCameraPosition == null ||
+            now.difference(_lastCameraUpdate!) > const Duration(milliseconds: 500) ||
+            _hasSignificantPositionChange(position, _lastCameraPosition!)) {
+          _lastCameraPosition = position;
+          _lastCameraUpdate = now;
+          _updateCameraPosition(position);
+        }
       }
     });
   }
@@ -102,16 +114,31 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
 
   @override
   void dispose() {
-    _isMapCreated = false;
     _mapController?.dispose();
     _mapController = null;
+    _isMapCreated = false;
+    _cachedMapWidget = null;
+    _lastCameraPosition = null;
+    _lastCameraUpdate = null;
     super.dispose();
   }
 
-  /// Update camera position without rebuilding the map
+  /// Check if position change is significant enough to update camera
+  bool _hasSignificantPositionChange(Position newPos, Position oldPos) {
+    // Update if moved more than ~10 meters
+    const threshold = 0.0001; // approximately 10 meters
+    return (newPos.latitude - oldPos.latitude).abs() > threshold || (newPos.longitude - oldPos.longitude).abs() > threshold;
+  }
+
+  /// Update camera position without rebuilding the map (with error handling)
   void _updateCameraPosition(position) {
-    if (_mapController != null && _isMapCreated) {
-      _mapController!.animateCamera(CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)));
+    if (_mapController != null && _isMapCreated && mounted) {
+      try {
+        _mapController!.animateCamera(CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)));
+      } catch (e) {
+        debugPrint('⚠️ Camera update error: $e');
+        // Don't throw, just log the error to prevent crashes
+      }
     }
   }
 
@@ -175,40 +202,48 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
       final position = _trackingController.currentPosition.value;
       final hasPosition = position != null;
 
-      debugPrint('🗺️ Building map preview - hasPosition: $hasPosition, mapError: $_mapLoadError');
+      // Build the map widget separately - it should never rebuild once created
+      Widget mapContent;
+      if (_isMapCreated && _cachedMapWidget != null) {
+        // Map is already created - use cached widget and NEVER rebuild it
+        mapContent = _cachedMapWidget!;
+      } else if (!hasPosition) {
+        mapContent = Container(
+          color: AppColors.surface,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), shape: BoxShape.circle),
+                  child: const Icon(Icons.location_searching, size: 40, color: AppColors.accent),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Finding your location...',
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(color: AppColors.accent, strokeWidth: 3)),
+              ],
+            ),
+          ),
+        );
+      } else if (_mapLoadError) {
+        mapContent = _buildMapErrorState(position);
+      } else {
+        // Build map only once - this should only happen once
+        mapContent = _buildGoogleMapWidgetOnce(position);
+      }
 
       return SizedBox(
         height: double.infinity,
         width: double.infinity,
         child: Stack(
           children: [
-            hasPosition
-                ? _mapLoadError
-                      ? _buildMapErrorState(position)
-                      : _buildGoogleMapWidget(position)
-                : Container(
-                    color: AppColors.surface,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.15), shape: BoxShape.circle),
-                            child: const Icon(Icons.location_searching, size: 40, color: AppColors.accent),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Finding your location...',
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 8),
-                          const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(color: AppColors.accent, strokeWidth: 3)),
-                        ],
-                      ),
-                    ),
-                  ),
+            mapContent,
 
             // Top overlay with gradient
             Positioned(
@@ -254,15 +289,28 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
     });
   }
 
-  /// Build Google Map widget with error handling - only builds once
-  Widget _buildGoogleMapWidget(position) {
-    // Only log on first build
-    if (!_isMapCreated) {
-      debugPrint('🗺️ Building GoogleMap widget - Position: ${position.latitude}, ${position.longitude}');
+  /// Build Google Map widget once and cache it to prevent buffer overflow
+  Widget _buildGoogleMapWidgetOnce(position) {
+    // CRITICAL: Return cached widget immediately if map is already created
+    // This prevents ANY rebuilds that cause buffer overflow
+    if (_isMapCreated && _cachedMapWidget != null) {
+      // Don't even check _mapController here to avoid any overhead
+      return _cachedMapWidget!;
     }
 
+    // Only build if not already created
+    if (_isMapCreated && _cachedMapWidget == null) {
+      // Map is being created but widget not cached yet, return loading state
+      return Container(
+        color: AppColors.surface,
+        child: const Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      );
+    }
+
+    debugPrint('🗺️ Building GoogleMap widget - Position: ${position.latitude}, ${position.longitude}');
+
     try {
-      return GoogleMap(
+      final mapWidget = GoogleMap(
         key: const ValueKey('static_google_map'), // Static key prevents rebuilds
         initialCameraPosition: CameraPosition(target: LatLng(position.latitude, position.longitude), zoom: 15),
         onMapCreated: (controller) {
@@ -270,6 +318,12 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
           if (!_isMapCreated || _mapController == null) {
             _mapController = controller;
             _isMapCreated = true;
+            _lastCameraPosition = position;
+            if (mounted) {
+              setState(() {
+                _mapLoadError = false;
+              });
+            }
             try {
               _setMapStyle(controller);
               debugPrint('✅ Map style applied');
@@ -289,6 +343,10 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
         indoorViewEnabled: false,
         trafficEnabled: false,
       );
+
+      // Cache the widget immediately (before onMapCreated fires)
+      _cachedMapWidget = mapWidget;
+      return mapWidget;
     } catch (e) {
       debugPrint('❌ Error building map: $e');
       // Schedule error state update for next frame
@@ -403,48 +461,10 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
 
   /// Set custom map style for dark theme
   void _setMapStyle(GoogleMapController controller) {
-    const String mapStyle = '''
-    [
-      {
-        "elementType": "geometry",
-        "stylers": [{"color": "#1a1a1a"}]
-      },
-      {
-        "elementType": "labels.text.fill",
-        "stylers": [{"color": "#8a8a8a"}]
-      },
-      {
-        "elementType": "labels.text.stroke",
-        "stylers": [{"color": "#1a1a1a"}]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [{"color": "#2a2a2a"}]
-      },
-      {
-        "featureType": "poi.park",
-        "elementType": "geometry",
-        "stylers": [{"color": "#29603C"}, {"lightness": -40}]
-      },
-      {
-        "featureType": "road",
-        "elementType": "geometry",
-        "stylers": [{"color": "#2a2a2a"}]
-      },
-      {
-        "featureType": "road",
-        "elementType": "geometry.stroke",
-        "stylers": [{"color": "#1a1a1a"}]
-      },
-      {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [{"color": "#000000"}]
-      }
-    ]
-    ''';
-    controller.setMapStyle(mapStyle);
+    // "Light" map - essentially disables custom styling so Google's normal light map shows.
+    // If you want a pure white background, use below (but it will hide features).
+    // To closely resemble Google Maps "default" light mode, just set to null or empty.
+    controller.setMapStyle(null);
   }
 
   /// Build activity type selector and action buttons

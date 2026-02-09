@@ -275,50 +275,11 @@ class _RoutePlanningScreenState extends State<RoutePlanningScreen> {
     );
   }
 
-  /// Set custom map style
   void _setMapStyle(GoogleMapController controller) {
-    const String mapStyle = '''
-    [
-      {
-        "elementType": "geometry",
-        "stylers": [{"color": "#1a1a1a"}]
-      },
-      {
-        "elementType": "labels.text.fill",
-        "stylers": [{"color": "#8a8a8a"}]
-      },
-      {
-        "elementType": "labels.text.stroke",
-        "stylers": [{"color": "#1a1a1a"}]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [{"color": "#2a2a2a"}]
-      },
-      {
-        "featureType": "poi.park",
-        "elementType": "geometry",
-        "stylers": [{"color": "#29603C"}, {"lightness": -40}]
-      },
-      {
-        "featureType": "road",
-        "elementType": "geometry",
-        "stylers": [{"color": "#2a2a2a"}]
-      },
-      {
-        "featureType": "road",
-        "elementType": "geometry.stroke",
-        "stylers": [{"color": "#1a1a1a"}]
-      },
-      {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [{"color": "#000000"}]
-      }
-    ]
-    ''';
-    controller.setMapStyle(mapStyle);
+    // "Light" map - essentially disables custom styling so Google's normal light map shows.
+    // If you want a pure white background, use below (but it will hide features).
+    // To closely resemble Google Maps "default" light mode, just set to null or empty.
+    controller.setMapStyle(null);
   }
 
   /// Build instructions overlay
