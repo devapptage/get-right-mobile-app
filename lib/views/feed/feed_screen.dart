@@ -18,6 +18,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   late TabController _tabController;
   final _storageService = Get.find<StorageService>();
   final Map<int, PageController> _pageControllers = {};
+  final TextEditingController _exploreSearchController = TextEditingController();
+  String _exploreSearchQuery = '';
 
   // Mock feed data
   final List<Map<String, dynamic>> _feedPosts = [
@@ -136,6 +138,466 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       'timestamp': '1 day ago',
       'duration': '1:20',
     },
+    {
+      'id': '6',
+      'creator': 'David Park',
+      'creatorImage': 'DP',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'Deadlift Mastery: Perfect Your Form',
+      'description': 'Learn the fundamentals of proper deadlift technique 💀',
+      'category': 'Strength',
+      'tags': ['#deadlift', '#strength', '#form'],
+      'videoUrl': 'https://example.com/video6.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
+      'likes': 3456,
+      'comments': 198,
+      'shares': 123,
+      'saves': 789,
+      'isLiked': true,
+      'isSaved': false,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '2 days ago',
+      'duration': '2:30',
+    },
+    {
+      'id': '7',
+      'creator': 'Jessica Martinez',
+      'creatorImage': 'JM',
+      'isTrainer': false,
+      'isFollowing': false,
+      'title': 'Yoga Flow for Beginners',
+      'description': 'Start your yoga journey with this gentle flow 🧘',
+      'category': 'Yoga',
+      'tags': ['#yoga', '#beginner', '#flexibility'],
+      'videoUrl': 'https://example.com/video7.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400',
+      'likes': 1876,
+      'comments': 89,
+      'shares': 45,
+      'saves': 234,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '2 days ago',
+      'duration': '15:00',
+    },
+    {
+      'id': '8',
+      'creator': 'Tom Wilson',
+      'creatorImage': 'TW',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'HIIT Cardio Blast',
+      'description': '20 minutes of high-intensity cardio 🔥',
+      'category': 'Cardio',
+      'tags': ['#hiit', '#cardio', '#fatburn'],
+      'videoUrl': 'https://example.com/video8.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400',
+      'likes': 4123,
+      'comments': 267,
+      'shares': 189,
+      'saves': 1023,
+      'isLiked': true,
+      'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '3 days ago',
+      'duration': '20:00',
+    },
+    {
+      'id': '9',
+      'creator': 'Maria Garcia',
+      'creatorImage': 'MG',
+      'isTrainer': true,
+      'isFollowing': false,
+      'title': 'Healthy Smoothie Recipes',
+      'description': '5 delicious and nutritious smoothie recipes 🥤',
+      'category': 'Nutrition',
+      'tags': ['#smoothie', '#nutrition', '#healthy'],
+      'videoUrl': 'https://example.com/video9.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400',
+      'likes': 2987,
+      'comments': 156,
+      'shares': 234,
+      'saves': 678,
+      'isLiked': false,
+      'isSaved': true,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '3 days ago',
+      'duration': '5:45',
+    },
+    {
+      'id': '10',
+      'creator': 'Chris Anderson',
+      'creatorImage': 'CA',
+      'isTrainer': false,
+      'isFollowing': true,
+      'title': 'Swimming Technique Tips',
+      'description': 'Improve your swimming form and speed 🏊',
+      'category': 'Swimming',
+      'tags': ['#swimming', '#technique', '#endurance'],
+      'videoUrl': 'https://example.com/video10.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400',
+      'likes': 1654,
+      'comments': 78,
+      'shares': 56,
+      'saves': 189,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '4 days ago',
+      'duration': '8:20',
+    },
+    {
+      'id': '11',
+      'creator': 'Rachel Kim',
+      'creatorImage': 'RK',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'Pilates Core Strengthening',
+      'description': 'Build a strong core with these Pilates moves 💪',
+      'category': 'Pilates',
+      'tags': ['#pilates', '#core', '#strength'],
+      'videoUrl': 'https://example.com/video11.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+      'likes': 2234,
+      'comments': 134,
+      'shares': 98,
+      'saves': 456,
+      'isLiked': true,
+      'isSaved': false,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '4 days ago',
+      'duration': '12:15',
+    },
+    {
+      'id': '12',
+      'creator': 'James Brown',
+      'creatorImage': 'JB',
+      'isTrainer': true,
+      'isFollowing': false,
+      'title': 'Boxing Fundamentals',
+      'description': 'Learn basic boxing punches and footwork 🥊',
+      'category': 'Boxing',
+      'tags': ['#boxing', '#martialarts', '#training'],
+      'videoUrl': 'https://example.com/video12.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
+      'likes': 3789,
+      'comments': 245,
+      'shares': 167,
+      'saves': 890,
+      'isLiked': false,
+      'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '5 days ago',
+      'duration': '10:30',
+    },
+    {
+      'id': '13',
+      'creator': 'Sophie Lee',
+      'creatorImage': 'SL',
+      'isTrainer': false,
+      'isFollowing': true,
+      'title': 'Cycling Training Tips',
+      'description': 'Boost your cycling performance 🚴‍♀️',
+      'category': 'Cycling',
+      'tags': ['#cycling', '#endurance', '#training'],
+      'videoUrl': 'https://example.com/video13.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+      'likes': 1456,
+      'comments': 67,
+      'shares': 34,
+      'saves': 123,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '5 days ago',
+      'duration': '6:45',
+    },
+    {
+      'id': '14',
+      'creator': 'Michael Taylor',
+      'creatorImage': 'MT',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'Pull-Up Progression Guide',
+      'description': 'Master pull-ups from zero to hero 💪',
+      'category': 'Calisthenics',
+      'tags': ['#pullups', '#calisthenics', '#bodyweight'],
+      'videoUrl': 'https://example.com/video14.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+      'likes': 4567,
+      'comments': 312,
+      'shares': 234,
+      'saves': 1234,
+      'isLiked': true,
+      'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '6 days ago',
+      'duration': '9:15',
+    },
+    {
+      'id': '15',
+      'creator': 'Amanda White',
+      'creatorImage': 'AW',
+      'isTrainer': true,
+      'isFollowing': false,
+      'title': 'Meditation for Athletes',
+      'description': 'Mental training for peak performance 🧘‍♂️',
+      'category': 'Mental Health',
+      'tags': ['#meditation', '#mentalhealth', '#recovery'],
+      'videoUrl': 'https://example.com/video15.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400',
+      'likes': 1890,
+      'comments': 98,
+      'shares': 76,
+      'saves': 345,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '6 days ago',
+      'duration': '15:30',
+    },
+    {
+      'id': '16',
+      'creator': 'Ryan Murphy',
+      'creatorImage': 'RM',
+      'isTrainer': false,
+      'isFollowing': true,
+      'title': 'Rock Climbing Basics',
+      'description': 'Get started with indoor rock climbing 🧗',
+      'category': 'Rock Climbing',
+      'tags': ['#climbing', '#adventure', '#strength'],
+      'videoUrl': 'https://example.com/video16.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
+      'likes': 2345,
+      'comments': 145,
+      'shares': 89,
+      'saves': 567,
+      'isLiked': true,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '1 week ago',
+      'duration': '11:20',
+    },
+    {
+      'id': '17',
+      'creator': 'Nicole Foster',
+      'creatorImage': 'NF',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'Kettlebell Workout Routine',
+      'description': 'Full body workout with kettlebells 🔔',
+      'category': 'Strength',
+      'tags': ['#kettlebell', '#strength', '#fullbody'],
+      'videoUrl': 'https://example.com/video17.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400',
+      'likes': 3124,
+      'comments': 189,
+      'shares': 145,
+      'saves': 789,
+      'isLiked': false,
+      'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '1 week ago',
+      'duration': '18:45',
+    },
+    {
+      'id': '18',
+      'creator': 'Kevin Zhang',
+      'creatorImage': 'KZ',
+      'isTrainer': true,
+      'isFollowing': false,
+      'title': 'Protein-Rich Meal Ideas',
+      'description': 'High protein meals for muscle building 🍖',
+      'category': 'Nutrition',
+      'tags': ['#protein', '#nutrition', '#musclebuilding'],
+      'videoUrl': 'https://example.com/video18.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
+      'likes': 2678,
+      'comments': 167,
+      'shares': 234,
+      'saves': 890,
+      'isLiked': true,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '1 week ago',
+      'duration': '7:30',
+    },
+    {
+      'id': '19',
+      'creator': 'Olivia Green',
+      'creatorImage': 'OG',
+      'isTrainer': false,
+      'isFollowing': true,
+      'title': 'Dance Cardio Workout',
+      'description': 'Fun dance moves that burn calories 💃',
+      'category': 'Cardio',
+      'tags': ['#dance', '#cardio', '#fun'],
+      'videoUrl': 'https://example.com/video19.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400',
+      'likes': 3456,
+      'comments': 234,
+      'shares': 189,
+      'saves': 678,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '1 week ago',
+      'duration': '25:00',
+    },
+    {
+      'id': '20',
+      'creator': 'Daniel Cooper',
+      'creatorImage': 'DC',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'Stretching Routine for Runners',
+      'description': 'Essential stretches to prevent injuries 🏃',
+      'category': 'Stretching',
+      'tags': ['#stretching', '#running', '#recovery'],
+      'videoUrl': 'https://example.com/video20.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400',
+      'likes': 2789,
+      'comments': 156,
+      'shares': 98,
+      'saves': 456,
+      'isLiked': true,
+      'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '1 week ago',
+      'duration': '14:20',
+    },
+    {
+      'id': '21',
+      'creator': 'Laura Mitchell',
+      'creatorImage': 'LM',
+      'isTrainer': true,
+      'isFollowing': false,
+      'title': 'TRX Suspension Training',
+      'description': 'Full body workout using TRX straps 🎯',
+      'category': 'Functional Training',
+      'tags': ['#trx', '#functionaltraining', '#core'],
+      'videoUrl': 'https://example.com/video21.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400',
+      'likes': 1890,
+      'comments': 112,
+      'shares': 78,
+      'saves': 345,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '2 weeks ago',
+      'duration': '16:45',
+    },
+    {
+      'id': '22',
+      'creator': 'Robert King',
+      'creatorImage': 'RK',
+      'isTrainer': false,
+      'isFollowing': true,
+      'title': 'Marathon Training Tips',
+      'description': 'How to prepare for your first marathon 🏃‍♂️',
+      'category': 'Running',
+      'tags': ['#marathon', '#running', '#endurance'],
+      'videoUrl': 'https://example.com/video22.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400',
+      'likes': 4123,
+      'comments': 298,
+      'shares': 234,
+      'saves': 1234,
+      'isLiked': true,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '2 weeks ago',
+      'duration': '12:00',
+    },
+    {
+      'id': '23',
+      'creator': 'Jennifer Adams',
+      'creatorImage': 'JA',
+      'isTrainer': true,
+      'isFollowing': true,
+      'title': 'Post-Workout Recovery Smoothie',
+      'description': 'Perfect smoothie to refuel after training 🥤',
+      'category': 'Nutrition',
+      'tags': ['#recovery', '#smoothie', '#postworkout'],
+      'videoUrl': 'https://example.com/video23.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400',
+      'likes': 2234,
+      'comments': 145,
+      'shares': 167,
+      'saves': 678,
+      'isLiked': false,
+      'isSaved': true,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '2 weeks ago',
+      'duration': '3:45',
+    },
+    {
+      'id': '24',
+      'creator': 'Mark Stevens',
+      'creatorImage': 'MS',
+      'isTrainer': true,
+      'isFollowing': false,
+      'title': 'Olympic Lifting Basics',
+      'description': 'Introduction to snatch and clean & jerk 🏋️',
+      'category': 'Olympic Lifting',
+      'tags': ['#olympiclifting', '#strength', '#technique'],
+      'videoUrl': 'https://example.com/video24.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
+      'likes': 5678,
+      'comments': 412,
+      'shares': 298,
+      'saves': 1890,
+      'isLiked': true,
+      'isSaved': false,
+      'isPremium': true,
+      'isFavorited': true,
+      'timestamp': '2 weeks ago',
+      'duration': '22:30',
+    },
+    {
+      'id': '25',
+      'creator': 'Patricia Moore',
+      'creatorImage': 'PM',
+      'isTrainer': false,
+      'isFollowing': true,
+      'title': 'Outdoor Hiking Adventure',
+      'description': 'Beautiful trails and hiking tips 🥾',
+      'category': 'Hiking',
+      'tags': ['#hiking', '#outdoor', '#adventure'],
+      'videoUrl': 'https://example.com/video25.mp4',
+      'thumbnail': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+      'likes': 3456,
+      'comments': 234,
+      'shares': 189,
+      'saves': 890,
+      'isLiked': false,
+      'isSaved': false,
+      'isPremium': false,
+      'isFavorited': false,
+      'timestamp': '3 weeks ago',
+      'duration': '18:15',
+    },
   ];
 
   @override
@@ -147,11 +609,28 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _tabController.dispose();
+    _exploreSearchController.dispose();
     for (var controller in _pageControllers.values) {
       controller.dispose();
     }
     _pageControllers.clear();
     super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _filteredExplorePosts {
+    if (_exploreSearchQuery.isEmpty) {
+      return _feedPosts;
+    }
+    final query = _exploreSearchQuery.toLowerCase();
+    return _feedPosts.where((post) {
+      final title = (post['title'] ?? '').toString().toLowerCase();
+      final description = (post['description'] ?? '').toString().toLowerCase();
+      final category = (post['category'] ?? '').toString().toLowerCase();
+      final creator = (post['creator'] ?? '').toString().toLowerCase();
+      final tags = (post['tags'] as List<String>?)?.map((t) => t.toLowerCase()).join(' ') ?? '';
+
+      return title.contains(query) || description.contains(query) || category.contains(query) || creator.contains(query) || tags.contains(query);
+    }).toList();
   }
 
   PageController _getPageController(int tabIndex) {
@@ -312,35 +791,87 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildExplorePage() {
+    final filteredPosts = _filteredExplorePosts;
+
     return CustomScrollView(
       slivers: [
-        // Main grid of all posts
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              childAspectRatio: 1.0, // Square grid items
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return _buildExploreGridItem(_feedPosts[index % _feedPosts.length]);
+        // Search Bar
+        SliverToBoxAdapter(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: TextField(
+              controller: _exploreSearchController,
+              onChanged: (value) {
+                setState(() {
+                  _exploreSearchQuery = value;
+                });
               },
-              childCount: 12, // Show 12 items (4 rows x 3 columns)
+              style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
+              decoration: InputDecoration(
+                hintText: 'Search videos, creators, categories...',
+                hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
+                suffixIcon: _exploreSearchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Color(0xFF404040)),
+                        onPressed: () {
+                          setState(() {
+                            _exploreSearchController.clear();
+                            _exploreSearchQuery = '';
+                          });
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: const Color(0xFFF5F5F5),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
             ),
           ),
         ),
+
+        // Show message if no results found
+        if (_exploreSearchQuery.isNotEmpty && filteredPosts.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
+                  const SizedBox(height: 16),
+                  Text('No videos found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
+                  const SizedBox(height: 8),
+                  Text('Try different keywords', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                ],
+              ),
+            ),
+          )
+        else
+          // Main grid of all posts
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                childAspectRatio: 1.0, // Square grid items
+              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return _buildExploreGridItem(filteredPosts[index]);
+              }, childCount: filteredPosts.length),
+            ),
+          ),
         const SliverToBoxAdapter(child: SizedBox(height: 100)),
       ],
     );
   }
 
   Widget _buildExploreGridItem(Map<String, dynamic> post) {
-    final isPremium = post['isPremium'] ?? false;
-    final isFavorited = post['isFavorited'] ?? false;
-    final isStarred = isPremium || isFavorited;
+    final isTrainer = post['isTrainer'] ?? false;
+    final isCertified = isTrainer; // Show verified/certified icon if trainer
 
     return GestureDetector(
       onTap: () => _showPostDetail(post),
@@ -379,20 +910,21 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             ),
           ),
 
-          // Premium star icon in top-right corner (always shown, gold if premium/favorited, gray otherwise)
-          Positioned(
-            top: 6,
-            right: 6,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: const Color.fromARGB(153, 71, 71, 71), shape: BoxShape.circle),
-              child: Icon(
-                Icons.star,
-                color: Color.fromARGB(255, 175, 149, 2), // Gold for premium/favorited, gray for regular
-                size: 18,
+          // Verified/Certified icon in top-right corner (only shown if trainer/certified)
+          if (isCertified)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(color: const Color.fromARGB(153, 71, 71, 71), shape: BoxShape.circle),
+                child: Icon(
+                  Icons.verified,
+                  color: AppColors.completed, // Blue/Green color for verified
+                  size: 18,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
