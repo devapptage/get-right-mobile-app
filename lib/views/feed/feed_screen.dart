@@ -736,12 +736,12 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           ),
         ),
         body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage()]),
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'feed_fab',
-          onPressed: _showCreatePostOptions,
-          backgroundColor: AppColors.accent,
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
-        ),
+        // floatingActionButton: FloatingActionButton(
+        //   heroTag: 'feed_fab',
+        //   onPressed: _showCreatePostOptions,
+        //   backgroundColor: AppColors.accent,
+        //   child: const Icon(Icons.add, color: Colors.white, size: 32),
+        // ),
       ),
     );
   }
@@ -997,7 +997,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           // Right side interaction buttons
           Positioned(
             right: 16,
-            bottom: 120,
+            bottom: 70,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
