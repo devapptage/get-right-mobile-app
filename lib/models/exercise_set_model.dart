@@ -3,8 +3,8 @@
 class ExerciseSetModel {
   final String id;
   final int setNumber;
-  final int? reps; // null if AMRAP or timed
-  final String? repsType; // 'standard', 'AMRAP', null for timed
+  final int? reps; // null if AMRAP, FAILURE, or timed
+  final String? repsType; // 'standard', 'AMRAP', 'FAILURE', null for timed
   final int? timeSeconds; // null if not timed
   final double? weight; // null if bodyweight
   final String? weightType; // 'standard', 'BW' (bodyweight), 'percentage'
@@ -101,5 +101,8 @@ class ExerciseSetModel {
 
   /// Check if this set is AMRAP
   bool get isAMRAP => repsType == 'AMRAP';
+
+  /// Check if this set is FAILURE
+  bool get isFAILURE => repsType == 'FAILURE';
 }
 

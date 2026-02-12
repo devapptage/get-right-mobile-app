@@ -161,7 +161,13 @@ class _ExerciseCardState extends State<ExerciseCard> {
       return Text(
         'AMRAP',
         textAlign: TextAlign.center,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600, fontSize: 12),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12),
+      );
+    if (set.isFAILURE)
+      return Text(
+        'FAILURE',
+        textAlign: TextAlign.center,
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12),
       );
     return Text(
       '${set.reps ?? '-'}',
