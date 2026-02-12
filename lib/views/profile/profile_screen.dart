@@ -35,8 +35,9 @@ class PersonalRecord {
 /// Profile screen - Social media style profile
 class ProfileScreen extends StatefulWidget {
   final bool hideAppBar;
+  final bool showOnlyPublic;
 
-  const ProfileScreen({super.key, this.hideAppBar = false});
+  const ProfileScreen({super.key, this.hideAppBar = false, this.showOnlyPublic = false});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -144,14 +145,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ],
               bottom: PreferredSize(preferredSize: const Size.fromHeight(68), child: tabBar),
             ),
-      body: Column(
-        children: [
-          if (widget.hideAppBar) tabBar,
-          Expanded(
-            child: TabBarView(controller: _tabController, children: [_buildPublicProfile(), _buildPersonalProfile()]),
-          ),
-        ],
-      ),
+      body: widget.showOnlyPublic
+          ? _buildPublicProfile()
+          : Column(
+              children: [
+                if (widget.hideAppBar) tabBar,
+                Expanded(
+                  child: TabBarView(controller: _tabController, children: [_buildPublicProfile(), _buildPersonalProfile()]),
+                ),
+              ],
+            ),
     );
   }
 
@@ -166,19 +169,39 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             child: Row(
               children: [
                 // Profile Picture
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.accent, width: 3),
-                  ),
-                  child: CircleAvatar(
-                    radius: 45,
-                    backgroundColor: AppColors.surface,
-                    child: Icon(Icons.person, size: 50, color: AppColors.accent),
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.accent, width: 3),
+                      ),
+                      child: CircleAvatar(
+                        radius: 45,
+                        backgroundColor: AppColors.surface,
+                        child: Icon(Icons.person, size: 50, color: AppColors.accent),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final result = await Get.toNamed(AppRoutes.editProfile);
+                        if (result == true) _loadProfileData();
+                      },
+                      icon: const Icon(Icons.edit, size: 10),
+                      label: Text('Edit Info', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 11)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.accent,
+                        side: const BorderSide(color: AppColors.accent, width: 1),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        minimumSize: const Size(0, 24),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 30),
+                const SizedBox(width: 20),
                 // Stats
                 Expanded(
                   child: Row(
@@ -188,32 +211,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       _buildStatColumn('1247', 'Followers', onTap: () => Get.toNamed(AppRoutes.followers)),
                       _buildStatColumn('342', 'Following', onTap: () => Get.toNamed(AppRoutes.following)),
                     ],
-                  ),
+                  ).paddingOnly(bottom: 30),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Username and Bio
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'brogan seier',
-                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text('Fitness enthusiast | Powerlifter | Always pushing limits', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
-                const SizedBox(height: 4),
-                Text('Training for strength and building a better version of myself every day.', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
-                const SizedBox(height: 4),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
 
           // Personal Records Section
           Padding(
@@ -326,6 +328,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         child: Icon(Icons.person, size: 50, color: AppColors.accent),
                       ),
                     ),
+
                     Positioned(
                       bottom: 0,
                       right: 0,

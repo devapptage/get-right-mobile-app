@@ -872,8 +872,8 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildProfilePage() {
-    // Return the ProfileScreen widget without AppBar for tab view
-    return const ProfileScreen(hideAppBar: true);
+    // Return the ProfileScreen widget without AppBar and tabs, showing only Public content
+    return const ProfileScreen(hideAppBar: true, showOnlyPublic: true);
   }
 
   Widget _buildExploreGridItem(Map<String, dynamic> post) {
