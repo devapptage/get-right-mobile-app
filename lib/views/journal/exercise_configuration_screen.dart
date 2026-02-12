@@ -350,7 +350,7 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
           children: [
             SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 150),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

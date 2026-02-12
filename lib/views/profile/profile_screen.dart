@@ -34,7 +34,9 @@ class PersonalRecord {
 
 /// Profile screen - Social media style profile
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool hideAppBar;
+
+  const ProfileScreen({super.key, this.hideAppBar = false});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -93,55 +95,63 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Get.back(),
-          child: Container(
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
-          ).paddingAll(8),
-        ),
-        title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppColors.accent),
-            onPressed: () => Get.toNamed(AppRoutes.settings),
+    final tabBar = Container(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
+        child: TabBar(
+          controller: _tabController,
+          indicator: BoxDecoration(
+            gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
           ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(68),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: AppColors.onAccent,
-                unselectedLabelColor: AppColors.onSurface.withOpacity(0.6),
-                labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
-                unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w500),
-                tabs: const [
-                  Tab(text: 'Public'),
-                  Tab(text: 'Personal'),
-                ],
-              ),
-            ),
-          ),
+          indicatorSize: TabBarIndicatorSize.tab,
+          dividerColor: Colors.transparent,
+          labelColor: AppColors.onAccent,
+          unselectedLabelColor: AppColors.onSurface.withOpacity(0.6),
+          labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
+          unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w500),
+          tabs: const [
+            Tab(text: 'Public'),
+            Tab(text: 'Personal'),
+          ],
         ),
       ),
-      body: TabBarView(controller: _tabController, children: [_buildPublicProfile(), _buildPersonalProfile()]),
+    );
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: widget.hideAppBar
+          ? null
+          : AppBar(
+              leading: GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                  child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+                ).paddingAll(8),
+              ),
+              title: Text('Profile', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined, color: AppColors.accent),
+                  onPressed: () => Get.toNamed(AppRoutes.settings),
+                ),
+              ],
+              bottom: PreferredSize(preferredSize: const Size.fromHeight(68), child: tabBar),
+            ),
+      body: Column(
+        children: [
+          if (widget.hideAppBar) tabBar,
+          Expanded(
+            child: TabBarView(controller: _tabController, children: [_buildPublicProfile(), _buildPersonalProfile()]),
+          ),
+        ],
+      ),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/views/profile/profile_screen.dart';
 
 /// Community Feed - Social Media Platform for fitness content
 class FeedScreen extends StatefulWidget {
@@ -603,7 +604,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -732,10 +733,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
               Tab(text: 'For You'),
               Tab(text: 'Following'),
               Tab(text: 'Explore'),
+              Tab(text: 'Profile'),
             ],
           ),
         ),
-        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage()]),
+        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage(), _buildProfilePage()]),
         // floatingActionButton: FloatingActionButton(
         //   heroTag: 'feed_fab',
         //   onPressed: _showCreatePostOptions,
@@ -867,6 +869,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         const SliverToBoxAdapter(child: SizedBox(height: 100)),
       ],
     );
+  }
+
+  Widget _buildProfilePage() {
+    // Return the ProfileScreen widget without AppBar for tab view
+    return const ProfileScreen(hideAppBar: true);
   }
 
   Widget _buildExploreGridItem(Map<String, dynamic> post) {

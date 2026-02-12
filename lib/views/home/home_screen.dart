@@ -43,14 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
     // Check if we should redirect based on preference from auth questionnaire or navigateToTab argument
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = Get.arguments as Map<String, dynamic>?;
-      
+
       // Check for navigateToTab argument (used from favorites screen)
       final navigateToTab = args?['navigateToTab'] as int?;
       if (navigateToTab != null) {
         _navController.changeTab(navigateToTab);
         return;
       }
-      
+
       // Check for preference argument
       final preference = args?['preference'] as String?;
       if (preference != null) {
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
       {'icon': Icons.storefront_outlined, 'activeIcon': Icons.storefront_rounded, 'label': 'Market'},
       {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Feed'},
-      {'icon': Icons.add_circle_outline, 'activeIcon': Icons.add_circle, 'label': 'Journal'},
+      {'icon': Icons.book_outlined, 'activeIcon': Icons.book_rounded, 'label': 'Journal'},
       {'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded, 'label': 'Library'},
       {'icon': Icons.restaurant_menu_outlined, 'activeIcon': Icons.restaurant_menu_rounded, 'label': 'Nutrition'},
     ];
