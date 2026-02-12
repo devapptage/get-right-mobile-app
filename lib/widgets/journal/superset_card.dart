@@ -27,7 +27,6 @@ class SupersetCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Superset Header
           // Container(
           //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           //   decoration: BoxDecoration(
