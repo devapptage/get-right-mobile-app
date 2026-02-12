@@ -261,8 +261,8 @@ class _RunTrackerScreenState extends State<RunTrackerScreen> {
             // Map info badge
             if (hasPosition)
               Positioned(
-                top: MediaQuery.of(Get.context!).padding.top + 16,
-                left: 16,
+                top: MediaQuery.of(Get.context!).padding.top + 125,
+                right: 16,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(

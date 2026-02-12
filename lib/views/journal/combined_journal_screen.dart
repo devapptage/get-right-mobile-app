@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get_right/controllers/notification_controller.dart';
+import 'package:get_right/services/gps_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
 import 'package:get_right/views/journal/workout_journal_screen.dart';
@@ -21,6 +24,9 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
   late TabController _tabController;
   late final HomeNavigationController _navController;
   late final Worker _journalTabWorker;
+  GoogleMapController? _headerMapController;
+  Position? _currentPosition;
+  bool _isMapInitialized = false;
 
   @override
   void initState() {
@@ -33,8 +39,17 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
       if (_navController.journalTabIndex.value != idx) {
         _navController.journalTabIndex.value = idx;
       }
+      // Initialize map when switching to Runner Log tab
+      if (idx == 1 && !_isMapInitialized) {
+        _initializeMap();
+      }
       setState(() {});
     });
+
+    // Initialize map if starting on Runner Log tab
+    if (_tabController.index == 1) {
+      _initializeMap();
+    }
 
     // If something (e.g. dashboard quick actions) requests a specific tab, jump there.
     _journalTabWorker = ever<int>(_navController.journalTabIndex, (idx) {
@@ -46,28 +61,90 @@ class _CombinedJournalScreenState extends State<CombinedJournalScreen> with Sing
     });
   }
 
+  Future<void> _initializeMap() async {
+    if (_isMapInitialized) return;
+
+    try {
+      final gpsService = GpsService.getInstance();
+      final position = await gpsService.getCurrentLocation();
+      if (mounted && position != null) {
+        setState(() {
+          _currentPosition = position;
+          _isMapInitialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error getting position for header map: $e');
+    }
+  }
+
   @override
   void dispose() {
     _journalTabWorker.dispose();
     _tabController.dispose();
+    _headerMapController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isRunnerLogTab = _tabController.index == 1;
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFD6D6D6), Color(0xFFE8E8E8), Color(0xFFC0C0C0)]),
       ),
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBodyBehindAppBar: isRunnerLogTab,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           toolbarHeight: 56,
           clipBehavior: Clip.none,
-
-          systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark, statusBarBrightness: Brightness.light),
+          flexibleSpace: isRunnerLogTab && _currentPosition != null
+              ? Stack(
+                  children: [
+                    // Map background
+                    Positioned.fill(
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude), zoom: 13),
+                        onMapCreated: (controller) {
+                          _headerMapController = controller;
+                        },
+                        myLocationEnabled: false,
+                        myLocationButtonEnabled: false,
+                        zoomControlsEnabled: false,
+                        mapToolbarEnabled: false,
+                        compassEnabled: false,
+                        liteModeEnabled: false,
+                        buildingsEnabled: true,
+                        trafficEnabled: false,
+                        zoomGesturesEnabled: false,
+                        scrollGesturesEnabled: false,
+                        tiltGesturesEnabled: false,
+                        rotateGesturesEnabled: false,
+                      ),
+                    ),
+                    // Gradient overlay for better text visibility
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.black.withOpacity(0.3), Colors.black.withOpacity(0.1), Colors.transparent],
+                          stops: const [0.0, 0.5, 1.0],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : null,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: isRunnerLogTab ? Brightness.light : Brightness.dark,
+            statusBarBrightness: isRunnerLogTab ? Brightness.dark : Brightness.light,
+          ),
           leading: Obx(() {
             final notificationController = Get.find<NotificationController>();
             final unreadCount = notificationController.unreadCount;
