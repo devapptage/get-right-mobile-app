@@ -63,15 +63,14 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
-                _buildDrawerItem(
-                  icon: Icons.sports_gymnastics_rounded,
-                  activeIcon: Icons.work,
-                  title: 'My Workouts',
-                  onTap: () {
-                    Get.to(() => const WorkoutScreen());
-                  },
-                ),
-
+                // _buildDrawerItem(
+                //   icon: Icons.sports_gymnastics_rounded,
+                //   activeIcon: Icons.work,
+                //   title: 'My Workouts',
+                //   onTap: () {
+                //     Get.to(() => const WorkoutScreen());
+                //   },
+                // ),
                 _buildDrawerItem(
                   icon: Icons.track_changes_outlined,
                   activeIcon: Icons.track_changes,
@@ -137,15 +136,15 @@ class AppDrawer extends StatelessWidget {
                 //     Get.toNamed(AppRoutes.marketplace);
                 //   },
                 // ),
-                _buildDrawerItem(
-                  icon: Icons.history_outlined,
-                  activeIcon: Icons.history,
-                  title: 'Program History',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.programHistory);
-                  },
-                ),
+                // _buildDrawerItem(
+                //   icon: Icons.history_outlined,
+                //   activeIcon: Icons.history,
+                //   title: 'Program History',
+                //   onTap: () {
+                //     Get.back();
+                //     Get.toNamed(AppRoutes.programHistory);
+                //   },
+                // ),
                 _buildDrawerItem(
                   icon: Icons.receipt_long_outlined,
                   activeIcon: Icons.receipt_long,
@@ -254,7 +253,7 @@ class AppDrawer extends StatelessWidget {
 
           // User Email
           Text(
-            userEmail,
+            "abc@gmail.com",
             style: AppTextStyles.bodySmall.copyWith(color: const Color.fromARGB(255, 55, 56, 58)),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -263,23 +262,23 @@ class AppDrawer extends StatelessWidget {
           const SizedBox(height: 12),
 
           // View Profile Button
-          InkWell(
-            onTap: () {
-              Get.back();
-              Get.toNamed(AppRoutes.profile);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.accent, width: 1.5),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'View Profile',
-                style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
+          // InkWell(
+          //   onTap: () {
+          //     Get.back();
+          //     Get.toNamed(AppRoutes.profile);
+          //   },
+          //   child: Container(
+          //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          //     decoration: BoxDecoration(
+          //       border: Border.all(color: AppColors.accent, width: 1.5),
+          //       borderRadius: BorderRadius.circular(20),
+          //     ),
+          //     child: Text(
+          //       'View Profile',
+          //       style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

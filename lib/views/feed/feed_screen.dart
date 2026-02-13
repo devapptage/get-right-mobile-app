@@ -20,8 +20,6 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   late TabController _tabController;
   final _storageService = Get.find<StorageService>();
   final Map<int, PageController> _pageControllers = {};
-  final TextEditingController _exploreSearchController = TextEditingController();
-  String _exploreSearchQuery = '';
 
   // Mock feed data
   final List<Map<String, dynamic>> _feedPosts = [
@@ -605,34 +603,17 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _exploreSearchController.dispose();
     for (var controller in _pageControllers.values) {
       controller.dispose();
     }
     _pageControllers.clear();
     super.dispose();
-  }
-
-  List<Map<String, dynamic>> get _filteredExplorePosts {
-    if (_exploreSearchQuery.isEmpty) {
-      return _feedPosts;
-    }
-    final query = _exploreSearchQuery.toLowerCase();
-    return _feedPosts.where((post) {
-      final title = (post['title'] ?? '').toString().toLowerCase();
-      final description = (post['description'] ?? '').toString().toLowerCase();
-      final category = (post['category'] ?? '').toString().toLowerCase();
-      final creator = (post['creator'] ?? '').toString().toLowerCase();
-      final tags = (post['tags'] as List<String>?)?.map((t) => t.toLowerCase()).join(' ') ?? '';
-
-      return title.contains(query) || description.contains(query) || category.contains(query) || creator.contains(query) || tags.contains(query);
-    }).toList();
   }
 
   PageController _getPageController(int tabIndex) {
@@ -716,9 +697,6 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                   titleText = 'Following';
                   break;
                 case 2:
-                  titleText = 'Explore';
-                  break;
-                case 3:
                   titleText = 'Profile';
                   break;
                 default:
@@ -735,7 +713,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             IconButton(
               icon: const Icon(Icons.search, color: AppColors.accent),
               onPressed: () {
-                // TODO: Implement search
+                _showSearchScreen();
               },
             ),
             IconButton(
@@ -753,12 +731,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             tabs: [
               Tab(icon: Icon(Icons.public)),
               Tab(icon: Icon(Icons.people)),
-              Tab(icon: Icon(Icons.explore)),
               Tab(icon: Icon(Icons.person)),
             ],
           ),
         ),
-        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage(), _buildProfilePage()]),
+        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildProfilePage()]),
       ),
     );
   }
@@ -807,88 +784,18 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildExplorePage() {
-    final filteredPosts = _filteredExplorePosts;
-
-    return CustomScrollView(
-      slivers: [
-        // Search Bar
-        SliverToBoxAdapter(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: TextField(
-              controller: _exploreSearchController,
-              onChanged: (value) {
-                setState(() {
-                  _exploreSearchQuery = value;
-                });
-              },
-              style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
-              decoration: InputDecoration(
-                hintText: 'Search videos, creators, categories...',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
-                suffixIcon: _exploreSearchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: Color(0xFF404040)),
-                        onPressed: () {
-                          setState(() {
-                            _exploreSearchController.clear();
-                            _exploreSearchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: const Color(0xFFF5F5F5),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
-          ),
-        ),
-
-        // Show message if no results found
-        if (_exploreSearchQuery.isNotEmpty && filteredPosts.isEmpty)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
-                  const SizedBox(height: 16),
-                  Text('No videos found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
-                  const SizedBox(height: 8),
-                  Text('Try different keywords', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
-                ],
-              ),
-            ),
-          )
-        else
-          // Main grid of all posts
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                childAspectRatio: 1.0, // Square grid items
-              ),
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return _buildExploreGridItem(filteredPosts[index]);
-              }, childCount: filteredPosts.length),
-            ),
-          ),
-        const SliverToBoxAdapter(child: SizedBox(height: 100)),
-      ],
-    );
-  }
-
   Widget _buildProfilePage() {
     // Return the ProfileScreen widget without AppBar and tabs, showing only Public content
     return const ProfileScreen(hideAppBar: true, showOnlyPublic: true);
+  }
+
+  void _showSearchScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _SearchScreen(allPosts: _feedPosts, onPostTap: (post) => _showPostDetail(post), buildExploreGridItem: (post) => _buildExploreGridItem(post)),
+      ),
+    );
   }
 
   Widget _buildExploreGridItem(Map<String, dynamic> post) {
@@ -1626,6 +1533,140 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           snackPosition: SnackPosition.BOTTOM,
         );
       },
+    );
+  }
+}
+
+/// Search Screen - Shows search bar with explore content
+class _SearchScreen extends StatefulWidget {
+  final List<Map<String, dynamic>> allPosts;
+  final ValueChanged<Map<String, dynamic>> onPostTap;
+  final Widget Function(Map<String, dynamic>) buildExploreGridItem;
+
+  const _SearchScreen({required this.allPosts, required this.onPostTap, required this.buildExploreGridItem});
+
+  @override
+  State<_SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<_SearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  List<Map<String, dynamic>> get _filteredPosts {
+    if (_searchQuery.isEmpty) {
+      return widget.allPosts;
+    }
+    final query = _searchQuery.toLowerCase();
+    return widget.allPosts.where((post) {
+      final title = (post['title'] ?? '').toString().toLowerCase();
+      final description = (post['description'] ?? '').toString().toLowerCase();
+      final category = (post['category'] ?? '').toString().toLowerCase();
+      final creator = (post['creator'] ?? '').toString().toLowerCase();
+      final tags = (post['tags'] as List<String>?)?.map((t) => t.toLowerCase()).join(' ') ?? '';
+
+      return title.contains(query) || description.contains(query) || category.contains(query) || creator.contains(query) || tags.contains(query);
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Search',
+          style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
+        ),
+        centerTitle: true,
+      ),
+      body: CustomScrollView(
+        slivers: [
+          // Search Bar
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF000000)),
+                decoration: InputDecoration(
+                  hintText: 'Search videos, creators, categories...',
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF404040)),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF404040)),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: Color(0xFF404040)),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: const Color(0xFFF5F5F5),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+            ),
+          ),
+
+          // Show message if no results found
+          if (_searchQuery.isNotEmpty && _filteredPosts.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off, size: 80, color: AppColors.primaryGray.withOpacity(0.5)),
+                    const SizedBox(height: 16),
+                    Text('No videos found', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
+                    const SizedBox(height: 8),
+                    Text('Try different keywords', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                  ],
+                ),
+              ),
+            )
+          else
+            // Main grid of all posts
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  childAspectRatio: 1.0, // Square grid items
+                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  return GestureDetector(onTap: () => widget.onPostTap(_filteredPosts[index]), child: widget.buildExploreGridItem(_filteredPosts[index]));
+                }, childCount: _filteredPosts.length),
+              ),
+            ),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        ],
+      ),
     );
   }
 }
