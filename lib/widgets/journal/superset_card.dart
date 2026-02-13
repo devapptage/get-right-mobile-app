@@ -67,7 +67,7 @@ class SupersetCard extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: ExerciseCard(exercise: exercise1, onMenuTap: onMenuTap1, onTimerTap: onTimerTap1),
+                      child: ExerciseCard(exercise: exercise1, onMenuTap: onMenuTap1, onTimerTap: onTimerTap1, showBorder: false),
                     ),
                   ],
                 ),
@@ -99,7 +99,7 @@ class SupersetCard extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: ExerciseCard(exercise: exercise2, onMenuTap: onMenuTap2, onTimerTap: onTimerTap2),
+                      child: ExerciseCard(exercise: exercise2, onMenuTap: onMenuTap2, onTimerTap: onTimerTap2, showBorder: false),
                     ),
                   ],
                 ),

@@ -8,8 +8,9 @@ class ExerciseCard extends StatefulWidget {
   final WorkoutExerciseModel exercise;
   final VoidCallback? onMenuTap;
   final VoidCallback? onTimerTap;
+  final bool showBorder;
 
-  const ExerciseCard({super.key, required this.exercise, this.onMenuTap, this.onTimerTap});
+  const ExerciseCard({super.key, required this.exercise, this.onMenuTap, this.onTimerTap, this.showBorder = true});
 
   @override
   State<ExerciseCard> createState() => _ExerciseCardState();
@@ -24,8 +25,8 @@ class _ExerciseCardState extends State<ExerciseCard> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 2),
-        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))],
+        border: widget.showBorder ? Border.all(color: AppColors.accent.withOpacity(0.3), width: 2) : null,
+        boxShadow: widget.showBorder ? [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 4))] : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
