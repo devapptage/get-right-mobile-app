@@ -24,9 +24,9 @@ class NutritionTrackerTab extends StatelessWidget {
       builder: (controller) {
         final currentDay = controller.currentDay;
 
-        // If no subscription, show limited view with upgrade prompt
+        // If no subscription, show locked view with upgrade prompt
         if (!_hasSubscription()) {
-          return _buildLimitedView(context, controller);
+          return _buildLockedView(context);
         }
 
         return Stack(
@@ -154,28 +154,187 @@ class NutritionTrackerTab extends StatelessWidget {
     );
   }
 
-  Widget _buildLimitedView(BuildContext context, NutritionController controller) {
+  Widget _buildLockedView(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Lock Icon Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [AppColors.accent.withOpacity(0.1), AppColors.accent.withOpacity(0.05)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.accent.withOpacity(0.3), width: 2),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.accent, width: 3),
+                  ),
+                  child: const Icon(Icons.lock, color: AppColors.accent, size: 40),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Nutrition Tracking',
+                  style: AppTextStyles.headlineSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Premium Feature',
+                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Subscribe to unlock full nutrition tracking and meal planning',
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // Subscription Upgrade Banner
           _buildSubscriptionBanner(context),
-          const SizedBox(height: 24),
-
-          // Limited preview - show calories card but with subscription notice
-          _buildCaloriesCard(controller.currentDay.totalCalories, controller.currentDay.calorieGoal, controller.currentDay.calorieProgress, isLimited: true),
 
           const SizedBox(height: 24),
 
-          // Subscription benefits section
+          // What You'll Get Section
+          Text(
+            'What You\'ll Get',
+            style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+
+          // Feature Preview Cards
+          _buildFeaturePreviewCard(
+            icon: Icons.local_fire_department,
+            title: 'Calorie Tracking',
+            description: 'Track your daily calorie intake and stay within your goals',
+            color: const Color(0xFFFF6B6B),
+            preview: '2,450 / 2,500 kcal',
+          ),
+          const SizedBox(height: 12),
+          _buildFeaturePreviewCard(
+            icon: Icons.fitness_center,
+            title: 'Macro Tracking',
+            description: 'Monitor protein, carbs, and fats with detailed progress bars',
+            color: const Color(0xFF4A90E2),
+            preview: 'P: 180g  C: 250g  F: 65g',
+          ),
+          const SizedBox(height: 12),
+          _buildFeaturePreviewCard(
+            icon: Icons.restaurant_menu,
+            title: 'Food Log',
+            description: 'Log meals by type: Breakfast, Lunch, Dinner, and Snacks',
+            color: const Color(0xFFFFA726),
+            preview: 'Breakfast • Lunch • Dinner • Snacks',
+          ),
+          const SizedBox(height: 12),
+          _buildFeaturePreviewCard(
+            icon: Icons.menu_book,
+            title: 'Full Cookbook Access',
+            description: 'Access hundreds of easy-to-prepare meals and shakes',
+            color: const Color(0xFF9C27B0),
+            preview: '500+ Recipes Available',
+          ),
+          const SizedBox(height: 12),
+          _buildFeaturePreviewCard(
+            icon: Icons.people,
+            title: 'Community Features',
+            description: 'Share meals, progress pics, and workout videos with the community',
+            color: const Color(0xFF4CAF50),
+            preview: 'Connect with Others',
+          ),
+
+          const SizedBox(height: 24),
+
+          // Subscription Benefits Section
           _buildSubscriptionBenefitsSection(context),
 
           const SizedBox(height: 24),
 
-          // Premium features locked
-          _buildLockedFeaturesSection(),
+          // Upgrade Button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: () => _showSubscriptionOptions(context),
+              icon: const Icon(Icons.star, size: 24),
+              label: Text(
+                'Upgrade to Premium',
+                style: AppTextStyles.buttonLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 6,
+                shadowColor: AppColors.accent.withOpacity(0.4),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturePreviewCard({required IconData icon, required String title, required String description, required Color color, required String preview}) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.lightGray.withOpacity(0.5)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: color.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    preview,
+                    style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(Icons.lock_outline, color: AppColors.mediumGray, size: 20),
         ],
       ),
     );
@@ -290,33 +449,6 @@ class NutritionTrackerTab extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildLockedFeaturesSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.lightGray.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.lightGray),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.lock_outline, size: 48, color: AppColors.mediumGray),
-          const SizedBox(height: 12),
-          Text(
-            'Premium Features Locked',
-            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Subscribe to unlock full calorie tracking, macro monitoring, cookbook access, and community features.',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mediumGray),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
     );
   }
 

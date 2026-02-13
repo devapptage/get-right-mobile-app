@@ -9,6 +9,10 @@ import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
 import 'package:get_right/views/nutrition/nutrition_screen.dart';
 import 'package:get_right/widgets/common/app_drawer.dart';
+import 'package:get_right/services/storage_service.dart';
+import 'package:get_right/routes/app_routes.dart';
+import 'package:get_right/theme/color_constants.dart';
+import 'package:get_right/theme/text_styles.dart';
 
 /// Home screen with bottom navigation - 5 tabs
 class HomeScreen extends StatefulWidget {
@@ -122,15 +126,119 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Check if user has subscription
+  bool _hasSubscription() {
+    try {
+      final storageService = Get.find<StorageService>();
+      return storageService.hasActiveSubscription();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Show subscription required dialog
+  void _showSubscriptionRequiredDialog() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: const Icon(Icons.lock, color: AppColors.accent, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Premium Feature',
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Nutrition tracking is a premium feature. Subscribe to unlock:', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+            const SizedBox(height: 16),
+            _buildBenefitItem(Icons.local_fire_department, 'Daily calorie & macro tracking', ''),
+            const SizedBox(height: 8),
+            _buildBenefitItem(Icons.restaurant_menu, 'Full cookbook access', ''),
+            const SizedBox(height: 8),
+            _buildBenefitItem(Icons.people, 'Community features', ''),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Later', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mediumGray)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              Get.toNamed(AppRoutes.paymentForm, arguments: {'type': 'subscription'});
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('View Plans'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBenefitItem(IconData icon, String title, String description) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+          child: Icon(icon, color: AppColors.accent, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+              ),
+              if (description.isNotEmpty) ...[const SizedBox(height: 2), Text(description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.mediumGray))],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   /// Modern navigation item
   Widget _buildNavItem({required IconData icon, required IconData activeIcon, required String label, required int index, required bool isSelected, bool isCenter = false}) {
     const greenAccent = Color(0xFF29603C);
     const blackPrimary = Color(0xFF000000);
     const textSecondary = Color(0xFF404040);
 
+    // Check if this is the nutrition tab (index 4) and user doesn't have subscription
+    final isNutritionTab = index == 4;
+    final hasSubscription = _hasSubscription();
+    final isLocked = isNutritionTab && !hasSubscription;
+
     return Expanded(
       child: GestureDetector(
-        onTap: () => _navController.changeTab(index),
+        onTap: () {
+          if (isLocked) {
+            _showSubscriptionRequiredDialog();
+          } else {
+            _navController.changeTab(index);
+          }
+        },
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 2),
@@ -139,38 +247,59 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Icon container
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                width: isCenter ? 48 : (isSelected ? 40 : 34),
-                height: isCenter ? 48 : (isSelected ? 40 : 34),
-                decoration: BoxDecoration(
-                  color: isCenter
-                      ? greenAccent
-                      : isSelected
-                      ? greenAccent.withOpacity(0.12)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(isCenter ? 26 : 22),
-                  boxShadow: isCenter ? [BoxShadow(color: greenAccent.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))] : null,
-                ),
-                child: Center(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    transitionBuilder: (child, animation) {
-                      return ScaleTransition(scale: animation, child: child);
-                    },
-                    child: Icon(
-                      isSelected ? activeIcon : icon,
-                      key: ValueKey('$index-$isSelected'),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOutCubic,
+                    width: isCenter ? 48 : (isSelected ? 40 : 34),
+                    height: isCenter ? 48 : (isSelected ? 40 : 34),
+                    decoration: BoxDecoration(
                       color: isCenter
-                          ? Colors.white
-                          : isSelected
                           ? greenAccent
-                          : textSecondary,
-                      size: isCenter ? 24 : 20,
+                          : isSelected
+                          ? greenAccent.withOpacity(0.12)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(isCenter ? 26 : 22),
+                      boxShadow: isCenter ? [BoxShadow(color: greenAccent.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 4))] : null,
+                    ),
+                    child: Center(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        transitionBuilder: (child, animation) {
+                          return ScaleTransition(scale: animation, child: child);
+                        },
+                        child: Icon(
+                          isLocked ? Icons.lock : (isSelected ? activeIcon : icon),
+                          key: ValueKey('$index-$isSelected-$isLocked'),
+                          color: isCenter
+                              ? Colors.white
+                              : isSelected
+                              ? greenAccent
+                              : textSecondary,
+                          size: isCenter ? 24 : 20,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  // Lock badge overlay for locked nutrition tab
+                  if (isLocked && !isSelected)
+                    Positioned(
+                      top: -2,
+                      right: -2,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: AppColors.accent,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                        child: const Icon(Icons.lock, size: 8, color: Colors.white),
+                      ),
+                    ),
+                ],
               ),
               // Label (hidden for center item)
               if (!isCenter) ...[
@@ -181,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? blackPrimary : textSecondary,
+                    color: isLocked ? AppColors.accent : (isSelected ? blackPrimary : textSecondary),
                     letterSpacing: 0.2,
                     height: 1.0,
                   ),
