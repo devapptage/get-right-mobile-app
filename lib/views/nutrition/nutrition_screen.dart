@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/controllers/nutrition_controller.dart';
@@ -36,9 +37,10 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        toolbarHeight: 56,
+        clipBehavior: Clip.none,
         leading: Obx(() {
           final notificationController = Get.find<NotificationController>();
           final unreadCount = notificationController.unreadCount;
@@ -90,62 +92,60 @@ class _NutritionScreenState extends State<NutritionScreen> with SingleTickerProv
             ],
           );
         }),
-        title: Text(
-          'Nutrition',
-          style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(68),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: AppColors.primaryGrayLight.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
-              child: AnimatedBuilder(
-                animation: _tabController,
-                builder: (context, child) {
-                  return TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
-                    ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    dividerColor: Colors.transparent,
-                    labelColor: AppColors.onAccent,
-                    unselectedLabelColor: AppColors.onSurface.withOpacity(0.6),
-                    labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.3),
-                    unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w500),
-                    tabs: [
-                      Tab(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.restaurant_menu, size: 18, color: _tabController.index == 0 ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.6)),
-                            const SizedBox(width: 6),
-                            const Text('Tracker'),
-                          ],
+        title: AnimatedBuilder(
+          animation: _tabController,
+          builder: (context, child) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () => _tabController.animateTo(0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Tracker',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontSize: 16.sp,
+                          color: _tabController.index == 0 ? AppColors.accent : const Color(0xFF000000),
+                          fontWeight: _tabController.index == 0 ? FontWeight.w900 : FontWeight.w600,
                         ),
                       ),
-                      Tab(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.menu_book, size: 18, color: _tabController.index == 1 ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.6)),
-                            const SizedBox(width: 6),
-                            const Text('Recipes'),
-                          ],
-                        ),
-                      ),
+                      if (_tabController.index == 0) Container(height: 3, width: 80, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
                     ],
-                  );
-                },
-              ),
-            ),
-          ),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                GestureDetector(
+                  onTap: () => _tabController.animateTo(1),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Recipes',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontSize: 16.sp,
+                          color: _tabController.index == 1 ? AppColors.accent : const Color(0xFF000000),
+                          fontWeight: _tabController.index == 1 ? FontWeight.w900 : FontWeight.w600,
+                        ),
+                      ),
+                      if (_tabController.index == 1) Container(height: 3, width: 80, margin: const EdgeInsets.only(top: 2), color: AppColors.accent),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month, color: AppColors.accent),
+            onPressed: () {
+              Get.toNamed('/planner');
+            },
+          ),
+        ],
+        centerTitle: true,
       ),
       body: TabBarView(controller: _tabController, children: [NutritionTrackerTab(), const RecipesTab()]),
     );

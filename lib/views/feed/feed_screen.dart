@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -727,9 +728,9 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             indicatorColor: AppColors.accent,
             labelColor: AppColors.accent,
             unselectedLabelColor: const Color(0xFF404040),
-            labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold),
-            unselectedLabelStyle: AppTextStyles.titleSmall,
-            tabs: const [
+            labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold, fontSize: 14.sp),
+            unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontSize: 14.sp),
+            tabs: [
               Tab(icon: Icon(Icons.public), text: 'For You'),
               Tab(icon: Icon(Icons.people), text: 'Following'),
               Tab(icon: Icon(Icons.explore), text: 'Explore'),
@@ -738,12 +739,6 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           ),
         ),
         body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildExplorePage(), _buildProfilePage()]),
-        // floatingActionButton: FloatingActionButton(
-        //   heroTag: 'feed_fab',
-        //   onPressed: _showCreatePostOptions,
-        //   backgroundColor: AppColors.accent,
-        //   child: const Icon(Icons.add, color: Colors.white, size: 32),
-        // ),
       ),
     );
   }
