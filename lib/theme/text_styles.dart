@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_right/theme/color_constants.dart';
 
 /// Get Right Typography System
@@ -17,27 +18,27 @@ class AppTextStyles {
   static const String primaryFont = 'Inter'; // Clean, geometric sans-serif
 
   // Heading Styles - Bold or semibold for section titles
-  static const TextStyle headlineLarge = TextStyle(
+  static TextStyle headlineLarge = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 32,
+    fontSize: 32.sp,
     fontWeight: FontWeight.bold,
     height: 1.2,
     letterSpacing: -0.5,
     color: AppColors.secondary, // Black (secondary accent)
   );
 
-  static const TextStyle headlineMedium = TextStyle(
+  static TextStyle headlineMedium = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 28,
+    fontSize: 28.sp,
     fontWeight: FontWeight.bold,
     height: 1.3,
     letterSpacing: -0.3,
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle headlineSmall = TextStyle(
+  static TextStyle headlineSmall = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 24,
+    fontSize: 24.sp,
     fontWeight: FontWeight.bold,
     height: 1.3,
     letterSpacing: 0,
@@ -45,27 +46,27 @@ class AppTextStyles {
   );
 
   // Title Styles - Bold or semibold
-  static const TextStyle titleLarge = TextStyle(
+  static TextStyle titleLarge = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 22,
+    fontSize: 22.sp,
     fontWeight: FontWeight.bold,
     height: 1.4,
     letterSpacing: 0,
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle titleMedium = TextStyle(
+  static TextStyle titleMedium = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 18,
+    fontSize: 18.sp,
     fontWeight: FontWeight.bold,
     height: 1.4,
     letterSpacing: 0.15,
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle titleSmall = TextStyle(
+  static TextStyle titleSmall = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 16,
+    fontSize: 16.sp,
     fontWeight: FontWeight.bold,
     height: 1.4,
     letterSpacing: 0.1,
@@ -73,27 +74,27 @@ class AppTextStyles {
   );
 
   // Sub headers & Labels - Medium weight with increased letter spacing
-  static const TextStyle labelLarge = TextStyle(
+  static TextStyle labelLarge = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 16,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w500, // Medium weight
     height: 1.4,
     letterSpacing: 0.75, // Increased letter spacing
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle labelMedium = TextStyle(
+  static TextStyle labelMedium = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 14,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w500, // Medium weight
     height: 1.4,
     letterSpacing: 0.5, // Increased letter spacing
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle labelSmall = TextStyle(
+  static TextStyle labelSmall = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 12,
+    fontSize: 12.sp,
     fontWeight: FontWeight.w500, // Medium weight
     height: 1.4,
     letterSpacing: 0.5, // Increased letter spacing
@@ -101,7 +102,7 @@ class AppTextStyles {
   );
 
   // Body Text - Regular weight for instructions, details, and stats
-  static const TextStyle bodyLarge = TextStyle(
+  static TextStyle bodyLarge = TextStyle(
     fontFamily: primaryFont,
     fontSize: 18,
     fontWeight: FontWeight.normal, // Regular weight
@@ -110,18 +111,18 @@ class AppTextStyles {
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle bodyMedium = TextStyle(
+  static TextStyle bodyMedium = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 16,
+    fontSize: 16.sp,
     fontWeight: FontWeight.normal, // Regular weight
     height: 1.5,
     letterSpacing: 0.25,
     color: AppColors.secondary, // Black
   );
 
-  static const TextStyle bodySmall = TextStyle(
+  static TextStyle bodySmall = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 14,
+    fontSize: 14.sp,
     fontWeight: FontWeight.normal, // Regular weight
     height: 1.5,
     letterSpacing: 0.4,
@@ -129,7 +130,7 @@ class AppTextStyles {
   );
 
   // Button & CTA Styles - Semibold with clear spacing and strong contrast
-  static const TextStyle buttonLarge = TextStyle(
+  static TextStyle buttonLarge = TextStyle(
     fontFamily: primaryFont,
     fontSize: 16,
     fontWeight: FontWeight.w600, // Semibold
@@ -138,17 +139,17 @@ class AppTextStyles {
     color: AppColors.onAccent, // White on green (strong contrast)
   );
 
-  static const TextStyle buttonMedium = TextStyle(
+  static TextStyle buttonMedium = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 14,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w600, // Semibold
     height: 1.2,
     letterSpacing: 0.5, // Clear spacing
     color: AppColors.onAccent, // White on green
   );
-  static const TextStyle buttonSmall = TextStyle(
+  static TextStyle buttonSmall = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 12,
+    fontSize: 12.sp,
     fontWeight: FontWeight.w600, // Semibold
     height: 0.8,
     letterSpacing: 0.5, // Clear spacing
@@ -156,14 +157,14 @@ class AppTextStyles {
   );
 
   // Specialized Styles
-  static const TextStyle caption = TextStyle(fontFamily: primaryFont, fontSize: 12, fontWeight: FontWeight.normal, height: 1.3, letterSpacing: 0.4, color: AppColors.darkGray);
+  static TextStyle caption = TextStyle(fontFamily: primaryFont, fontSize: 12, fontWeight: FontWeight.normal, height: 1.3, letterSpacing: 0.4, color: AppColors.darkGray);
 
-  static const TextStyle overline = TextStyle(fontFamily: primaryFont, fontSize: 10, fontWeight: FontWeight.w500, height: 1.6, letterSpacing: 1.5, color: AppColors.darkGray);
+  static TextStyle overline = TextStyle(fontFamily: primaryFont, fontSize: 10, fontWeight: FontWeight.w500, height: 1.6, letterSpacing: 1.5, color: AppColors.darkGray);
 
   // Workout-specific Styles
-  static const TextStyle statNumber = TextStyle(
+  static TextStyle statNumber = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 36,
+    fontSize: 36.sp,
     fontWeight: FontWeight.bold,
     height: 1.1,
     letterSpacing: -1,

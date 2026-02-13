@@ -151,7 +151,7 @@ class AppTheme {
       ),
 
       // Bottom Navigation Bar Theme - Steel Grey background, Green for selected
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.primary, // Steel Grey background
         selectedItemColor: AppColors.accent, // Green for selected
         unselectedItemColor: AppColors.primaryGrayDark, // Gray for unselected

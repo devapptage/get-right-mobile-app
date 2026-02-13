@@ -963,28 +963,37 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => _openExerciseSelection(idx),
-            child: AbsorbPointer(
-              child: TextField(
-                controller: cfg.nameController,
-                decoration: InputDecoration(
-                  hintText: 'Enter exercise name',
-                  hintStyle: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.6)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.primaryGrayDark.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.primaryGrayDark.withOpacity(0.3)),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                  suffixIcon: Icon(Icons.search, color: AppColors.primaryGrayDark.withOpacity(0.6), size: 22),
-                ),
-                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+          TextField(
+            controller: cfg.nameController,
+            onChanged: (value) {
+              setState(() {
+                cfg.name = value;
+              });
+            },
+            decoration: InputDecoration(
+              hintText: 'Enter exercise name',
+              hintStyle: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.6)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.primaryGrayDark.withOpacity(0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.primaryGrayDark.withOpacity(0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.accent, width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search, color: AppColors.primaryGrayDark.withOpacity(0.6), size: 22),
+                onPressed: () => _openExerciseSelection(idx),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ),
+            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 24),
           // "Two tabs" selector (like the screenshot): main metric (Reps/Time) + extra metric (Weight/Distance)
