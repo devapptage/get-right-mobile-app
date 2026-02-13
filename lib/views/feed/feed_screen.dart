@@ -704,9 +704,31 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
               ],
             );
           }),
-          title: Text(
-            'Community Feed',
-            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
+          title: AnimatedBuilder(
+            animation: _tabController,
+            builder: (context, child) {
+              String titleText;
+              switch (_tabController.index) {
+                case 0:
+                  titleText = 'For You';
+                  break;
+                case 1:
+                  titleText = 'Following';
+                  break;
+                case 2:
+                  titleText = 'Explore';
+                  break;
+                case 3:
+                  titleText = 'Profile';
+                  break;
+                default:
+                  titleText = 'Community Feed';
+              }
+              return Text(
+                titleText,
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
+              );
+            },
           ),
           centerTitle: true,
           actions: [
@@ -728,13 +750,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             indicatorColor: AppColors.accent,
             labelColor: AppColors.accent,
             unselectedLabelColor: const Color(0xFF404040),
-            labelStyle: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold, fontSize: 14.sp),
-            unselectedLabelStyle: AppTextStyles.titleSmall.copyWith(fontSize: 14.sp),
             tabs: [
-              Tab(icon: Icon(Icons.public), text: 'For You'),
-              Tab(icon: Icon(Icons.people), text: 'Following'),
-              Tab(icon: Icon(Icons.explore), text: 'Explore'),
-              Tab(icon: Icon(Icons.person), text: 'Profile'),
+              Tab(icon: Icon(Icons.public)),
+              Tab(icon: Icon(Icons.people)),
+              Tab(icon: Icon(Icons.explore)),
+              Tab(icon: Icon(Icons.person)),
             ],
           ),
         ),
