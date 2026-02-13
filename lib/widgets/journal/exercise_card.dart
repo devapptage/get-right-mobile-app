@@ -159,7 +159,7 @@ class _ExerciseCardState extends State<ExerciseCard> {
         children: [
           Icon(Icons.timer_outlined, size: 12, color: AppColors.accent),
           const SizedBox(width: 4),
-          Text(m > 0 ? '$m:${s.toString().padLeft(2, '0')}' : '$s', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12)),
+          Text(m > 0 ? '$m:${s.toString().padLeft(2, '0')} S' : '$s S', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12)),
         ],
       );
     }

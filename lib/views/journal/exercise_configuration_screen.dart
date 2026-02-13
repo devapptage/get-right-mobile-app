@@ -210,6 +210,13 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
   @override
   void dispose() {
     _nameController.dispose();
+    // Dispose all configs and their sets
+    for (var cfg in _configs) {
+      cfg.dispose();
+      for (var setData in cfg.sets) {
+        setData.dispose();
+      }
+    }
     super.dispose();
   }
 
@@ -1210,65 +1217,137 @@ class _ExerciseConfigurationScreenState extends State<ExerciseConfigurationScree
                       border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
                       boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
                     ),
-                    child: TextField(
-                      key: ValueKey('reps_${cfgIdx}_${setIdx}_${data.repsType}_${data.reps}'),
-                      controller: TextEditingController(
-                        text: cfg.mainType == 'Time'
-                            ? (data.time > 0 ? data.time.toString() : '')
-                            : (data.repsType == 'AMRAP'
-                                  ? 'AMRAP'
-                                  : data.repsType == 'FAILURE'
-                                  ? 'FAILURE'
-                                  : (data.reps > 0 ? data.reps.toString() : '')),
-                      ),
-                      textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      readOnly: cfg.mainType != 'Time' && (data.repsType == 'AMRAP' || data.repsType == 'FAILURE'),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: cfg.mainType == 'Time' ? '30' : '10',
-                        hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.4), fontSize: 14),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                      ),
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: cfg.mainType != 'Time' && (data.repsType == 'AMRAP' || data.repsType == 'FAILURE') ? AppColors.accent : AppColors.onSurface,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _focusedFieldType = cfg.mainType == 'Time' ? null : 'reps';
-                          _focusedConfigIdx = cfgIdx;
-                          _focusedSetIdx = setIdx;
-                        });
-                      },
-                      onChanged: (v) {
-                        if (cfg.mainType == 'Time') {
-                          final n = int.tryParse(v) ?? 0;
-                          data.time = n;
-                        } else {
-                          // Only allow numeric input if not AMRAP or FAILURE
-                          if (data.repsType == null || data.repsType == 'standard') {
-                            final n = int.tryParse(v) ?? 0;
+                    child: Builder(
+                      builder: (context) {
+                        // Update controller text when data changes
+                        data.updateControllerText(cfg.mainType);
+                        return TextField(
+                          key: ValueKey('reps_${cfgIdx}_${setIdx}_${data.repsType}_${data.reps}_${cfg.mainType == 'Time' ? data.timeUnit : ''}'),
+                          focusNode: data.repsTimeFocusNode,
+                          controller: data.repsTimeController,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          readOnly: cfg.mainType != 'Time' && (data.repsType == 'AMRAP' || data.repsType == 'FAILURE'),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: cfg.mainType == 'Time' ? '30' : '10',
+                            hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGrayDark.withOpacity(0.4), fontSize: 14),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: cfg.mainType != 'Time' && (data.repsType == 'AMRAP' || data.repsType == 'FAILURE') ? AppColors.accent : AppColors.onSurface,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                          onTap: () {
                             setState(() {
-                              data.reps = n;
-                              data.repsType = null; // Standard reps
+                              _focusedFieldType = cfg.mainType == 'Time' ? null : 'reps';
+                              _focusedConfigIdx = cfgIdx;
+                              _focusedSetIdx = setIdx;
                             });
-                          }
-                        }
-                      },
-                      onSubmitted: (_) {
-                        setState(() {
-                          _focusedFieldType = null;
-                          _focusedConfigIdx = null;
-                          _focusedSetIdx = null;
-                        });
-                        FocusScope.of(context).unfocus();
+                          },
+                          onChanged: (v) {
+                            if (cfg.mainType == 'Time') {
+                              final n = int.tryParse(v) ?? 0;
+                              // Convert to seconds based on timeUnit
+                              setState(() {
+                                data.time = data.timeUnit == 'M' ? n * 60 : n;
+                              });
+                            } else {
+                              // Only allow numeric input if not AMRAP or FAILURE
+                              if (data.repsType == null || data.repsType == 'standard') {
+                                final n = int.tryParse(v) ?? 0;
+                                setState(() {
+                                  data.reps = n;
+                                  data.repsType = null; // Standard reps
+                                });
+                              }
+                            }
+                          },
+                          onSubmitted: (_) {
+                            setState(() {
+                              _focusedFieldType = null;
+                              _focusedConfigIdx = null;
+                              _focusedSetIdx = null;
+                            });
+                            data.repsTimeFocusNode.unfocus();
+                            FocusScope.of(context).unfocus();
+                          },
+                        );
                       },
                     ),
                   ),
                 ),
+                if (cfg.mainType == 'Time')
+                  Padding(
+                    padding: const EdgeInsets.only(left: 3),
+                    child: Container(
+                      height: 44,
+                      decoration: BoxDecoration(color: const Color.fromARGB(255, 149, 151, 155).withOpacity(0.3), borderRadius: BorderRadius.circular(10)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (data.timeUnit != 'M') {
+                                setState(() {
+                                  // Switch to minutes mode (time stays in seconds, just display changes)
+                                  data.timeUnit = 'M';
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+                              decoration: BoxDecoration(
+                                gradient: data.timeUnit == 'M'
+                                    ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                                    : null,
+                                color: data.timeUnit == 'M' ? null : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: data.timeUnit == 'M' ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                              ),
+                              child: Text(
+                                'M',
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: data.timeUnit == 'M' ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
+                                  fontWeight: data.timeUnit == 'M' ? FontWeight.w700 : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (data.timeUnit != 'S') {
+                                setState(() {
+                                  // Switch to seconds mode (time stays in seconds, just display changes)
+                                  data.timeUnit = 'S';
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+                              decoration: BoxDecoration(
+                                gradient: data.timeUnit == 'S'
+                                    ? LinearGradient(colors: [AppColors.accent, AppColors.accent.withOpacity(0.85)], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                                    : null,
+                                color: data.timeUnit == 'S' ? null : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: data.timeUnit == 'S' ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+                              ),
+                              child: Text(
+                                'S',
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: data.timeUnit == 'S' ? AppColors.onAccent : AppColors.onSurface.withOpacity(0.8),
+                                  fontWeight: data.timeUnit == 'S' ? FontWeight.w700 : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -1391,10 +1470,39 @@ class _Config {
 
 class _SetData {
   int reps = 0;
-  int time = 0;
+  int time = 0; // Stored in seconds
   double weight = 0;
   double distance = 0;
   String distanceUnit = 'miles';
   bool isBodyweight = false; // Track if BW was explicitly set
   String? repsType; // 'AMRAP', 'FAILURE', or null (standard)
+  String timeUnit = 'S'; // 'M' for minutes, 'S' for seconds
+  late final FocusNode repsTimeFocusNode;
+  late final TextEditingController repsTimeController;
+
+  _SetData() {
+    repsTimeFocusNode = FocusNode();
+    repsTimeController = TextEditingController();
+  }
+
+  void dispose() {
+    repsTimeFocusNode.dispose();
+    repsTimeController.dispose();
+  }
+
+  void updateControllerText(String mainType) {
+    // Only update if the field is not currently focused (user is not typing)
+    if (!repsTimeFocusNode.hasFocus) {
+      final text = mainType == 'Time'
+          ? (time > 0 ? (timeUnit == 'M' ? (time / 60).round().toString() : time.toString()) : '')
+          : (repsType == 'AMRAP'
+                ? 'AMRAP'
+                : repsType == 'FAILURE'
+                ? 'FAILURE'
+                : (reps > 0 ? reps.toString() : ''));
+      if (repsTimeController.text != text) {
+        repsTimeController.text = text;
+      }
+    }
+  }
 }
