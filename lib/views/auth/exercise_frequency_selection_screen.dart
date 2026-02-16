@@ -9,13 +9,21 @@ class ExerciseFrequencySelectionScreen extends StatefulWidget {
   const ExerciseFrequencySelectionScreen({super.key});
 
   @override
-  State<ExerciseFrequencySelectionScreen> createState() => _ExerciseFrequencySelectionScreenState();
+  State<ExerciseFrequencySelectionScreen> createState() =>
+      _ExerciseFrequencySelectionScreenState();
 }
 
-class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySelectionScreen> {
+class _ExerciseFrequencySelectionScreenState
+    extends State<ExerciseFrequencySelectionScreen> {
   String? _selectedFrequency;
 
-  final List<String> _frequencies = ['Daily (7x/week)', '5 times per week', '3 times per week', '2 times per week', 'Once per week'];
+  final List<String> _frequencies = [
+    'Daily (7x/week)',
+    '5 times per week',
+    '3 times per week',
+    '2 times per week',
+    'Once per week',
+  ];
 
   int get _currentIndex {
     final args = Get.arguments as Map<String, dynamic>?;
@@ -34,7 +42,11 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 28),
+                  icon: const Icon(
+                    Icons.chevron_left,
+                    color: AppColors.accent,
+                    size: 28,
+                  ),
                   onPressed: () => Get.back(),
                 ),
                 _currentIndex == 3
@@ -43,7 +55,10 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                         onPressed: () => Get.offAllNamed(AppRoutes.home),
                         child: Text(
                           'Skip',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.accent,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
               ],
@@ -57,7 +72,12 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   width: 8,
                   height: 8,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: index < 4 ? AppColors.accent : AppColors.accent.withOpacity(0.3)),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: index < 4
+                        ? AppColors.accent
+                        : AppColors.accent.withOpacity(0.3),
+                  ),
                 );
               }),
             ),
@@ -75,7 +95,11 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                       child: Text(
                         textAlign: TextAlign.center,
                         'How often do you plan to exercise?',
-                        style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                        style: AppTextStyles.headlineLarge.copyWith(
+                          color: AppColors.accent,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -85,25 +109,40 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
                       child: Text(
                         textAlign: TextAlign.center,
                         'This helps us create realistic goals for you',
-                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.onBackground.withOpacity(0.7),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 40),
 
                     // Options
-                    ..._frequencies.map((frequency) => Padding(padding: const EdgeInsets.only(bottom: 12), child: _buildFrequencyButton(frequency))),
+                    ..._frequencies.map(
+                      (frequency) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _buildFrequencyButton(frequency),
+                      ),
+                    ),
 
                     const SizedBox(height: 25),
                     CustomButton(
                       text: 'Get Started',
                       onPressed: _selectedFrequency != null
                           ? () {
-                              final args = Get.arguments as Map<String, dynamic>?;
+                              final args =
+                                  Get.arguments as Map<String, dynamic>?;
                               final preference = args?['preference'] as String?;
-                              Get.offAllNamed(AppRoutes.home, arguments: {'preference': preference});
+                              Get.offAllNamed(
+                                AppRoutes.home,
+                                arguments: {'preference': preference},
+                              );
                             }
                           : null,
-                      backgroundColor: _selectedFrequency != null ? AppColors.accent : AppColors.primaryGray,
+                      backgroundColor: _selectedFrequency != null
+                          ? AppColors.accent
+                          : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),
                   ],
@@ -134,16 +173,24 @@ class _ExerciseFrequencySelectionScreenState extends State<ExerciseFrequencySele
         decoration: BoxDecoration(
           color: isSelected ? AppColors.accent : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppColors.accent : const Color(0xFF666666), width: isSelected ? 2 : 1.5),
+          border: Border.all(
+            color: isSelected ? AppColors.accent : const Color(0xFF666666),
+            width: isSelected ? 2 : 1.5,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               frequency,
-              style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? Colors.white : AppColors.onBackground, fontSize: 15, fontWeight: FontWeight.w500),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: isSelected ? Colors.white : AppColors.onBackground,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            if (isSelected) const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: Colors.white, size: 20),
           ],
         ),
       ),

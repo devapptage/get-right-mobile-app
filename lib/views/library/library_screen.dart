@@ -92,57 +92,13 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: Obx(() {
-            final notificationController = Get.find<NotificationController>();
-            final unreadCount = notificationController.unreadCount;
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconButton(
-                  icon: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 3,
-                        margin: const EdgeInsets.only(bottom: 4),
-                        decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
-                      ),
-                      Container(
-                        width: 25,
-                        height: 3,
-                        margin: const EdgeInsets.only(bottom: 4),
-                        decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
-                      ),
-                      Container(
-                        width: 20,
-                        height: 3,
-                        decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
-                      ),
-                    ],
-                  ),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ).paddingOnly(left: 10),
-                if (unreadCount > 0)
-                  Positioned(
-                    right: 0,
-                    top: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                      child: Text(
-                        unreadCount > 99 ? '99+' : '$unreadCount',
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, height: 1.0),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          }),
+          leading: GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+            ).paddingAll(8),
+          ),
           title: Text(
             'Library',
             style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),

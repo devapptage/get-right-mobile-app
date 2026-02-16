@@ -17,7 +17,8 @@ class ProfileSetupScreen extends StatefulWidget {
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
 }
 
-class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTickerProviderStateMixin {
+class _ProfileSetupScreenState extends State<ProfileSetupScreen>
+    with SingleTickerProviderStateMixin {
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
 
@@ -35,9 +36,20 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
   }
 
   void _setupAnimations() {
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
     _animationController.forward();
   }
 
@@ -52,13 +64,20 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
   Future<void> _selectDateOfBirth() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _dateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 25)),
+      initialDate:
+          _dateOfBirth ??
+          DateTime.now().subtract(const Duration(days: 365 * 25)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(primary: AppColors.accent, onPrimary: AppColors.onAccent, surface: Colors.white, onSurface: AppColors.onBackground),
+            colorScheme: ColorScheme.light(
+              primary: AppColors.accent,
+              onPrimary: AppColors.onAccent,
+              surface: Colors.white,
+              onSurface: AppColors.onBackground,
+            ),
           ),
           child: child!,
         );
@@ -84,7 +103,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
         backgroundColor: AppColors.background,
         body: Container(
           decoration: BoxDecoration(
-            gradient: RadialGradient(center: Alignment.topLeft, radius: 1.2, colors: [AppColors.accent.withOpacity(0.05), AppColors.background]),
+            gradient: RadialGradient(
+              center: Alignment.topLeft,
+              radius: 1.2,
+              colors: [
+                AppColors.accent.withOpacity(0.05),
+                AppColors.background,
+              ],
+            ),
           ),
           child: SafeArea(
             child: SingleChildScrollView(
@@ -99,7 +125,15 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: [IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Get.close(1))],
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
+                              size: 20,
+                            ),
+                            onPressed: () => Get.close(1),
+                          ),
+                        ],
                       ),
 
                       // Header
@@ -112,15 +146,29 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                                 const SizedBox(height: 16),
                                 Text(
                                   'Welcome to GetRight',
-                                  style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+                                  style: AppTextStyles.headlineLarge.copyWith(
+                                    color: AppColors.accent,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.5,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 10),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
                                   child: Text(
                                     'Create an account to access your personal fitness journal, workout programs, and more.',
-                                    style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400, height: 1.5),
+                                    style: AppTextStyles.bodyLarge.copyWith(
+                                      color: AppColors.onBackground.withOpacity(
+                                        0.7,
+                                      ),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.5,
+                                    ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -136,7 +184,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                                 _buildLabelWithAsterisk('Full name'),
 
                                 const SizedBox(height: 8),
-                                CustomTextField(controller: _fullNameController, labelText: null, hintText: 'Full name', prefixIcon: null),
+                                CustomTextField(
+                                  controller: _fullNameController,
+                                  labelText: null,
+                                  hintText: 'Full name',
+                                  prefixIcon: null,
+                                ),
                                 const SizedBox(height: 10),
 
                                 // Date of Birth
@@ -165,27 +218,43 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                                   value: _selectedGender,
                                   items: AppConstants.genderOptions,
                                   icon: null,
-                                  onChanged: (value) => setState(() => _selectedGender = value),
+                                  onChanged: (value) =>
+                                      setState(() => _selectedGender = value),
                                 ),
                                 const SizedBox(height: 18),
                               ],
                             ),
                             // Terms and Conditions
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               child: Text.rich(
                                 TextSpan(
-                                  text: 'By continuing, you agree to GetRight\'s ',
-                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 13, fontWeight: FontWeight.w400),
+                                  text:
+                                      'By continuing, you agree to GetRight\'s ',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.onBackground.withOpacity(
+                                      0.7,
+                                    ),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                   children: [
                                     TextSpan(
                                       text: 'Terms & Conditions',
-                                      style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                                      style: TextStyle(
+                                        color: AppColors.accent,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                     const TextSpan(text: ' and '),
                                     TextSpan(
                                       text: 'Privacy Policy',
-                                      style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                                      style: TextStyle(
+                                        color: AppColors.accent,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                     const TextSpan(text: '.'),
                                   ],
@@ -212,15 +281,37 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                             // Divider with "or"
                             Row(
                               children: [
-                                Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Text(
-                                    'or',
-                                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground.withOpacity(0.6), fontSize: 14, fontWeight: FontWeight.w400),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: AppColors.primaryGray.withOpacity(
+                                      0.3,
+                                    ),
                                   ),
                                 ),
-                                Expanded(child: Container(height: 1, color: AppColors.primaryGray.withOpacity(0.3))),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: Text(
+                                    'or',
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      color: AppColors.onBackground.withOpacity(
+                                        0.6,
+                                      ),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: AppColors.primaryGray.withOpacity(
+                                      0.3,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 24),
@@ -229,11 +320,23 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _buildSocialIcon(Icons.apple_rounded, Colors.black, () {}),
+                                _buildSocialIcon(
+                                  Icons.apple_rounded,
+                                  Colors.black,
+                                  () {},
+                                ),
                                 const SizedBox(width: 20),
-                                _buildSocialIcon(Icons.facebook_rounded, const Color(0xFF1877F2), () {}),
+                                _buildSocialIcon(
+                                  Icons.facebook_rounded,
+                                  const Color(0xFF1877F2),
+                                  () {},
+                                ),
                                 const SizedBox(width: 20),
-                                _buildSocialIcon(Icons.g_mobiledata_rounded, Colors.white, () {}),
+                                _buildSocialIcon(
+                                  Icons.g_mobiledata_rounded,
+                                  Colors.white,
+                                  () {},
+                                ),
                               ],
                             ),
                             const SizedBox(height: 32),
@@ -255,7 +358,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
     return RichText(
       text: TextSpan(
         text: label,
-        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.w500),
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.onBackground,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
         children: const [
           TextSpan(
             text: ' *',
@@ -269,7 +376,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
   Widget _buildLabel(String label) {
     return Text(
       label,
-      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.w500),
+      style: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.onBackground,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 
@@ -277,11 +388,19 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
     return RichText(
       text: TextSpan(
         text: label,
-        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground, fontSize: 14, fontWeight: FontWeight.w500),
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.onBackground,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
         children: [
           TextSpan(
             text: ' (Optional)',
-            style: AppTextStyles.bodyMedium.copyWith(color: const Color.fromARGB(255, 39, 40, 41), fontSize: 10, fontWeight: FontWeight.w400),
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: const Color.fromARGB(255, 39, 40, 41),
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),
@@ -297,29 +416,44 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: AppColors.surface,
-          border: Border.all(color: const Color(0xFF666666), width: 1.5), // Dark gray border
+          border: Border.all(
+            color: const Color(0xFF666666),
+            width: 1.5,
+          ), // Dark gray border
         ),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
           children: [
             Expanded(
               child: Text(
-                _dateOfBirth != null ? DateFormat('MMMM dd, yyyy').format(_dateOfBirth!) : 'December 22, 2025',
+                _dateOfBirth != null
+                    ? DateFormat('MMMM dd, yyyy').format(_dateOfBirth!)
+                    : 'December 22, 2025',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: _dateOfBirth != null ? AppColors.onBackground : const Color.fromARGB(255, 117, 116, 116),
+                  color: _dateOfBirth != null
+                      ? AppColors.onBackground
+                      : const Color.fromARGB(255, 117, 116, 116),
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
                 ),
               ),
             ),
-            Icon(Icons.calendar_today_rounded, color: AppColors.accent, size: 20),
+            Icon(
+              Icons.calendar_today_rounded,
+              color: AppColors.accent,
+              size: 20,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSocialIcon(IconData icon, Color backgroundColor, VoidCallback onTap) {
+  Widget _buildSocialIcon(
+    IconData icon,
+    Color backgroundColor,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -328,20 +462,38 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: backgroundColor,
-          border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+          border: Border.all(
+            color: AppColors.primaryGray.withOpacity(0.2),
+            width: 1,
+          ),
         ),
-        child: Icon(icon, color: backgroundColor == Colors.white ? AppColors.onBackground : Colors.white, size: 24),
+        child: Icon(
+          icon,
+          color: backgroundColor == Colors.white
+              ? AppColors.onBackground
+              : Colors.white,
+          size: 24,
+        ),
       ),
     );
   }
 
-  Widget _buildDropdownField({required String? label, required String? value, required List<String> items, required IconData? icon, required ValueChanged<String?> onChanged}) {
+  Widget _buildDropdownField({
+    required String? label,
+    required String? value,
+    required List<String> items,
+    required IconData? icon,
+    required ValueChanged<String?> onChanged,
+  }) {
     return Container(
       height: 56,
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF666666), width: 1.5), // Dark gray border
+        border: Border.all(
+          color: const Color(0xFF666666),
+          width: 1.5,
+        ), // Dark gray border
       ),
       child: DropdownButtonFormField<String>(
         value: value,
@@ -353,8 +505,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
                   child: Icon(icon, color: AppColors.primaryGray, size: 22),
                 )
               : null,
-          prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 48,
+            minHeight: 48,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 16,
+          ),
           filled: false,
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
@@ -362,22 +520,40 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> with SingleTick
           errorBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
-          labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, fontSize: 15, fontWeight: FontWeight.w500),
-          floatingLabelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontSize: 13, fontWeight: FontWeight.w600),
+          labelStyle: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.primaryGray,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+          floatingLabelStyle: AppTextStyles.labelMedium.copyWith(
+            color: AppColors.accent,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         style: AppTextStyles.bodyMedium.copyWith(
-          color: value != null ? AppColors.onBackground : const Color.fromARGB(255, 117, 116, 116),
+          color: value != null
+              ? AppColors.onBackground
+              : const Color.fromARGB(255, 117, 116, 116),
           fontSize: 15,
           fontWeight: FontWeight.w400,
         ),
         dropdownColor: AppColors.surface,
         icon: Padding(
           padding: const EdgeInsets.only(right: 16),
-          child: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.accent, size: 20),
+          child: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppColors.accent,
+            size: 20,
+          ),
         ),
         hint: Text(
           'Select gender',
-          style: AppTextStyles.bodyMedium.copyWith(color: const Color.fromARGB(255, 117, 116, 116), fontSize: 15, fontWeight: FontWeight.w400),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: const Color.fromARGB(255, 117, 116, 116),
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         items: items.map((String item) {
           return DropdownMenuItem<String>(value: item, child: Text(item));

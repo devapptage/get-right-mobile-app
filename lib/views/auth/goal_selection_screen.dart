@@ -15,7 +15,14 @@ class GoalSelectionScreen extends StatefulWidget {
 class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
   final List<String> _selectedGoals = [];
 
-  final List<String> _goals = ['Lose Weight', 'Build Muscle', 'Stay Healthy', 'Improve Performance', 'Track Progress', 'Build Habits'];
+  final List<String> _goals = [
+    'Lose Weight',
+    'Build Muscle',
+    'Stay Healthy',
+    'Improve Performance',
+    'Track Progress',
+    'Build Habits',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +36,21 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 28),
+                  icon: const Icon(
+                    Icons.chevron_left,
+                    color: AppColors.accent,
+                    size: 28,
+                  ),
                   onPressed: () => Get.back(),
                 ),
                 TextButton(
                   onPressed: () => Get.offAllNamed(AppRoutes.home),
                   child: Text(
                     'Skip',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -50,7 +64,12 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   width: 8,
                   height: 8,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: index < 2 ? AppColors.accent : AppColors.accent.withOpacity(0.3)),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: index < 2
+                        ? AppColors.accent
+                        : AppColors.accent.withOpacity(0.3),
+                  ),
                 );
               }),
             ),
@@ -67,7 +86,11 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                     Center(
                       child: Text(
                         'What\'s your main goal?',
-                        style: AppTextStyles.headlineLarge.copyWith(color: AppColors.accent, fontSize: 28, fontWeight: FontWeight.w800),
+                        style: AppTextStyles.headlineLarge.copyWith(
+                          color: AppColors.accent,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -77,24 +100,39 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                       child: Text(
                         textAlign: TextAlign.center,
                         'This helps us recommend the best features for you \n Select all that apply',
-                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.onBackground.withOpacity(0.7), fontSize: 15, fontWeight: FontWeight.w400),
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.onBackground.withOpacity(0.7),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
 
                     const SizedBox(height: 32),
 
                     // Options
-                    ..._goals.map((goal) => Padding(padding: const EdgeInsets.only(bottom: 12), child: _buildGoalButton(goal))),
+                    ..._goals.map(
+                      (goal) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _buildGoalButton(goal),
+                      ),
+                    ),
                     const SizedBox(height: 25),
                     CustomButton(
                       text: 'Continue',
                       onPressed: _selectedGoals.isNotEmpty
                           ? () {
-                              final args = Get.arguments as Map<String, dynamic>?;
-                              Get.toNamed(AppRoutes.fitnessLevelSelection, arguments: args);
+                              final args =
+                                  Get.arguments as Map<String, dynamic>?;
+                              Get.toNamed(
+                                AppRoutes.fitnessLevelSelection,
+                                arguments: args,
+                              );
                             }
                           : null,
-                      backgroundColor: _selectedGoals.isNotEmpty ? AppColors.accent : AppColors.primaryGray,
+                      backgroundColor: _selectedGoals.isNotEmpty
+                          ? AppColors.accent
+                          : AppColors.primaryGray,
                       textColor: Colors.white,
                     ),
                   ],
@@ -128,16 +166,24 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.accent : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppColors.accent : const Color(0xFF666666), width: isSelected ? 2 : 1.5),
+          border: Border.all(
+            color: isSelected ? AppColors.accent : const Color(0xFF666666),
+            width: isSelected ? 2 : 1.5,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               goal,
-              style: AppTextStyles.bodyMedium.copyWith(color: isSelected ? Colors.white : AppColors.onBackground, fontSize: 15, fontWeight: FontWeight.w500),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: isSelected ? Colors.white : AppColors.onBackground,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            if (isSelected) const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: Colors.white, size: 20),
           ],
         ),
       ),

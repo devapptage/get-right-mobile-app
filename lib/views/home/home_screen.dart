@@ -8,6 +8,7 @@ import 'package:get_right/views/feed/feed_screen.dart';
 import 'package:get_right/views/marketplace/marketplace_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
 import 'package:get_right/views/nutrition/nutrition_screen.dart';
+import 'package:get_right/views/profile/profile_screen.dart';
 import 'package:get_right/widgets/common/app_drawer.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -30,8 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
     MarketplaceScreen(), // Marketplace
     FeedScreen(), // Community Feed
     CombinedJournalScreen(), // Journal (Center - Workout Journal + Runner Log)
-    LibraryScreen(), // Library
     NutritionScreen(), // Home
+    ProfileScreen(), // Library
   ];
 
   @override
@@ -88,8 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
       {'icon': Icons.storefront_outlined, 'activeIcon': Icons.storefront_rounded, 'label': 'Market'},
       {'icon': Icons.explore_outlined, 'activeIcon': Icons.explore_rounded, 'label': 'Feed'},
       {'icon': Icons.book_outlined, 'activeIcon': Icons.book_rounded, 'label': 'Journal'},
-      {'icon': Icons.menu_book_outlined, 'activeIcon': Icons.menu_book_rounded, 'label': 'Library'},
       {'icon': Icons.restaurant_menu_outlined, 'activeIcon': Icons.restaurant_menu_rounded, 'label': 'Nutrition'},
+      {'icon': Icons.person_outlined, 'activeIcon': Icons.person_rounded, 'label': 'Profile'},
     ];
 
     return ClipRRect(

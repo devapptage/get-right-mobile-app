@@ -8,6 +8,7 @@ import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/views/chat/chat_list_screen.dart';
 import 'package:get_right/views/journal/My_work_screen.dart';
+import 'package:get_right/views/library/library_screen.dart';
 
 /// Professional App Drawer
 ///
@@ -63,14 +64,6 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
-                // _buildDrawerItem(
-                //   icon: Icons.sports_gymnastics_rounded,
-                //   activeIcon: Icons.work,
-                //   title: 'My Workouts',
-                //   onTap: () {
-                //     Get.to(() => const WorkoutScreen());
-                //   },
-                // ),
                 _buildDrawerItem(
                   icon: Icons.track_changes_outlined,
                   activeIcon: Icons.track_changes,
@@ -80,6 +73,14 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
+                _buildDrawerItem(
+                  icon: Icons.sports_gymnastics_rounded,
+                  activeIcon: Icons.library_books,
+                  title: 'Library',
+                  onTap: () {
+                    Get.to(() => const LibraryScreen());
+                  },
+                ),
                 const SizedBox(height: 16),
                 const Divider(color: AppColors.primaryGray, thickness: 0.5, height: 1),
                 const SizedBox(height: 16),

@@ -506,7 +506,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: 48,
+                      height: 52,
                       child: ElevatedButton(
                         onPressed: () {
                           Get.back();
@@ -528,7 +528,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: SizedBox(
-                      height: 48,
+                      height: 52,
                       child: ElevatedButton(
                         onPressed: () {
                           Get.back();

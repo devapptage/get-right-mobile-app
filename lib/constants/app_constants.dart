@@ -8,7 +8,8 @@ class AppConstants {
   static const String appTagline = 'Your fitness journey starts here';
 
   // API Configuration (Update with your backend URLs)
-  static const String baseUrl = 'https://api.getright.app'; // TODO: Update with actual API
+  static const String baseUrl =
+      'https://api.getright.app'; // TODO: Update with actual API
   static const String apiVersion = 'v1';
 
   // Storage Keys
@@ -25,22 +26,66 @@ class AppConstants {
   static const String keySavedPosts = 'saved_posts';
   static const String keyHasSubscription = 'has_subscription';
   static const String keySubscriptionExpiryDate = 'subscription_expiry_date';
-  static const String keySubscriptionType = 'subscription_type'; // 'monthly', 'quarterly', 'yearly'
+  static const String keySubscriptionType =
+      'subscription_type'; // 'monthly', 'quarterly', 'yearly'
 
   // Workout Tags
-  static const List<String> workoutTags = ['Leg Day', 'Upper Body', 'Arms', 'Chest', 'Back', 'Shoulders', 'Core', 'Cardio', 'HIIT', 'Yoga', 'Stretching', 'Full Body'];
+  static const List<String> workoutTags = [
+    'Leg Day',
+    'Upper Body',
+    'Arms',
+    'Chest',
+    'Back',
+    'Shoulders',
+    'Core',
+    'Cardio',
+    'HIIT',
+    'Yoga',
+    'Stretching',
+    'Full Body',
+  ];
 
   // Fitness Goals
-  static const List<String> fitnessGoals = ['Weight Loss', 'Muscle Gain', 'Endurance', 'Strength', 'Flexibility', 'General Fitness', 'Athletic Performance'];
+  static const List<String> fitnessGoals = [
+    'Weight Loss',
+    'Muscle Gain',
+    'Endurance',
+    'Strength',
+    'Flexibility',
+    'General Fitness',
+    'Athletic Performance',
+  ];
 
   // Workout Types
-  static const List<String> workoutTypes = ['Cardio', 'Strength Training', 'Yoga', 'HIIT', 'Pilates', 'Crossfit', 'Running', 'Cycling', 'Swimming', 'Sports'];
+  static const List<String> workoutTypes = [
+    'Cardio',
+    'Strength Training',
+    'Yoga',
+    'HIIT',
+    'Pilates',
+    'Crossfit',
+    'Running',
+    'Cycling',
+    'Swimming',
+    'Sports',
+  ];
 
   // Gender Options
-  static const List<String> genderOptions = ['Male', 'Female', 'Other', 'Prefer not to say'];
+  static const List<String> genderOptions = [
+    'Male',
+    'Female',
+    'Other',
+    'Prefer not to say',
+  ];
 
   // Activity Levels
-  static const List<String> activityLevels = ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Extremely Active'];
+  static const List<String> activityLevels = [
+    'Sedentary',
+    'Lightly Active',
+    'Moderately Active',
+    'Very Active',
+    'Extremely Active',
+  ];
 
   // Units
   static const List<String> unitsOptions = ['Metric', 'Imperial'];

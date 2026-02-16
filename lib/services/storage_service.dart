@@ -166,14 +166,18 @@ class StorageService {
   /// Get runs list
   Future<List<RunModel>> getRuns() async {
     final jsonList = getStringList('user_runs') ?? [];
-    return jsonList.map((jsonStr) => RunModel.fromJson(json.decode(jsonStr))).toList();
+    return jsonList
+        .map((jsonStr) => RunModel.fromJson(json.decode(jsonStr)))
+        .toList();
   }
 
   /// Get runs for specific date
   Future<List<RunModel>> getRunsForDate(DateTime date) async {
     final allRuns = await getRuns();
     return allRuns.where((run) {
-      return run.startTime.year == date.year && run.startTime.month == date.month && run.startTime.day == date.day;
+      return run.startTime.year == date.year &&
+          run.startTime.month == date.month &&
+          run.startTime.day == date.day;
     }).toList();
   }
 
@@ -250,14 +254,18 @@ class StorageService {
 
   /// Save workouts list
   Future<bool> saveWorkouts(List<WorkoutModel> workouts) async {
-    final jsonList = workouts.map((workout) => json.encode(workout.toJson())).toList();
+    final jsonList = workouts
+        .map((workout) => json.encode(workout.toJson()))
+        .toList();
     return await saveStringList('user_workouts', jsonList);
   }
 
   /// Get workouts list
   Future<List<WorkoutModel>> getWorkouts() async {
     final jsonList = getStringList('user_workouts') ?? [];
-    return jsonList.map((jsonStr) => WorkoutModel.fromJson(json.decode(jsonStr))).toList();
+    return jsonList
+        .map((jsonStr) => WorkoutModel.fromJson(json.decode(jsonStr)))
+        .toList();
   }
 
   /// Add a single workout
@@ -271,7 +279,9 @@ class StorageService {
   Future<List<WorkoutModel>> getWorkoutsForDate(DateTime date) async {
     final allWorkouts = await getWorkouts();
     return allWorkouts.where((workout) {
-      return workout.date.year == date.year && workout.date.month == date.month && workout.date.day == date.day;
+      return workout.date.year == date.year &&
+          workout.date.month == date.month &&
+          workout.date.day == date.day;
     }).toList();
   }
 
@@ -285,7 +295,9 @@ class StorageService {
   /// Update workout
   Future<bool> updateWorkout(WorkoutModel updatedWorkout) async {
     final workouts = await getWorkouts();
-    final index = workouts.indexWhere((workout) => workout.id == updatedWorkout.id);
+    final index = workouts.indexWhere(
+      (workout) => workout.id == updatedWorkout.id,
+    );
     if (index != -1) {
       workouts[index] = updatedWorkout;
       return await saveWorkouts(workouts);
@@ -297,14 +309,18 @@ class StorageService {
 
   /// Save planned routes list
   Future<bool> savePlannedRoutes(List<PlannedRouteModel> routes) async {
-    final jsonList = routes.map((route) => json.encode(route.toJson())).toList();
+    final jsonList = routes
+        .map((route) => json.encode(route.toJson()))
+        .toList();
     return await saveStringList('user_planned_routes', jsonList);
   }
 
   /// Get planned routes list
   Future<List<PlannedRouteModel>> getPlannedRoutes() async {
     final jsonList = getStringList('user_planned_routes') ?? [];
-    return jsonList.map((jsonStr) => PlannedRouteModel.fromJson(json.decode(jsonStr))).toList();
+    return jsonList
+        .map((jsonStr) => PlannedRouteModel.fromJson(json.decode(jsonStr)))
+        .toList();
   }
 
   /// Add a single planned route
@@ -378,7 +394,9 @@ class StorageService {
 
   /// Save bookmarked posts
   Future<bool> saveSavedPosts(List<Map<String, dynamic>> posts) async {
-    final List<String> postsJson = posts.map((post) => jsonEncode(post)).toList();
+    final List<String> postsJson = posts
+        .map((post) => jsonEncode(post))
+        .toList();
     return await saveStringList(AppConstants.keySavedPosts, postsJson);
   }
 
@@ -388,7 +406,9 @@ class StorageService {
     if (postsJson == null || postsJson.isEmpty) {
       return [];
     }
-    return postsJson.map((postJson) => jsonDecode(postJson) as Map<String, dynamic>).toList();
+    return postsJson
+        .map((postJson) => jsonDecode(postJson) as Map<String, dynamic>)
+        .toList();
   }
 
   /// Add a saved post
@@ -435,10 +455,17 @@ class StorageService {
   }
 
   /// Save subscription status
-  Future<bool> saveSubscription(bool hasSubscription, {DateTime? expiryDate, String? subscriptionType}) async {
+  Future<bool> saveSubscription(
+    bool hasSubscription, {
+    DateTime? expiryDate,
+    String? subscriptionType,
+  }) async {
     await saveBool(AppConstants.keyHasSubscription, hasSubscription);
     if (expiryDate != null) {
-      await saveString(AppConstants.keySubscriptionExpiryDate, expiryDate.toIso8601String());
+      await saveString(
+        AppConstants.keySubscriptionExpiryDate,
+        expiryDate.toIso8601String(),
+      );
     }
     if (subscriptionType != null) {
       await saveString(AppConstants.keySubscriptionType, subscriptionType);
