@@ -227,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const textSecondary = Color(0xFF404040);
 
     // Check if this is the nutrition tab (index 4) and user doesn't have subscription
-    final isNutritionTab = index == 4;
+    final isNutritionTab = index == 3;
     final hasSubscription = _hasSubscription();
     final isLocked = isNutritionTab && !hasSubscription;
 

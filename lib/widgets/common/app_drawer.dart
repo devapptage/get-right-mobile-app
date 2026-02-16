@@ -6,8 +6,6 @@ import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/controllers/auth_controller.dart';
 import 'package:get_right/controllers/notification_controller.dart';
 import 'package:get_right/services/storage_service.dart';
-import 'package:get_right/views/chat/chat_list_screen.dart';
-import 'package:get_right/views/journal/My_work_screen.dart';
 import 'package:get_right/views/library/library_screen.dart';
 
 /// Professional App Drawer
@@ -100,33 +98,6 @@ class AppDrawer extends StatelessWidget {
                       Get.toNamed(AppRoutes.notifications);
                     },
                   ),
-                ),
-                _buildDrawerItem(
-                  icon: Icons.favorite_outline,
-                  activeIcon: Icons.favorite,
-                  title: 'Favorites',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.favorites);
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.bookmark_outline,
-                  activeIcon: Icons.bookmark,
-                  title: 'Saved Posts',
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(AppRoutes.savedPosts);
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.chat_bubble_outline,
-                  activeIcon: Icons.chat_bubble,
-                  title: 'Chat',
-                  onTap: () {
-                    Get.back();
-                    Get.to(() => const ChatListScreen());
-                  },
                 ),
                 // _buildDrawerItem(
                 //   icon: Icons.people_outline,
