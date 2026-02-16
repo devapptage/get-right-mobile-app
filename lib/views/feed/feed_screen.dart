@@ -716,12 +716,6 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                 _showSearchScreen();
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: AppColors.accent),
-              onPressed: () {
-                // TODO: Show notifications
-              },
-            ),
           ],
           bottom: TabBar(
             controller: _tabController,
