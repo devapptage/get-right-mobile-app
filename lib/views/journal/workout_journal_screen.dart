@@ -525,7 +525,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: SizedBox(
                       height: 52,
@@ -542,7 +542,7 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
                         ),
                         child: Text(
                           'Workout',
-                          style: AppTextStyles.buttonMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: AppTextStyles.buttonMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold).copyWith(fontSize: 13.sp),
                         ),
                       ),
                     ),
@@ -611,7 +611,10 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
             _buildHeader('Warmup', Icons.local_fire_department, isWarmup: true),
             ..._buildExercisesList(_workout!.warmupExercises, true),
           ],
-          if (_workout!.workoutExercises.isNotEmpty) ...[_buildHeader('Workout', Icons.fitness_center, isWarmup: false), ..._buildExercisesList(_workout!.workoutExercises, false)],
+          if (_workout!.workoutExercises.isNotEmpty) ...[
+            _buildHeader('Workout', Icons.fitness_center, isWarmup: false),
+            ..._buildExercisesList(_workout!.workoutExercises, false),
+          ],
           const SizedBox(height: 100),
         ],
       ),
@@ -841,7 +844,9 @@ class _WorkoutJournalScreenState extends State<WorkoutJournalScreen> {
               ListTile(
                 onTap: () {
                   Get.back();
-                  Get.toNamed(AppRoutes.reorderExercises, arguments: {'exercises': isWarmup ? _workout!.warmupExercises : _workout!.workoutExercises})?.then((r) {
+                  Get.toNamed(AppRoutes.reorderExercises, arguments: {'exercises': isWarmup ? _workout!.warmupExercises : _workout!.workoutExercises})?.then((
+                    r,
+                  ) {
                     if (r != null && r['exercises'] != null)
                       setState(() {
                         if (isWarmup)

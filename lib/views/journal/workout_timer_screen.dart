@@ -86,31 +86,16 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: AppColors.accent,
-                  size: 48,
-                ),
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle),
+                child: const Icon(Icons.check_circle, color: AppColors.accent, size: 48),
               ),
               const SizedBox(height: 20),
               Text(
                 'Time\'s Up!',
-                style: AppTextStyles.titleLarge.copyWith(
-                  color: AppColors.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              Text(
-                'Set ${setIndex + 1} completed',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.primaryGrayDark,
-                ),
-              ),
+              Text('Set ${setIndex + 1} completed', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -121,14 +106,9 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text(
-                    'Done',
-                    style: AppTextStyles.buttonMedium,
-                  ),
+                  child: Text('Done', style: AppTextStyles.buttonMedium),
                 ),
               ),
             ],
@@ -155,18 +135,9 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isRunning ? AppColors.accent : AppColors.primaryGray.withOpacity(0.3),
-          width: isRunning ? 2 : 1,
-        ),
+        border: Border.all(color: isRunning ? AppColors.accent : AppColors.primaryGray.withOpacity(0.3), width: isRunning ? 2 : 1),
         boxShadow: [
-          BoxShadow(
-            color: isRunning
-                ? AppColors.accent.withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: isRunning ? AppColors.accent.withOpacity(0.2) : Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -177,23 +148,14 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
             children: [
               Text(
                 'Set ${setIndex + 1}',
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
                 child: Text(
                   _formatTime(initialSeconds),
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.accent,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -205,20 +167,12 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: isRunning ? AppColors.accent : AppColors.primaryGray,
-                  width: 3,
-                ),
+                border: Border.all(color: isRunning ? AppColors.accent : AppColors.primaryGray, width: 3),
               ),
               child: Center(
                 child: Text(
                   _formatTime(currentSeconds),
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: isRunning ? AppColors.accent : AppColors.onSurface,
-                  ),
+                  style: TextStyle(fontFamily: 'Inter', fontSize: 32, fontWeight: FontWeight.bold, color: isRunning ? AppColors.accent : AppColors.onSurface),
                 ),
               ),
             ),
@@ -231,16 +185,11 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
               child: ElevatedButton.icon(
                 onPressed: () => _startTimer(setIndex),
                 icon: const Icon(Icons.play_arrow, size: 20),
-                label: Text(
-                  'Start Timer',
-                  style: AppTextStyles.buttonMedium,
-                ),
+                label: Text('Start Timer', style: AppTextStyles.buttonMedium),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   foregroundColor: AppColors.onAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             )
@@ -257,9 +206,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.accent, width: 2),
                         foregroundColor: AppColors.accent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
@@ -273,14 +220,9 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                       icon: const Icon(Icons.refresh, size: 20),
                       label: const Text('Reset'),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(
-                          color: AppColors.primaryGray,
-                          width: 2,
-                        ),
+                        side: const BorderSide(color: AppColors.primaryGray, width: 2),
                         foregroundColor: AppColors.onBackground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
@@ -299,18 +241,10 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.onBackground,
-          title: Text(
-            'Timer',
-            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent),
-          ),
+          title: Text('Timer', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
         ),
         body: Center(
-          child: Text(
-            'No timed sets available',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.onBackground,
-            ),
-          ),
+          child: Text('No timed sets available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground)),
         ),
       );
     }
@@ -321,22 +255,17 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
         backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onBackground),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent),
           onPressed: () => Get.back(),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              'Timer',
-              style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent),
-            ),
+            Text('Timer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent)),
+            const SizedBox(width: 3),
             Text(
               _exercise!.exerciseName,
-              style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.accent,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -344,14 +273,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            ...List.generate(
-              _timedSets.length,
-              (index) => _buildSetTimerCard(index),
-            ),
-            const SizedBox(height: 24),
-          ],
+          children: [const SizedBox(height: 16), ...List.generate(_timedSets.length, (index) => _buildSetTimerCard(index)), const SizedBox(height: 24)],
         ),
       ),
     );

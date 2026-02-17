@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_right/controllers/favorites_controller.dart';
 import 'package:get_right/routes/app_routes.dart';
@@ -40,13 +41,10 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
 
     // Check if program is completed (from trainer profile)
     final bool isCompletedProgram = program['status'] == 'completed';
-    
+
     // Check if user is enrolled (mock - in real app, check from enrolled programs list)
     // For programs from My Programs (active, scheduled, or completed), user is enrolled
-    _isEnrolled = program['isEnrolled'] ?? 
-                  program['status'] == 'completed' || 
-                  program['status'] == 'active' || 
-                  program['status'] == 'scheduled';
+    _isEnrolled = program['isEnrolled'] ?? program['status'] == 'completed' || program['status'] == 'active' || program['status'] == 'scheduled';
 
     // Ensure required fields have defaults
     _safeProgram = {
@@ -68,7 +66,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
       'review': program['review'],
       ...program, // Keep any additional fields
     };
-    
+
     // Initialize rating state if program has existing rating
     if (_safeProgram['hasRating'] == true && _rating == 0.0) {
       _rating = (_safeProgram['rating'] ?? 0.0) as double;
@@ -170,7 +168,11 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                         child: Container(
                           height: 60,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, AppColors.background]),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.transparent, AppColors.background],
+                            ),
                           ),
                         ),
                       ),
@@ -219,7 +221,13 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(_safeProgram['trainer'] ?? 'Trainer', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                                        SizedBox(
+                                          width: 180.w,
+                                          child: Text(
+                                            _safeProgram['trainer'] ?? 'Trainer',
+                                            style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface),
+                                          ),
+                                        ),
                                         if (_safeProgram['certified'] == true)
                                           Padding(
                                             padding: const EdgeInsets.only(left: 8),
@@ -227,6 +235,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                                           ),
                                       ],
                                     ),
+
                                     Row(
                                       children: [
                                         Icon(Icons.star, color: AppColors.upcoming, size: 16),
@@ -264,7 +273,10 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                         style: AppTextStyles.titleLarge.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
-                      Text(_safeProgram['description'] ?? 'No description available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6)),
+                      Text(
+                        _safeProgram['description'] ?? 'No description available',
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGray, height: 1.6),
+                      ),
                       const SizedBox(height: 24),
 
                       // What's Included
@@ -288,9 +300,19 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                           style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 12),
-                        _buildEnrolledContentCard(icon: Icons.video_library, title: 'Full Program Video', subtitle: 'Complete training video', onTap: () => _openEnrolledVideo()),
+                        _buildEnrolledContentCard(
+                          icon: Icons.video_library,
+                          title: 'Full Program Video',
+                          subtitle: 'Complete training video',
+                          onTap: () => _openEnrolledVideo(),
+                        ),
                         const SizedBox(height: 12),
-                        _buildEnrolledContentCard(icon: Icons.picture_as_pdf, title: 'Program Guide PDF', subtitle: 'Download program guide', onTap: () => _openPDF()),
+                        _buildEnrolledContentCard(
+                          icon: Icons.picture_as_pdf,
+                          title: 'Program Guide PDF',
+                          subtitle: 'Download program guide',
+                          onTap: () => _openPDF(),
+                        ),
                         const SizedBox(height: 24),
                       ],
 
@@ -301,10 +323,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                           style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 12),
-                        if (_hasSubmittedRating || _safeProgram['hasRating'] == true)
-                          _buildExistingRatingCard()
-                        else
-                          _buildRatingForm(),
+                        if (_hasSubmittedRating || _safeProgram['hasRating'] == true) _buildExistingRatingCard() else _buildRatingForm(),
                         const SizedBox(height: 24),
                       ],
 
@@ -320,7 +339,10 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                             children: [
                               Icon(Icons.star, color: AppColors.upcoming, size: 20),
                               const SizedBox(width: 4),
-                              Text('${_safeProgram['rating']} (${_safeProgram['reviews']} reviews)', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
+                              Text(
+                                '${_safeProgram['rating']} (${_safeProgram['reviews']} reviews)',
+                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface),
+                              ),
                             ],
                           ),
                         ],
@@ -458,7 +480,12 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(review['userName'], style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface)),
-                    Row(children: List.generate(5, (index) => Icon(index < review['rating'] ? Icons.star : Icons.star_border, size: 14, color: AppColors.upcoming))),
+                    Row(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(index < review['rating'] ? Icons.star : Icons.star_border, size: 14, color: AppColors.upcoming),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -756,10 +783,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: AppColors.accent,
-                  child: Text(
-                    _safeProgram['trainerImage'] ?? 'UT',
-                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent),
-                  ),
+                  child: Text(_safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onAccent)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -770,10 +794,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                         'Rate ${_safeProgram['trainer']}',
                         style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        'Share your experience with this trainer',
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray),
-                      ),
+                      Text('Share your experience with this trainer', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
                     ],
                   ),
                 ),
@@ -782,9 +803,12 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
             const SizedBox(height: 20),
             const Divider(color: AppColors.primaryGray, height: 1),
             const SizedBox(height: 20),
-            
+
             // Rating
-            Text('Your Rating', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600)),
+            Text(
+              'Your Rating',
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             Row(
               children: List.generate(5, (index) {
@@ -807,19 +831,22 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
                 _rating == 1
                     ? 'Poor'
                     : _rating == 2
-                        ? 'Fair'
-                        : _rating == 3
-                            ? 'Good'
-                            : _rating == 4
-                                ? 'Very Good'
-                                : 'Excellent',
+                    ? 'Fair'
+                    : _rating == 3
+                    ? 'Good'
+                    : _rating == 4
+                    ? 'Very Good'
+                    : 'Excellent',
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600),
               ),
             ],
             const SizedBox(height: 24),
 
             // Comment
-            Text('Your Review Comment', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600)),
+            Text(
+              'Your Review Comment',
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 4),
             Text('Tell others about your experience with ${_safeProgram['trainer']}', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
             const SizedBox(height: 8),
@@ -879,7 +906,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
   Widget _buildExistingRatingCard() {
     final existingRating = _safeProgram['rating'] ?? _rating;
     final existingReview = _safeProgram['review'] ?? _reviewCommentController.text;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -896,10 +923,7 @@ class _ProgramDetailScreenState extends State<ProgramDetailScreen> {
               CircleAvatar(
                 radius: 20,
                 backgroundColor: AppColors.accent,
-                child: Text(
-                  _safeProgram['trainerImage'] ?? 'UT',
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.onAccent),
-                ),
+                child: Text(_safeProgram['trainerImage'] ?? 'UT', style: AppTextStyles.labelMedium.copyWith(color: AppColors.onAccent)),
               ),
               const SizedBox(width: 12),
               Expanded(
