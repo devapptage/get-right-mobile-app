@@ -14,13 +14,12 @@ class WorkoutTimerScreen extends StatefulWidget {
 }
 
 class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
-  Timer? _timer;
-  int _currentSeconds = 0;
-  int _initialSeconds = 0;
-  bool _isRunning = false;
   WorkoutExerciseModel? _exercise;
   List<ExerciseSetModel> _timedSets = [];
-  int _currentSetIndex = 0;
+  Map<int, Timer?> _timers = {};
+  Map<int, int> _currentSeconds = {};
+  Map<int, int> _initialSeconds = {};
+  Map<int, bool> _isRunning = {};
 
   @override
   void initState() {
@@ -29,81 +28,114 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
     if (args != null && args['exercise'] != null) {
       _exercise = args['exercise'] as WorkoutExerciseModel;
       _timedSets = _exercise!.timedSets;
-      if (_timedSets.isNotEmpty) {
-        _currentSeconds = _timedSets[0].timeSeconds!;
-        _initialSeconds = _currentSeconds;
+      for (var i = 0; i < _timedSets.length; i++) {
+        final set = _timedSets[i];
+        _currentSeconds[i] = set.timeSeconds ?? 0;
+        _initialSeconds[i] = set.timeSeconds ?? 0;
+        _isRunning[i] = false;
       }
     }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    for (var timer in _timers.values) {
+      timer?.cancel();
+    }
     super.dispose();
   }
 
-  void _startTimer() {
-    if (_currentSeconds <= 0) _currentSeconds = _initialSeconds;
-    setState(() => _isRunning = true);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_currentSeconds > 0) {
-        setState(() => _currentSeconds--);
+  void _startTimer(int setIndex) {
+    if (_currentSeconds[setIndex]! <= 0) {
+      _currentSeconds[setIndex] = _initialSeconds[setIndex]!;
+    }
+    setState(() => _isRunning[setIndex] = true);
+    _timers[setIndex] = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_currentSeconds[setIndex]! > 0) {
+        setState(() => _currentSeconds[setIndex] = _currentSeconds[setIndex]! - 1);
       } else {
-        _timer?.cancel();
-        setState(() => _isRunning = false);
-        _showCompletionDialog();
+        _timers[setIndex]?.cancel();
+        setState(() => _isRunning[setIndex] = false);
+        _showCompletionDialog(setIndex);
       }
     });
   }
 
-  void _pauseTimer() {
-    _timer?.cancel();
-    setState(() => _isRunning = false);
+  void _pauseTimer(int setIndex) {
+    _timers[setIndex]?.cancel();
+    setState(() => _isRunning[setIndex] = false);
   }
 
-  void _resetTimer() {
-    _timer?.cancel();
+  void _resetTimer(int setIndex) {
+    _timers[setIndex]?.cancel();
     setState(() {
-      _currentSeconds = _initialSeconds;
-      _isRunning = false;
+      _currentSeconds[setIndex] = _initialSeconds[setIndex]!;
+      _isRunning[setIndex] = false;
     });
   }
 
-  void _showCompletionDialog() {
-    Get.dialog(Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(width: 80, height: 80, decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.2), shape: BoxShape.circle), child: const Icon(Icons.check_circle, color: AppColors.accent, size: 48)),
-            const SizedBox(height: 20),
-            Text('Time\'s Up!', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Text('Set ${_currentSetIndex + 1} completed', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
-            const SizedBox(height: 24),
-            Row(children: [
-              Expanded(child: OutlinedButton(onPressed: () { Get.back(); _nextSet(); }, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12), side: const BorderSide(color: AppColors.primaryGray, width: 2), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text('Next Set', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.onBackground)))),
-              const SizedBox(width: 12),
-              Expanded(child: ElevatedButton(onPressed: () { Get.back(); Get.back(); }, style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, padding: const EdgeInsets.symmetric(vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text('Done', style: AppTextStyles.buttonMedium))),
-            ]),
-          ],
+  void _showCompletionDialog(int setIndex) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle,
+                  color: AppColors.accent,
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Time\'s Up!',
+                style: AppTextStyles.titleLarge.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Set ${setIndex + 1} completed',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primaryGrayDark,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Done',
+                    style: AppTextStyles.buttonMedium,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
-  }
-
-  void _nextSet() {
-    if (_currentSetIndex < _timedSets.length - 1) {
-      setState(() {
-        _currentSetIndex++;
-        _currentSeconds = _timedSets[_currentSetIndex].timeSeconds!;
-        _initialSeconds = _currentSeconds;
-      });
-    } else {
-      Get.back();
-    }
+    );
   }
 
   String _formatTime(int seconds) {
@@ -112,34 +144,216 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
     return '$m:$s';
   }
 
+  Widget _buildSetTimerCard(int setIndex) {
+    final isRunning = _isRunning[setIndex] ?? false;
+    final currentSeconds = _currentSeconds[setIndex] ?? 0;
+    final initialSeconds = _initialSeconds[setIndex] ?? 0;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isRunning ? AppColors.accent : AppColors.primaryGray.withOpacity(0.3),
+          width: isRunning ? 2 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isRunning
+                ? AppColors.accent.withOpacity(0.2)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Set ${setIndex + 1}',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _formatTime(initialSeconds),
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isRunning ? AppColors.accent : AppColors.primaryGray,
+                  width: 3,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  _formatTime(currentSeconds),
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: isRunning ? AppColors.accent : AppColors.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (!isRunning)
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () => _startTimer(setIndex),
+                icon: const Icon(Icons.play_arrow, size: 20),
+                label: Text(
+                  'Start Timer',
+                  style: AppTextStyles.buttonMedium,
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  foregroundColor: AppColors.onAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _pauseTimer(setIndex),
+                      icon: const Icon(Icons.pause, size: 20),
+                      label: const Text('Pause'),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.accent, width: 2),
+                        foregroundColor: AppColors.accent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _resetTimer(setIndex),
+                      icon: const Icon(Icons.refresh, size: 20),
+                      label: const Text('Reset'),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                          color: AppColors.primaryGray,
+                          width: 2,
+                        ),
+                        foregroundColor: AppColors.onBackground,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_exercise == null || _timedSets.isEmpty) {
-      return Scaffold(appBar: AppBar(backgroundColor: AppColors.primary, foregroundColor: AppColors.onBackground, title: Text('Timer', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent))), body: Center(child: Text('No timed sets available', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onBackground))));
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onBackground,
+          title: Text(
+            'Timer',
+            style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent),
+          ),
+        ),
+        body: Center(
+          child: Text(
+            'No timed sets available',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.onBackground,
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: AppColors.primary, elevation: 0, leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppColors.onBackground), onPressed: () => Get.back()), title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Timer', style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent)), Text(_exercise!.exerciseName, style: AppTextStyles.titleMedium.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold))])),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.onBackground),
+          onPressed: () => Get.back(),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(width: 280, height: 280, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.accent, width: 3)), child: Center(child: Text(_formatTime(_currentSeconds), style: const TextStyle(fontFamily: 'Inter', fontSize: 56, fontWeight: FontWeight.bold, color: AppColors.accent)))),
+            Text(
+              'Timer',
+              style: AppTextStyles.titleSmall.copyWith(color: AppColors.accent),
+            ),
+            Text(
+              _exercise!.exerciseName,
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.accent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            ...List.generate(
+              _timedSets.length,
+              (index) => _buildSetTimerCard(index),
+            ),
             const SizedBox(height: 24),
-            Text('Starting from: ${_formatTime(_initialSeconds)}', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryGrayDark)),
-            if (_timedSets.length > 1) ...[const SizedBox(height: 16), Text('Set ${_currentSetIndex + 1} of ${_timedSets.length}', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGrayDark))],
-            const SizedBox(height: 40),
-            if (!_isRunning) SizedBox(width: 200, height: 56, child: ElevatedButton.icon(onPressed: _startTimer, icon: const Icon(Icons.play_arrow, size: 24), label: Text('Start', style: AppTextStyles.buttonLarge), style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, foregroundColor: AppColors.onAccent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))))
-            else Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              SizedBox(width: 100, height: 56, child: OutlinedButton.icon(onPressed: _pauseTimer, icon: const Icon(Icons.pause, size: 24), label: const Text('Pause'), style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.accent, width: 2), foregroundColor: AppColors.accent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))),
-              const SizedBox(width: 12),
-              SizedBox(width: 100, height: 56, child: OutlinedButton.icon(onPressed: _resetTimer, icon: const Icon(Icons.refresh, size: 24), label: const Text('Reset'), style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.primaryGray, width: 2), foregroundColor: AppColors.onBackground, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))),
-            ]),
           ],
         ),
       ),
     );
   }
 }
-

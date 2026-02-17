@@ -41,17 +41,6 @@ class _ExerciseCardState extends State<ExerciseCard> {
                     style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                   ),
                 ),
-                if (widget.exercise.hasTimedSets && widget.onTimerTap != null)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 6),
-                    child: GestureDetector(
-                      onTap: widget.onTimerTap,
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Icon(Icons.timer_outlined, size: 16, color: AppColors.accent),
-                      ),
-                    ),
-                  ),
                 if (widget.exercise.notes != null && widget.exercise.notes!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(left: 6),
@@ -154,13 +143,17 @@ class _ExerciseCardState extends State<ExerciseCard> {
     if (set.isTimed) {
       final m = (set.timeSeconds! / 60).floor();
       final s = set.timeSeconds! % 60;
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.timer_outlined, size: 12, color: AppColors.accent),
-          const SizedBox(width: 4),
-          Text(m > 0 ? '$m:${s.toString().padLeft(2, '0')} S' : '$s S', style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12)),
-        ],
+      final timeText = m > 0 ? (s > 0 ? '$m M $s S' : '$m M') : '$s S';
+      return GestureDetector(
+        onTap: widget.onTimerTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.timer_outlined, size: 12, color: AppColors.accent),
+            const SizedBox(width: 4),
+            Text(timeText, style: AppTextStyles.bodySmall.copyWith(color: AppColors.onSurface, fontSize: 12)),
+          ],
+        ),
       );
     }
     if (set.isAMRAP)
