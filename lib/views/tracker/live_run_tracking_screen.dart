@@ -97,8 +97,9 @@ class _LiveRunTrackingScreenState extends State<LiveRunTrackingScreen> {
       completedAt: DateTime.now(),
     );
 
-    // Navigate to post-run summary
-    Get.offNamed(AppRoutes.runDetail, arguments: {'activity': activity});
+    // Navigate to post-run summary (pop this screen then push so home stays in stack)
+    Get.back();
+    Get.toNamed(AppRoutes.runDetail, arguments: {'activity': activity});
   }
 
   void _toggleLock() {

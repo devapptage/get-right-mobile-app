@@ -335,33 +335,56 @@ class _PlannerScreenState extends State<PlannerScreen> {
     // Show options for front or side photo
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Add Progress Photo', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface)),
-            const SizedBox(height: 24),
-            ListTile(
-              leading: const Icon(Icons.camera_front, color: AppColors.accent),
-              title: Text('Front Photo', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              onTap: () {
-                Navigator.pop(context);
-                _capturePhoto('front');
-              },
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [BoxShadow(color: AppColors.blackOverlay, blurRadius: 20, offset: Offset(0, -4))],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.5), borderRadius: BorderRadius.circular(2)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Add Progress Photo',
+                  style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text('Choose front or side photo', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                const SizedBox(height: 24),
+                _buildShareOptionTile(
+                  icon: Icons.camera_front,
+                  title: 'Front Photo',
+                  subtitle: 'Capture from the front',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _capturePhoto('front');
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildShareOptionTile(
+                  icon: Icons.camera_alt,
+                  title: 'Side Photo',
+                  subtitle: 'Capture from the side',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _capturePhoto('side');
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppColors.accent),
-              title: Text('Side Photo', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              onTap: () {
-                Navigator.pop(context);
-                _capturePhoto('side');
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
     );
@@ -382,7 +405,13 @@ class _PlannerScreenState extends State<PlannerScreen> {
           }
         });
 
-        Get.snackbar('Success', '$type photo added successfully', backgroundColor: AppColors.completed, colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'Success',
+          '$type photo added successfully',
+          backgroundColor: AppColors.completed,
+          colorText: AppColors.onError,
+          snackPosition: SnackPosition.BOTTOM,
+        );
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to capture photo: $e', backgroundColor: AppColors.error, colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
@@ -400,67 +429,90 @@ class _PlannerScreenState extends State<PlannerScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              isFuture ? 'Plan for ${_formatDate(_selectedDate)}' : 'Add to ${_formatDate(_selectedDate)}',
-              style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface),
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [BoxShadow(color: AppColors.blackOverlay, blurRadius: 20, offset: Offset(0, -4))],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.5), borderRadius: BorderRadius.circular(2)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  isFuture ? 'Plan for ${_formatDate(_selectedDate)}' : 'Add to ${_formatDate(_selectedDate)}',
+                  style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(isFuture ? 'Schedule an activity' : 'Log something for this day', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                const SizedBox(height: 24),
+                _buildShareOptionTile(
+                  icon: Icons.fitness_center,
+                  title: 'Add Workout',
+                  subtitle: 'Log a gym or home workout',
+                  onTap: () {
+                    Get.back();
+                    Get.to(AddWorkoutScreen());
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildShareOptionTile(
+                  icon: Icons.directions_run,
+                  title: 'Add Run',
+                  subtitle: 'Log a run or outdoor activity',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Get.toNamed(AppRoutes.logRun, arguments: {'selectedDate': _selectedDate});
+                  },
+                ),
+                if (!isFuture) ...[
+                  const SizedBox(height: 12),
+                  _buildShareOptionTile(
+                    icon: Icons.camera_alt,
+                    title: 'Add Progress Photo',
+                    subtitle: 'Front or side progress photo',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _addProgressPhoto();
+                    },
+                  ),
+                ],
+                const SizedBox(height: 12),
+                _buildShareOptionTile(
+                  icon: Icons.note_alt_rounded,
+                  title: 'Add Notes',
+                  subtitle: 'Add notes for this day',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showNotesDialog();
+                  },
+                ),
+                if (isFuture) ...[
+                  const SizedBox(height: 12),
+                  _buildShareOptionTile(
+                    icon: Icons.bedtime_rounded,
+                    title: 'Mark as Rest Day',
+                    subtitle: 'No workout planned',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _markAsRestDay();
+                    },
+                  ),
+                ],
+                const SizedBox(height: 8),
+              ],
             ),
-            const SizedBox(height: 24),
-            ListTile(
-              leading: const Icon(Icons.fitness_center, color: AppColors.accent),
-              title: Text('Add Workout', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
-              onTap: () {
-                Get.back();
-                Get.to(AddWorkoutScreen());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.directions_run, color: AppColors.accent),
-              title: Text('Add Run', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
-              onTap: () {
-                Navigator.pop(context);
-                Get.toNamed(AppRoutes.logRun, arguments: {'selectedDate': _selectedDate});
-              },
-            ),
-            if (!isFuture)
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: AppColors.accent),
-                title: Text('Add Progress Photo', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-                trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
-                onTap: () {
-                  Navigator.pop(context);
-                  _addProgressPhoto();
-                },
-              ),
-            ListTile(
-              leading: const Icon(Icons.note_alt_outlined, color: AppColors.accent),
-              title: Text('Add Notes', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
-              onTap: () {
-                Navigator.pop(context);
-                _showNotesDialog();
-              },
-            ),
-            if (isFuture)
-              ListTile(
-                leading: const Icon(Icons.bedtime, color: const Color(0xFF4A90E2)),
-                title: Text('Mark as Rest Day', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-                trailing: const Icon(Icons.chevron_right, color: AppColors.primaryGray),
-                onTap: () {
-                  Navigator.pop(context);
-                  _markAsRestDay();
-                },
-              ),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
     );
@@ -504,7 +556,14 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 if (_dayData[key] != null) {
                   _dayData[key]!['notes'] = notesController.text;
                 } else {
-                  _dayData[key] = {'workoutStatus': null, 'hasProgressPhoto': false, 'workout': null, 'run': null, 'nutrition': null, 'notes': notesController.text};
+                  _dayData[key] = {
+                    'workoutStatus': null,
+                    'hasProgressPhoto': false,
+                    'workout': null,
+                    'run': null,
+                    'nutrition': null,
+                    'notes': notesController.text,
+                  };
                 }
               });
               Navigator.pop(context);
@@ -520,10 +579,23 @@ class _PlannerScreenState extends State<PlannerScreen> {
   void _markAsRestDay() {
     setState(() {
       final key = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-      _dayData[key] = {'workoutStatus': 'rest', 'hasProgressPhoto': false, 'workout': null, 'run': null, 'nutrition': null, 'notes': _dayData[key]?['notes'] ?? ''};
+      _dayData[key] = {
+        'workoutStatus': 'rest',
+        'hasProgressPhoto': false,
+        'workout': null,
+        'run': null,
+        'nutrition': null,
+        'notes': _dayData[key]?['notes'] ?? '',
+      };
     });
 
-    Get.snackbar('Success', 'Day marked as rest day', backgroundColor: const Color(0xFF4A90E2), colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      'Success',
+      'Day marked as rest day',
+      backgroundColor: const Color(0xFF4A90E2),
+      colorText: AppColors.onError,
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   void _showPhotoHistory() {
@@ -531,7 +603,13 @@ class _PlannerScreenState extends State<PlannerScreen> {
     final photoDates = _dayData.entries.where((entry) => entry.value['hasProgressPhoto'] == true).map((entry) => entry.key).toList();
 
     if (photoDates.isEmpty) {
-      Get.snackbar('No Photos', 'You haven\'t added any progress photos yet', backgroundColor: AppColors.error, colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'No Photos',
+        'You haven\'t added any progress photos yet',
+        backgroundColor: AppColors.error,
+        colorText: AppColors.onError,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
 
@@ -748,53 +826,125 @@ class _PlannerScreenState extends State<PlannerScreen> {
   void _showShareOptions() {
     final data = _getDataForDate(_selectedDate);
     if (data == null || (data['workout'] == null && data['run'] == null)) {
-      Get.snackbar('No Data', 'No workout or run data to share for this date', backgroundColor: AppColors.error, colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'No Data',
+        'No workout or run data to share for this date',
+        backgroundColor: AppColors.error,
+        colorText: AppColors.onError,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Share Options', style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface)),
-            const SizedBox(height: 24),
-            if (data['workout'] != null)
-              ListTile(
-                leading: const Icon(Icons.share, color: AppColors.accent),
-                title: Text('Share Summary', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-                subtitle: Text('Share workout summary to social media', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showSharePreview('summary');
-                },
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [BoxShadow(color: AppColors.blackOverlay, blurRadius: 20, offset: Offset(0, -4))],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.5), borderRadius: BorderRadius.circular(2)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Share Options',
+                  style: AppTextStyles.titleLarge.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text('Choose how you want to share your activity', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryGray)),
+                const SizedBox(height: 24),
+                if (data['workout'] != null) ...[
+                  _buildShareOptionTile(
+                    icon: Icons.article_outlined,
+                    title: 'Share Summary',
+                    subtitle: 'Share workout summary to social media',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSharePreview('summary');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildShareOptionTile(
+                    icon: Icons.download_for_offline_outlined,
+                    title: 'Share Workout Download',
+                    subtitle: 'Share workout details with a friend',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSharePreview('download');
+                    },
+                  ),
+                  if (data['run'] != null) const SizedBox(height: 12),
+                ],
+                if (data['run'] != null)
+                  _buildShareOptionTile(
+                    icon: Icons.directions_run,
+                    title: 'Share Run Summary',
+                    subtitle: 'Share run summary to social media',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSharePreview('run');
+                    },
+                  ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShareOptionTile({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+            boxShadow: [BoxShadow(color: AppColors.blackOverlay.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.12), borderRadius: BorderRadius.circular(14)),
+                child: Icon(icon, color: AppColors.accent, size: 24),
               ),
-            if (data['workout'] != null)
-              ListTile(
-                leading: const Icon(Icons.download, color: AppColors.accent),
-                title: Text('Share Workout Download', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-                subtitle: Text('Share workout details with a friend', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showSharePreview('download');
-                },
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(subtitle, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+                  ],
+                ),
               ),
-            if (data['run'] != null)
-              ListTile(
-                leading: const Icon(Icons.share, color: AppColors.accent),
-                title: Text('Share Run Summary', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
-                subtitle: Text('Share run summary to social media', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showSharePreview('run');
-                },
-              ),
-            const SizedBox(height: 16),
-          ],
+              Icon(Icons.chevron_right, color: AppColors.primaryGray, size: 22),
+            ],
+          ),
         ),
       ),
     );
@@ -811,54 +961,84 @@ class _PlannerScreenState extends State<PlannerScreen> {
         height: MediaQuery.of(context).size.height * 0.8,
         decoration: const BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [BoxShadow(color: AppColors.blackOverlay, blurRadius: 24, offset: Offset(0, -4))],
         ),
         child: Column(
           children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Row(
+            // Handle + Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+              child: Column(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.onPrimary),
-                    onPressed: () => Navigator.pop(context),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.5), borderRadius: BorderRadius.circular(2)),
                   ),
-                  Expanded(
-                    child: Text(
-                      type == 'download' ? 'Workout Download Preview' : 'Share Preview',
-                      style: AppTextStyles.titleMedium.copyWith(color: AppColors.onPrimary),
-                      textAlign: TextAlign.center,
-                    ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.close, color: AppColors.onBackground, size: 20),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      Expanded(
+                        child: Text(
+                          type == 'download' ? 'Workout Download Preview' : 'Share Preview',
+                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 56),
+                    ],
                   ),
-                  const SizedBox(width: 48),
                 ],
               ),
             ),
             // Preview Content
             Expanded(
-              child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: _buildSharePreviewContent(type, data)),
+              child: SingleChildScrollView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 20), child: _buildSharePreviewContent(type, data)),
             ),
             // Share Button
             Container(
-              padding: const EdgeInsets.all(16),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Implement actual sharing functionality
-                  Navigator.pop(context);
-                  Get.snackbar('Shared', 'Content shared successfully', backgroundColor: AppColors.completed, colorText: AppColors.onError, snackPosition: SnackPosition.BOTTOM);
-                },
-                icon: const Icon(Icons.share),
-                label: Text(type == 'download' ? 'Share Workout Download' : 'Share'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: AppColors.onAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                boxShadow: [BoxShadow(color: AppColors.blackOverlay.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, -2))],
+              ),
+              child: SafeArea(
+                top: false,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: Implement actual sharing functionality
+                    Navigator.pop(context);
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!Get.isSnackbarOpen) {
+                        Get.snackbar(
+                          'Shared',
+                          'Content shared successfully',
+                          backgroundColor: AppColors.completed,
+                          colorText: AppColors.onError,
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.share_rounded, size: 22),
+                  label: Text(type == 'download' ? 'Share Workout Download' : 'Share'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: AppColors.onAccent,
+                    elevation: 0,
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                 ),
               ),
             ),
@@ -1166,7 +1346,10 @@ class _PlannerScreenState extends State<PlannerScreen> {
                             });
                           },
                         ),
-                        Text('${_getMonthName(_focusedMonth.month)} ${_focusedMonth.year}', style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface)),
+                        Text(
+                          '${_getMonthName(_focusedMonth.month)} ${_focusedMonth.year}',
+                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface),
+                        ),
                         IconButton(
                           icon: const Icon(Icons.chevron_right, color: AppColors.onSurface),
                           onPressed: () {
@@ -1313,7 +1496,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   Text(
                     '$day',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: isSelected ? AppColors.onAccent : (isToday ? AppColors.onBackground : (dateColor != Colors.transparent ? AppColors.onSurface : AppColors.primaryGray)),
+                      color: isSelected
+                          ? AppColors.onAccent
+                          : (isToday ? AppColors.onBackground : (dateColor != Colors.transparent ? AppColors.onSurface : AppColors.primaryGray)),
                       fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
@@ -1340,7 +1525,11 @@ class _PlannerScreenState extends State<PlannerScreen> {
     final data = _getDataForDate(_selectedDate);
 
     if (data == null ||
-        (data['workout'] == null && data['run'] == null && data['nutrition'] == null && (data['notes'] == null || data['notes'].toString().isEmpty) && !data['hasProgressPhoto'])) {
+        (data['workout'] == null &&
+            data['run'] == null &&
+            data['nutrition'] == null &&
+            (data['notes'] == null || data['notes'].toString().isEmpty) &&
+            !data['hasProgressPhoto'])) {
       return Padding(
         padding: const EdgeInsets.all(40),
         child: Center(
@@ -1433,12 +1622,13 @@ class _PlannerScreenState extends State<PlannerScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: _showAddWorkoutDialog,
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Icons.add_rounded, size: 20),
                   label: const Text('Add'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.accent,
-                    side: const BorderSide(color: AppColors.accent),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    side: BorderSide(color: AppColors.accent.withOpacity(0.8)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
               ),
@@ -1446,9 +1636,15 @@ class _PlannerScreenState extends State<PlannerScreen> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: _showShareOptions,
-                  icon: const Icon(Icons.share),
+                  icon: const Icon(Icons.share_rounded, size: 20),
                   label: const Text('Share'),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent, foregroundColor: AppColors.onAccent, padding: const EdgeInsets.symmetric(vertical: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: AppColors.onAccent,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                 ),
               ),
             ],
@@ -1464,8 +1660,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGray, width: 1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.4)),
+        boxShadow: [BoxShadow(color: AppColors.blackOverlay.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1489,44 +1686,56 @@ class _PlannerScreenState extends State<PlannerScreen> {
           Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _viewPhotoFullScreen(_selectedDate, 'front');
-                  },
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(color: AppColors.primaryGrayLight, borderRadius: BorderRadius.circular(8)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.camera_front, size: 40, color: AppColors.primaryGray),
-                        const SizedBox(height: 8),
-                        Text('Front Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                        const SizedBox(height: 4),
-                        Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 10)),
-                      ],
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _viewPhotoFullScreen(_selectedDate, 'front'),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGrayLight.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_front_rounded, size: 36, color: AppColors.primaryGray),
+                          const SizedBox(height: 8),
+                          Text('Front Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
+                          const SizedBox(height: 2),
+                          Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 11)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _viewPhotoFullScreen(_selectedDate, 'side');
-                  },
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(color: AppColors.primaryGrayLight, borderRadius: BorderRadius.circular(8)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.camera_alt, size: 40, color: AppColors.primaryGray),
-                        const SizedBox(height: 8),
-                        Text('Side Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-                        const SizedBox(height: 4),
-                        Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 10)),
-                      ],
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _viewPhotoFullScreen(_selectedDate, 'side'),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGrayLight.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt_rounded, size: 36, color: AppColors.primaryGray),
+                          const SizedBox(height: 8),
+                          Text('Side Photo', style: AppTextStyles.labelSmall.copyWith(color: AppColors.onSurface)),
+                          const SizedBox(height: 2),
+                          Text('Tap to view', style: AppTextStyles.labelSmall.copyWith(color: AppColors.accent, fontSize: 11)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1544,40 +1753,48 @@ class _PlannerScreenState extends State<PlannerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.accent, width: 1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.accent.withOpacity(0.4)),
+        boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.fitness_center, color: AppColors.accent, size: 24),
-              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.fitness_center, color: AppColors.accent, size: 22),
+              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Workout Summary',
                   style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.share_outlined, color: AppColors.accent, size: 20),
-                onPressed: () => _showShareOptions(),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showShareOptions(),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(Icons.share_rounded, color: AppColors.accent, size: 22),
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          // Duration first, then other stats
           _buildDetailRow(Icons.timer, 'Duration', workout['duration'] ?? 'N/A'),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem(Icons.fitness_center, 'Exercises', workout['exercises'].toString()),
-              _buildStatItem(Icons.repeat, 'Sets', workout['sets'].toString()),
-              _buildStatItem(Icons.local_fire_department, 'Calories', workout['calories'].toString()),
+              Expanded(child: _buildStatItem(Icons.fitness_center, 'Exercises', workout['exercises'].toString())),
+              Expanded(child: _buildStatItem(Icons.repeat, 'Sets', workout['sets'].toString())),
+              Expanded(child: _buildStatItem(Icons.local_fire_department, 'Calories', workout['calories'].toString())),
             ],
           ),
         ],
@@ -1592,12 +1809,17 @@ class _PlannerScreenState extends State<PlannerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGray.withOpacity(0.2), width: 1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+        boxShadow: [BoxShadow(color: AppColors.blackOverlay.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Row(
         children: [
-          const Icon(Icons.local_fire_department, color: AppColors.primaryGray, size: 20),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.local_fire_department, color: AppColors.primaryGray, size: 20),
+          ),
           const SizedBox(width: 12),
           Text('Calories', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
           const Spacer(),
@@ -1618,27 +1840,37 @@ class _PlannerScreenState extends State<PlannerScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.accent, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.accent.withOpacity(0.4)),
+          boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 2))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.directions_run, color: AppColors.accent, size: 24),
-                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                  child: const Icon(Icons.directions_run, color: AppColors.accent, size: 22),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Running Summary',
                     style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.share_outlined, color: AppColors.accent, size: 20),
-                  onPressed: () => _showShareOptions(),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _showShareOptions(),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(Icons.share_rounded, color: AppColors.accent, size: 22),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1686,7 +1918,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
       final averagePace = paceMinutes + (paceSeconds / 60.0);
 
       // Get calories
-      final calories = runData['calories'] is int ? runData['calories'] as int : (runData['calories'] is String ? int.tryParse(runData['calories'].toString()) ?? 0 : 0);
+      final calories = runData['calories'] is int
+          ? runData['calories'] as int
+          : (runData['calories'] is String ? int.tryParse(runData['calories'].toString()) ?? 0 : 0);
 
       // Create RunModel from parsed data
       final runModel = RunModel(
@@ -1714,16 +1948,21 @@ class _PlannerScreenState extends State<PlannerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.upcoming, width: 1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.upcoming.withOpacity(0.4)),
+        boxShadow: [BoxShadow(color: AppColors.upcoming.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.restaurant, color: AppColors.upcoming, size: 24),
-              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: AppColors.upcoming.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.restaurant_rounded, color: AppColors.upcoming, size: 22),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Nutrition',
                 style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
@@ -1749,30 +1988,40 @@ class _PlannerScreenState extends State<PlannerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryGray, width: 1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.4)),
+        boxShadow: [BoxShadow(color: AppColors.blackOverlay.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.note_alt_outlined, color: AppColors.accent, size: 24),
-              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.note_alt_rounded, color: AppColors.accent, size: 22),
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Notes',
                 style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.edit, size: 18, color: AppColors.primaryGray),
-                onPressed: _showNotesDialog,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _showNotesDialog,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(Icons.edit_rounded, size: 20, color: AppColors.primaryGray),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(notes, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.onSurface)),
         ],
       ),
@@ -1780,17 +2029,25 @@ class _PlannerScreenState extends State<PlannerScreen> {
   }
 
   Widget _buildStatItem(IconData icon, String label, String value) {
-    return Column(
-      children: [
-        Icon(icon, color: AppColors.primaryGray, size: 20),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 2),
-        Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.25)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: AppColors.accent, size: 20),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: AppTextStyles.titleSmall.copyWith(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 2),
+          Text(label, style: AppTextStyles.labelSmall.copyWith(color: AppColors.primaryGray)),
+        ],
+      ),
     );
   }
 

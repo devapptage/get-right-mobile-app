@@ -616,7 +616,9 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> with SingleTickerProv
               final run = await _controller.stopTracking();
               Get.back(); // Close dialog
               if (run != null) {
-                Get.offNamed(AppRoutes.runDetail, arguments: run);
+                // Pop this screen then push run-detail so home stays in stack (avoids disposing HomeNavigationController etc.)
+                Get.back();
+                Get.toNamed(AppRoutes.runDetail, arguments: run);
               } else {
                 Get.back(); // Go back to tracker screen
               }

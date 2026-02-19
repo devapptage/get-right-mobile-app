@@ -8,6 +8,7 @@ import 'package:get_right/routes/app_routes.dart';
 import 'package:get_right/services/storage_service.dart';
 import 'package:get_right/theme/color_constants.dart';
 import 'package:get_right/theme/text_styles.dart';
+import 'package:get_right/utils/helpers.dart';
 
 /// Run Summary Screen - Display completed run with map and stats
 class RunSummaryScreen extends StatefulWidget {
@@ -476,15 +477,7 @@ class _RunSummaryScreenState extends State<RunSummaryScreen> {
 
     final success = await storageService.syncRunToJournal(run);
     if (success) {
-      Get.snackbar(
-        'Success',
-        'Run saved to journal!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.completed,
-        colorText: AppColors.white,
-        icon: const Icon(Icons.check_circle, color: AppColors.white),
-      );
-      Get.back();
+      Helpers.showSuccessThen('Run saved to journal!', () => Get.back());
     } else {
       Get.snackbar('Error', 'Failed to save run to journal', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.error, colorText: AppColors.white);
     }

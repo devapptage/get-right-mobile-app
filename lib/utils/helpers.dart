@@ -8,6 +8,50 @@ import 'package:get_right/constants/app_constants.dart';
 class Helpers {
   Helpers._(); // Private constructor
 
+  /// Show a snackbar then run [then] after [delay]. Use this when navigating
+  /// right after a message to avoid GetX "Cannot remove entry from a disposed snackbar".
+  static void showSuccessThen(
+    String message,
+    VoidCallback then, {
+    Duration delay = const Duration(milliseconds: 450),
+  }) {
+    Get.snackbar(
+      'Success',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.completed,
+      colorText: AppColors.white,
+      duration: AppConstants.snackbarDuration,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+    );
+    Future.delayed(delay, then);
+  }
+
+  /// Show snackbar in the next frame to avoid showing during build/dispose (prevents disposed snackbar assertion).
+  static void showSnackbarNextFrame(
+    String title,
+    String message, {
+    Color? backgroundColor,
+    Color? colorText,
+    SnackPosition position = SnackPosition.BOTTOM,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!Get.isSnackbarOpen) {
+        Get.snackbar(
+          title,
+          message,
+          snackPosition: position,
+          backgroundColor: backgroundColor ?? AppColors.completed,
+          colorText: colorText ?? AppColors.white,
+          duration: AppConstants.snackbarDuration,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 12,
+        );
+      }
+    });
+  }
+
   /// Show success snackbar
   static void showSuccess(String message) {
     Get.snackbar(
