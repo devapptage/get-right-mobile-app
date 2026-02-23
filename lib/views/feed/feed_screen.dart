@@ -603,7 +603,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -631,9 +631,11 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          scrolledUnderElevation: 0,
           leading: Obx(() {
             final notificationController = Get.find<NotificationController>();
             final unreadCount = notificationController.unreadCount;
@@ -648,18 +650,18 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                         width: 30,
                         height: 3,
                         margin: const EdgeInsets.only(bottom: 4),
-                        decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)),
                       ),
                       Container(
                         width: 25,
                         height: 3,
                         margin: const EdgeInsets.only(bottom: 4),
-                        decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)),
                       ),
                       Container(
                         width: 20,
                         height: 3,
-                        decoration: BoxDecoration(color: Color(0xFF29603C), borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)),
                       ),
                     ],
                   ),
@@ -688,48 +690,83 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
           title: AnimatedBuilder(
             animation: _tabController,
             builder: (context, child) {
-              String titleText;
-              switch (_tabController.index) {
-                case 0:
-                  titleText = 'For You';
-                  break;
-                case 1:
-                  titleText = 'Following';
-                  break;
-                case 2:
-                  titleText = 'Profile';
-                  break;
-                default:
-                  titleText = 'Community Feed';
-              }
-              return Text(
-                titleText,
-                style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent, fontWeight: FontWeight.w900),
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () => _tabController.animateTo(0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'For You',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            fontSize: 16.sp,
+                            color: _tabController.index == 0 ? AppColors.accent : Colors.white,
+                            fontWeight: _tabController.index == 0 ? FontWeight.w900 : FontWeight.w600,
+                          ),
+                        ),
+                        if (_tabController.index == 0)
+                          Container(
+                            height: 3,
+                            width: 70,
+                            margin: const EdgeInsets.only(top: 2),
+                            decoration: const BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(2)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 20.w),
+                  GestureDetector(
+                    onTap: () => _tabController.animateTo(1),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Following',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            fontSize: 16.sp,
+                            color: _tabController.index == 1 ? AppColors.accent : Colors.white,
+                            fontWeight: _tabController.index == 1 ? FontWeight.w900 : FontWeight.w600,
+                          ),
+                        ),
+                        if (_tabController.index == 1)
+                          Container(
+                            height: 3,
+                            width: 70,
+                            margin: const EdgeInsets.only(top: 2),
+                            decoration: const BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(2)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.search, color: AppColors.accent),
+              icon: const Icon(Icons.search, color: Colors.white),
               onPressed: () {
                 _showSearchScreen();
               },
             ),
           ],
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: AppColors.accent,
-            labelColor: AppColors.accent,
-            unselectedLabelColor: const Color(0xFF404040),
-            tabs: [
-              Tab(icon: Icon(Icons.public)),
-              Tab(icon: Icon(Icons.people)),
-              Tab(icon: Icon(Icons.person)),
-            ],
-          ),
         ),
-        body: TabBarView(controller: _tabController, children: [_buildForYouFeed(), _buildFollowingFeed(), _buildProfilePage()]),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildForYouFeed(),
+            _buildFollowingFeed(),
+          ],
+        ),
       ),
     );
   }
@@ -758,9 +795,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             Text('No posts from followed creators', style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryGray)),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: () {
-                _tabController.animateTo(2);
-              },
+              onPressed: _showSearchScreen,
               child: const Text('Discover Creators'),
             ),
           ],
@@ -854,24 +889,30 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildFullScreenPost(Map<String, dynamic> post) {
+    final topBarHeight = MediaQuery.of(context).padding.top + kToolbarHeight;
     return GestureDetector(
       onTap: () => _showPostDetail(post),
-      child: Stack(
-        fit: StackFit.expand,
+      child: Column(
         children: [
-          // Full screen background image/video
-          Image.network(
-            post['thumbnail'],
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
-              ),
-            ),
-          ),
+          // Black rectangle at top of video - keeps nav text readable, video stays in frame below
+          Container(height: topBarHeight, width: double.infinity, color: Colors.black),
+          Expanded(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Full screen background image/video
+                Image.network(
+                  post['thumbnail'],
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF9333EA), const Color(0xFFFBBF24)]),
+                    ),
+                  ),
+                ),
 
-          // Gradient overlay for better text visibility
-          Container(
+                // Gradient overlay for better text visibility
+                Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -1077,6 +1118,9 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
               ],
             ),
           ),
+        ],
+              ),
+            ),
         ],
       ),
     );

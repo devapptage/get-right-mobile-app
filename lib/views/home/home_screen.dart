@@ -93,13 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
       {'icon': Icons.person_outlined, 'activeIcon': Icons.person_rounded, 'label': 'Profile'},
     ];
 
+    final isFeedTab = _navController.currentIndex == 1;
+    final barColor = isFeedTab ? Colors.black : AppColors.background;
     return ClipRRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.background,
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 24, offset: const Offset(0, -8))],
+            color: barColor,
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(isFeedTab ? 0.2 : 0.08), blurRadius: 24, offset: const Offset(0, -8))],
           ),
           child: SafeArea(
             top: false,
@@ -117,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     index: index,
                     isSelected: _navController.currentIndex == index,
                     isCenter: isCenter,
+                    isDarkBar: isFeedTab,
                   );
                 }),
               ),
@@ -221,10 +224,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Modern navigation item
-  Widget _buildNavItem({required IconData icon, required IconData activeIcon, required String label, required int index, required bool isSelected, bool isCenter = false}) {
+  Widget _buildNavItem({
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required int index,
+    required bool isSelected,
+    bool isCenter = false,
+    bool isDarkBar = false,
+  }) {
     const greenAccent = Color(0xFF29603C);
     const blackPrimary = Color(0xFF000000);
     const textSecondary = Color(0xFF404040);
+    final unselectedColor = isDarkBar ? Colors.white : textSecondary;
 
     // Check if this is the nutrition tab (index 4) and user doesn't have subscription
     final isNutritionTab = index == 3;
@@ -278,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? Colors.white
                               : isSelected
                               ? greenAccent
-                              : textSecondary,
+                              : unselectedColor,
                           size: isCenter ? 24 : 20,
                         ),
                       ),
@@ -311,7 +323,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isLocked ? AppColors.accent : (isSelected ? blackPrimary : textSecondary),
+                    color: isLocked
+                        ? AppColors.accent
+                        : (isSelected ? (isDarkBar ? greenAccent : blackPrimary) : unselectedColor),
                     letterSpacing: 0.2,
                     height: 1.0,
                   ),
