@@ -19,7 +19,82 @@ class PlannerScreen extends StatefulWidget {
 class _PlannerScreenState extends State<PlannerScreen> {
   DateTime _selectedDate = DateTime.now();
   DateTime _focusedMonth = DateTime.now();
+  bool _showDayDetail = false;
   final ImagePicker _imagePicker = ImagePicker();
+  late final ScrollController _scrollController;
+
+  static const int _startYear = 2024;
+  static const int _totalYears = 6;
+  static const int _totalMonths = _totalYears * 12;
+  static const double _monthTitleHeight = 55.0;   // ~125% of 44
+  static const double _monthTitleBottomPadding = 5.0;
+  static const double _calendarRowHeight = 50.0; // ~125% of 40
+
+  List<double>? _monthHeights;
+  List<double>? _cumulativeOffsets;
+
+  double _heightForMonth(DateTime month) {
+    final first = DateTime(month.year, month.month, 1);
+    final last = DateTime(month.year, month.month + 1, 0);
+    final firstWeekday = first.weekday % 7;
+    final daysInMonth = last.day;
+    final rows = ((firstWeekday + daysInMonth) / 7).ceil();
+    return _monthTitleHeight + _monthTitleBottomPadding + rows * _calendarRowHeight;
+  }
+
+  List<double> get _offsets {
+    _cumulativeOffsets ??= () {
+      final list = <double>[];
+      double sum = 0;
+      for (var i = 0; i < _totalMonths; i++) {
+        list.add(sum);
+        final month = DateTime(_startYear + (i ~/ 12), (i % 12) + 1, 1);
+        sum += _heightForMonth(month);
+      }
+      list.add(sum);
+      return list;
+    }();
+    return _cumulativeOffsets!;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    final currentIndex = (now.year - _startYear) * 12 + (now.month - 1).clamp(0, _totalMonths - 1);
+    final initialOffset = currentIndex < _offsets.length - 1 ? _offsets[currentIndex] : 0.0;
+    _scrollController = ScrollController(initialScrollOffset: initialOffset);
+    _scrollController.addListener(_onCalendarScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onCalendarScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onCalendarScroll() {
+    if (!_scrollController.hasClients) return;
+    final offset = _scrollController.offset;
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final centerOffset = offset + viewportHeight * 0.35;
+    final list = _offsets;
+    var index = 0;
+    for (var i = 0; i < list.length - 1; i++) {
+      if (centerOffset >= list[i] && centerOffset < list[i + 1]) {
+        index = i;
+        break;
+      }
+      if (centerOffset < list[i]) break;
+      index = i;
+    }
+    index = index.clamp(0, _totalMonths - 1);
+    final newMonth = DateTime(_startYear + (index ~/ 12), (index % 12) + 1, 1);
+    if (newMonth.year != _focusedMonth.year || newMonth.month != _focusedMonth.month) {
+      setState(() => _focusedMonth = newMonth);
+    }
+  }
 
   // Mock workout data for calendar (status: completed, incomplete, rest)
   final Map<DateTime, Map<String, dynamic>> _dayData = {
@@ -1258,178 +1333,270 @@ class _PlannerScreenState extends State<PlannerScreen> {
     );
   }
 
+  static const Color _iosRed = Color(0xFFFF3B30);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.arrow_back_ios_new, color: AppColors.accent, size: 18),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leadingWidth: 56,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Material(
+            color: const Color(0xFFE5E5EA),
+            borderRadius: BorderRadius.circular(10),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () {
+                if (_showDayDetail) {
+                  setState(() => _showDayDetail = false);
+                } else {
+                  Get.back();
+                }
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Icon(Icons.chevron_left, size: 24, color: Color(0xFF0A84FF)),
+              ),
+            ),
           ),
-          onPressed: () => Get.back(),
         ),
-        title: Text('Calendar', style: AppTextStyles.titleLarge.copyWith(color: AppColors.accent)),
-        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.photo_library_outlined, color: AppColors.green),
-            onPressed: () {
-              _addProgressPhoto();
-            },
+            icon: const Icon(Icons.view_agenda_outlined, size: 22, color: Colors.black87),
+            onPressed: _showPhotoHistory,
           ),
+          IconButton(
+            icon: const Icon(Icons.search, size: 22, color: Colors.black87),
+            onPressed: () {},
+          ),
+          const SizedBox(width: 4),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
+      body: _showDayDetail ? _buildDayDetailScreenBody() : _buildCalendarBody(),
+    );
+  }
 
-            // Photo History Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: OutlinedButton.icon(
-                onPressed: _showPhotoHistory,
-                icon: const Icon(Icons.photo_library, size: 20),
-                label: const Text('View Photo History'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.accent,
-                  side: const BorderSide(color: AppColors.accent),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  minimumSize: const Size(double.infinity, 44),
-                ),
+  Widget _buildCalendarBody() {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          // Sticky month name (updates as user scrolls)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              _getMonthName(_focusedMonth.month),
+              style: const TextStyle(
+                fontSize: 43,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Calendar Legend
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildLegendItem(const Color(0xFF29603C), 'Incomplete'),
-                  const SizedBox(width: 12),
-                  _buildLegendItem(const Color(0xFF90EE90), 'Completed'),
-                  const SizedBox(width: 12),
-                  _buildLegendItem(const Color(0xFF4A90E2), 'Rest Day'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Calendar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primaryGray, width: 1),
-              ),
-              child: Column(
-                children: [
-                  // Month navigation
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_left, color: AppColors.onSurface),
-                          onPressed: () {
-                            setState(() {
-                              _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1);
-                            });
-                          },
+          ),
+          const SizedBox(height: 16),
+          // Weekday headers (once)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                  .map(
+                    (day) => SizedBox(
+                      width: 40,
+                      child: Center(
+                        child: Text(
+                          day,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black45,
+                          ),
                         ),
-                        Text(
-                          '${_getMonthName(_focusedMonth.month)} ${_focusedMonth.year}',
-                          style: AppTextStyles.titleMedium.copyWith(color: AppColors.onSurface),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right, color: AppColors.onSurface),
-                          onPressed: () {
-                            setState(() {
-                              _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1);
-                            });
-                          },
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                  )
+                  .toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Continuous scroll of all months (variable height per month, no gap)
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: _totalMonths,
+              itemBuilder: (context, index) {
+                final month = DateTime(_startYear + (index ~/ 12), (index % 12) + 1, 1);
+                final height = _heightForMonth(month);
+                return SizedBox(
+                  height: height,
+                  child: _buildMonthBlock(month),
+                );
+              },
+            ),
+          ),
+        ],
+    );
+  }
 
-                  // Weekday headers
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-                          .map(
-                            (day) => SizedBox(
-                              width: 40,
-                              child: Center(
-                                child: Text(day, style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryGray)),
-                              ),
+  static const double _dayDetailCardWidth = 300.0;
+
+  Widget _buildDayDetailScreenBody() {
+    final data = _getDataForDate(_selectedDate);
+    final weekStart = _selectedDate.subtract(Duration(days: _selectedDate.weekday % 7));
+    final weekdayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Week-at-a-glance strip
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(7, (i) {
+                  return SizedBox(
+                    width: 36,
+                    child: Center(
+                      child: Text(
+                        weekdayLetters[i],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black45,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(7, (i) {
+                  final dayDate = weekStart.add(Duration(days: i));
+                  final isSelected = dayDate.year == _selectedDate.year &&
+                      dayDate.month == _selectedDate.month &&
+                      dayDate.day == _selectedDate.day;
+                  final isToday = dayDate.year == DateTime.now().year &&
+                      dayDate.month == DateTime.now().month &&
+                      dayDate.day == DateTime.now().day;
+                  return SizedBox(
+                    width: 36,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => setState(() => _selectedDate = dayDate),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.black : Colors.transparent,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '${dayDate.day}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : (isToday ? _iosRed : Colors.black87),
                             ),
-                          )
-                          .toList(),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Calendar grid
-                  _buildCalendarGrid(),
-                  const SizedBox(height: 16),
-
-                  // Pagination dots below calendar
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), shape: BoxShape.circle),
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(color: AppColors.primaryGray.withOpacity(0.3), shape: BoxShape.circle),
-                        ),
-                      ],
-                    ),
-                  ).paddingOnly(bottom: 16),
-                ],
+                  );
+                }),
               ),
-            ),
-            const SizedBox(height: 24),
-
-            // Selected date header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                _formatDate(_selectedDate),
-                style: AppTextStyles.titleMedium.copyWith(color: AppColors.onBackground, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Day detail view
-            _buildDayDetailView(),
-            const SizedBox(height: 80),
-          ],
+            ],
+          ),
         ),
+        const Divider(height: 1),
+        // Date header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Text(
+            DateFormat('EEEE - MMM d, y').format(_selectedDate),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        // Horizontal scroll of summary cards
+        Expanded(
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              SizedBox(
+                width: _dayDetailCardWidth,
+                child: data != null && data['workout'] != null
+                    ? _buildWorkoutSummarySection(data['workout'] as Map<String, dynamic>)
+                    : _buildDayDetailPlaceholder('Workout', Icons.fitness_center),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: _dayDetailCardWidth,
+                child: data != null && data['run'] != null
+                    ? _buildRunSummarySection(data['run'] as Map<String, dynamic>)
+                    : _buildDayDetailPlaceholder('Run', Icons.directions_run),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: _dayDetailCardWidth,
+                child: data != null && data['nutrition'] != null
+                    ? _buildNutritionSummarySection(data['nutrition'] as Map<String, dynamic>)
+                    : _buildDayDetailPlaceholder('Nutrition', Icons.restaurant_rounded),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: _dayDetailCardWidth,
+                child: data != null && data['notes'] != null && data['notes'].toString().isNotEmpty
+                    ? _buildNotesSection(data['notes'] as String)
+                    : _buildDayDetailPlaceholder('Notes', Icons.note_alt_rounded),
+              ),
+              const SizedBox(width: 16),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDayDetailPlaceholder(String title, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryGray.withOpacity(0.3)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 40, color: AppColors.primaryGray.withOpacity(0.6)),
+          const SizedBox(height: 12),
+          Text(
+            'No $title',
+            style: AppTextStyles.titleSmall.copyWith(
+              color: AppColors.primaryGray,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1448,76 +1615,153 @@ class _PlannerScreenState extends State<PlannerScreen> {
     );
   }
 
-  Widget _buildCalendarGrid() {
-    final firstDayOfMonth = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
-    final lastDayOfMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0);
+  static String _getMonthAbbrev(int month) {
+    const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return names[month - 1];
+  }
+
+  Widget _buildMonthBlock(DateTime month) {
+    final firstDay = DateTime(month.year, month.month, 1);
+    final firstWeekday = firstDay.weekday % 7; // 0 = Sun, 6 = Sat
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Abbreviated month, small; aligned with first day column (iOS style)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final contentWidth = constraints.maxWidth;
+              final cellWidth = contentWidth / 7;
+              final leftPadding = firstWeekday * cellWidth;
+              return Padding(
+                padding: EdgeInsets.only(left: leftPadding, bottom: _monthTitleBottomPadding),
+                child: Text(
+                  _getMonthAbbrev(month.month),
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              );
+            },
+          ),
+          Expanded(
+            child: _buildCalendarGridForMonth(month),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarGridForMonth(DateTime month) {
+    final firstDayOfMonth = DateTime(month.year, month.month, 1);
+    final lastDayOfMonth = DateTime(month.year, month.month + 1, 0);
     final firstWeekday = firstDayOfMonth.weekday % 7;
     final daysInMonth = lastDayOfMonth.day;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, childAspectRatio: 1),
-        itemCount: firstWeekday + daysInMonth,
-        itemBuilder: (context, index) {
-          if (index < firstWeekday) return const SizedBox();
-
-          final day = index - firstWeekday + 1;
-          final date = DateTime(_focusedMonth.year, _focusedMonth.month, day);
-          final isSelected = _selectedDate.year == date.year && _selectedDate.month == date.month && _selectedDate.day == date.day;
-          final isToday = DateTime.now().year == date.year && DateTime.now().month == date.month && DateTime.now().day == date.day;
-          final dateColor = _getDateColor(date);
-          final hasPhoto = _hasProgressPhoto(date);
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedDate = date;
-              });
-            },
-            onLongPress: () {
-              setState(() {
-                _selectedDate = date;
-              });
-              _showAddWorkoutDialog();
-            },
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.accent : (dateColor != Colors.transparent ? dateColor : Colors.transparent),
-                borderRadius: BorderRadius.circular(8),
-                border: isToday && !isSelected ? Border.all(color: AppColors.accent, width: 2) : null,
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    '$day',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: isSelected
-                          ? AppColors.onAccent
-                          : (isToday ? AppColors.onBackground : (dateColor != Colors.transparent ? AppColors.onSurface : AppColors.primaryGray)),
-                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                  if (hasPhoto)
-                    Positioned(
-                      top: 2,
-                      right: 2,
-                      child: Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7,
+        mainAxisExtent: _calendarRowHeight,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 0,
       ),
+      itemCount: firstWeekday + daysInMonth,
+      itemBuilder: (context, index) {
+        if (index < firstWeekday) {
+          return const SizedBox();
+        }
+        final day = index - firstWeekday + 1;
+        final date = DateTime(month.year, month.month, day);
+        final isSelected = _selectedDate.year == date.year &&
+            _selectedDate.month == date.month &&
+            _selectedDate.day == date.day;
+        final isToday = DateTime.now().year == date.year &&
+            DateTime.now().month == date.month &&
+            DateTime.now().day == date.day;
+        final dateColor = _getDateColor(date);
+        final hasPhoto = _hasProgressPhoto(date);
+
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedDate = date;
+              _showDayDetail = true;
+            });
+          },
+          onLongPress: () {
+            setState(() {
+              _selectedDate = date;
+            });
+            _showAddWorkoutDialog();
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 45,
+                height: 45,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isToday
+                      ? _iosRed
+                      : (isSelected ? const Color(0xFFE5E5EA) : Colors.transparent),
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '$day',
+                  style: TextStyle(
+                    fontSize: 21,
+                    fontWeight: isToday || isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isToday
+                        ? Colors.white
+                        : (isSelected
+                            ? Colors.black
+                            : (dateColor != Colors.transparent
+                                ? Colors.black87
+                                : Colors.black45)),
+                  ),
+                ),
+              ),
+              if (hasPhoto || dateColor != Colors.transparent) ...[
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (dateColor != Colors.transparent)
+                      Container(
+                        width: 4,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: dateColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    if (hasPhoto) ...[
+                      if (dateColor != Colors.transparent) const SizedBox(width: 2),
+                      Container(
+                        width: 4,
+                        height: 4,
+                        decoration: const BoxDecoration(
+                          color: AppColors.accent,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -1531,31 +1775,41 @@ class _PlannerScreenState extends State<PlannerScreen> {
             (data['notes'] == null || data['notes'].toString().isEmpty) &&
             !data['hasProgressPhoto'])) {
       return Padding(
-        padding: const EdgeInsets.all(40),
-        child: Center(
-          child: Column(
-            children: [
-              Icon(Icons.calendar_month_outlined, size: 60, color: AppColors.green),
-              const SizedBox(height: 16),
-              Text('No data for this day', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.green)),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Data'),
-                  onPressed: _showAddWorkoutDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
-                    foregroundColor: AppColors.onAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    textStyle: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          children: [
+            const Text(
+              'No events',
+              style: TextStyle(fontSize: 17, color: Colors.black54),
+            ),
+            const SizedBox(height: 20),
+            Material(
+              color: const Color(0xFFE5E5EA),
+              borderRadius: BorderRadius.circular(10),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: _showAddWorkoutDialog,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add, size: 22, color: Colors.black87),
+                      SizedBox(width: 8),
+                      Text(
+                        'Add',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
